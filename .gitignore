@@ -42,4 +42,5 @@ buildNumber.properties
 .classpath
 
 .idea/
+.idea/*
 *.iml
