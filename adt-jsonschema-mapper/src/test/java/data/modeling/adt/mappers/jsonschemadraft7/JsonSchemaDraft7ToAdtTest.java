@@ -2,8 +2,15 @@ package data.modeling.adt.mappers.jsonschemadraft7;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import data.modeling.adt.SchemaContext;
+import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.GenericAnnotation;
 import data.modeling.adt.abstraction.exceptions.AdtException;
 import data.modeling.adt.abstraction.typedefs.*;
+import data.modeling.adt.annotations.golden.DataCompliance;
+import data.modeling.adt.annotations.golden.DataHandlingClassification;
+import data.modeling.adt.annotations.golden.IsPersonalData;
+import data.modeling.adt.enums.DataCompliances;
+import data.modeling.adt.enums.DataHandlingClassifications;
 import data.modeling.adt.mappers.jsonschemadraft7.fixtures.JsonSchemaAllOfTestFixture;
 import data.modeling.adt.mappers.jsonschemadraft7.fixtures.JsonSchemaSanityTestFixture;
 import data.modeling.adt.util.AnyTypeComparator;
@@ -78,6 +85,21 @@ public class JsonSchemaDraft7ToAdtTest {
         productType.resolveAllFields(schemaContext).stream()
                 .forEach(fieldType -> System.out.println(fieldType.getIndex() + " : " + fieldType.getName() + " : "+fieldType.getType().toString()));
 
+        namedType.accept(anno -> {
+            if(anno instanceof GenericAnnotation){
+                GenericAnnotation genericAnnotation = (GenericAnnotation)anno;
+                String name = genericAnnotation.getName();
+                Object value = genericAnnotation.getValue();
+                if(name.equals("x-data-compliances")){
+                    return (Annotation)new DataCompliance(DataCompliances.fromBitwise((int)value));
+                } else if(name.equals("x-data-handling-classification")){
+                    return (Annotation)new DataHandlingClassification(DataHandlingClassifications.fromString((String)value));
+                } else if(name.equals("x-data-is-personal-data")){
+                    return (Annotation)IsPersonalData.of((boolean)value);
+                }
+            }
+            return null;
+        });
         AnyTypeComparator.compare(expectedNamedType, namedType).forEach(System.out::println);
         assertEquals(0, AnyTypeComparator.compare(expectedNamedType, namedType).size());
         assertEquals(expectedNamedType, namedType);

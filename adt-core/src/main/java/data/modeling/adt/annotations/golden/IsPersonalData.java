@@ -2,10 +2,10 @@ package data.modeling.adt.annotations.golden;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 
-public final class IsPersonalData extends Annotation {
+public final class IsPersonalData extends Annotation<Boolean> {
 
 
-    private IsPersonalData(boolean value) {
+    public IsPersonalData(boolean value) {
         super(value);
     }
 

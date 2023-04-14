@@ -18,9 +18,12 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
 
     protected Map<String, Object> jsonSchemaMap;
 
-    protected SchemaContext schemaContext = new SchemaContext();
-
+    protected SchemaContext schemaContext;
     public JsonSchemaDraft7ToAdt(String jsonSchemaString) throws JsonProcessingException {
+        this(jsonSchemaString, new SchemaContext());
+    }
+    public JsonSchemaDraft7ToAdt(String jsonSchemaString, SchemaContext schemaContext) throws JsonProcessingException {
+        this.schemaContext = schemaContext;
 
         ObjectMapper objectMapper = new ObjectMapper();
         this.jsonSchemaMap = objectMapper.readValue(jsonSchemaString, Map.class);

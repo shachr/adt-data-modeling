@@ -11,5 +11,7 @@ public abstract class Annotation<T> {
         return value;
     }
 
-//    public abstract <R> R accept(AnnotationVisitor<R> visitor);
+    public <R> R accept(AnnotationVisitor<R> visitor){
+        return visitor.visit(this);
+    }
 }

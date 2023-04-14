@@ -7,6 +7,9 @@ public class JsonSchemaAllOfTestFixture {
             "  \"title\": \"My Schema\",\n" +
             "  \"description\": \"This is a sample schema that defines a data structure.\",\n" +
             "  \"type\": \"object\",\n" +
+            "      \"x-data-handling-classification\": \"PUBLIC\",\n" +
+            "      \"x-data-compliances\": 1,\n" +
+            "      \"x-data-is-personal-data\": true,\n" +
             "  \"allOf\": [\n" +
             "    {\n" +
             "      \"$ref\": \"#/definitions/MyDefinition\"\n" +
@@ -40,9 +43,6 @@ public class JsonSchemaAllOfTestFixture {
             "  \"definitions\": {\n" +
             "    \"MyDefinition\": {\n" +
             "      \"type\": \"object\",\n" +
-            "      \"x-data-handling-classification\": \"PUBLIC\",\n" +
-            "      \"x-data-compliances\": 1,\n" +
-            "      \"x-data-is-personal-data\": true,\n" +
             "      \"properties\": {\n" +
             "        \"id\": {\n" +
             "          \"type\": \"string\"\n" +

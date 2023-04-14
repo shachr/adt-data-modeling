@@ -1,10 +1,12 @@
 package data.modeling.adt.abstraction.typedefs;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.AnnotationVisitor;
 import data.modeling.adt.util.NamedTypeBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NamedType implements AnyType {
     private final String name;
@@ -54,5 +56,14 @@ public class NamedType implements AnyType {
         if (o == null || getClass() != o.getClass()) return false;
         NamedType namedType = (NamedType) o;
         return name.equals(namedType.name) && type.equals(namedType.type) && annotations.equals(namedType.annotations);
+    }
+
+    public <R> void accept(AnnotationVisitor<Annotation<R>> visitor){
+        annotations.stream().collect(Collectors.toSet()).forEach(annotation -> {
+            Annotation<R> newAnno = visitor.visit(annotation);
+            if(null != newAnno){
+                annotations.add(newAnno);
+            }
+        });
     }
 }
