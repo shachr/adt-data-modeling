@@ -7,6 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ *
+ */
 public class SchemaContext {
     private final Map<String, NamedType> namedTypes;
     private final Map<String, Set<Annotation>> annotations;
