@@ -12,6 +12,7 @@ public class FieldTypeBuilder {
     private AnyType type;
 
     private Set<Annotation> annotations = new LinkedHashSet<>();
+    private boolean isRequired = false;
 
     public FieldTypeBuilder(String name, AnyType type) {
         this.name = name;
@@ -23,8 +24,14 @@ public class FieldTypeBuilder {
         return this;
     }
 
+    public FieldTypeBuilder withIsRequired(boolean required) {
+        isRequired = required;
+        return this;
+    }
+
     public FieldType build() {
         FieldType fieldType = new FieldType(name, type, annotations);
+        fieldType.setRequired(this.isRequired);
         return fieldType;
     }
 }

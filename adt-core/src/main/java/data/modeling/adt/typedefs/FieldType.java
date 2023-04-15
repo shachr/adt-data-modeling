@@ -10,7 +10,7 @@ public class FieldType implements AnyType {
     private final String name;
     private AnyType type;
     private int index;
-    private boolean isRequired=false;
+    private Boolean isRequired=false;
     private final Set<Annotation> annotations;
 
     public FieldType(String name, AnyType type) {
@@ -55,7 +55,10 @@ public class FieldType implements AnyType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FieldType fieldType = (FieldType) o;
-        return index == fieldType.index && name.equals(fieldType.name) && type.equals(fieldType.type) && annotations.equals(fieldType.annotations);
+        return index == fieldType.index && name.equals(fieldType.name)
+                && type.equals(fieldType.type)
+                && annotations.equals(fieldType.annotations)
+                && isRequired.equals(fieldType.isRequired);
     }
 
     public int getIndex() {
@@ -66,7 +69,7 @@ public class FieldType implements AnyType {
         this.index = index;
     }
 
-    public boolean isRequired() {
+    public Boolean isRequired() {
         return isRequired;
     }
 

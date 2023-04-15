@@ -36,13 +36,16 @@ public class JsonSchemaDraft7ToAdtTest {
         NamedType expectedNamedType = NamedType.builder(schemaNamespace, ProductType.of(
                 FieldType.builder("productId", new IntType())
                         .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))
+                        .withIsRequired(true)
                         .build(),
                 FieldType.builder("productName", new StringType())
                         .withAnnotations(new JsonSchemaAnnotation("description", "Name of the product"))
+                        .withIsRequired(true)
                         .build(),
                 FieldType.builder("price", new DoubleType())
                         .withAnnotations(new JsonSchemaAnnotation("description", "The price of the product"),
                                 new JsonSchemaAnnotation("exclusiveMinimum", 0))
+                        .withIsRequired(true)
                         .build(),
                 FieldType.builder("tags", new SetType(new StringType()))
                         .withAnnotations(
@@ -51,9 +54,9 @@ public class JsonSchemaDraft7ToAdtTest {
                         )
                         .build(),
                 FieldType.builder("dimensions", ProductType.of(
-                        FieldType.builder("length", new DoubleType()).build(),
-                        FieldType.builder("width", new DoubleType()).build(),
-                        FieldType.builder("height", new DoubleType()).build()
+                        FieldType.builder("length", new DoubleType()).withIsRequired(true).build(),
+                        FieldType.builder("width", new DoubleType()).withIsRequired(true).build(),
+                        FieldType.builder("height", new DoubleType()).withIsRequired(true).build()
                 ))
                         .withAnnotations(new JsonSchemaAnnotation("description", "Product dimensions"))
                         .build(),

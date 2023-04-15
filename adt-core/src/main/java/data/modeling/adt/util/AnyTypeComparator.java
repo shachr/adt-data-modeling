@@ -162,6 +162,10 @@ public class AnyTypeComparator {
             if (!fieldType1.getName().equals(fieldType2.getName())) {
                 diffs.add(new Difference("field name mismatch", context.getJsonPointer(), fieldType1.getName(), fieldType2.getName()));
             }
+
+            if (!fieldType1.isRequired().equals(fieldType2.isRequired())) {
+                diffs.add(new Difference("field isRequired mismatch", context.getJsonPointer(), fieldType1.isRequired(), fieldType2.isRequired()));
+            }
             compareAnnotations(context, fieldType1.getAnnotations(), fieldType2.getAnnotations());
             // todo: traverse
             diffs.addAll(new AnyTypeComparator(context, fieldType1.getType(), fieldType2.getType()).findDiff());
