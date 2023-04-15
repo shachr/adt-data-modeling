@@ -1,29 +1,30 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.abstraction.typedefs.AnyType;
-import data.modeling.adt.abstraction.typedefs.FieldType;
+import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.typedefs.AnyType;
+import data.modeling.adt.typedefs.FieldType;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FieldTypeBuilder {
     private String name;
     private AnyType type;
 
-    private Set annotations = new HashSet<>();
+    private Set<Annotation> annotations = new LinkedHashSet<>();
 
     public FieldTypeBuilder(String name, AnyType type) {
         this.name = name;
         this.type = type;
     }
 
-    public FieldTypeBuilder withAnnotations(){
+    public FieldTypeBuilder withAnnotations(Annotation... annotations){
+        this.annotations.addAll(Arrays.stream(annotations).collect(Collectors.toCollection(LinkedHashSet::new)));
         return this;
     }
 
-    public FieldType build(int index) {
+    public FieldType build() {
         FieldType fieldType = new FieldType(name, type, annotations);
-        fieldType.setIndex(index);
         return fieldType;
     }
 }

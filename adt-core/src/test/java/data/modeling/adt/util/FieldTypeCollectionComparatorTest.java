@@ -1,9 +1,9 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.abstraction.typedefs.FieldType;
-import data.modeling.adt.abstraction.typedefs.IntType;
-import data.modeling.adt.abstraction.typedefs.ProductType;
-import data.modeling.adt.abstraction.typedefs.StringType;
+import data.modeling.adt.typedefs.FieldType;
+import data.modeling.adt.typedefs.IntType;
+import data.modeling.adt.typedefs.ProductType;
+import data.modeling.adt.typedefs.StringType;
 import data.modeling.adt.util.AnyTypeComparator.Difference;
 import org.junit.Test;
 

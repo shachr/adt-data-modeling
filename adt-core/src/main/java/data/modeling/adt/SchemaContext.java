@@ -1,7 +1,7 @@
 package data.modeling.adt;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
-import data.modeling.adt.abstraction.typedefs.NamedType;
+import data.modeling.adt.typedefs.NamedType;
 
 import java.util.*;
 import java.util.stream.Collectors;

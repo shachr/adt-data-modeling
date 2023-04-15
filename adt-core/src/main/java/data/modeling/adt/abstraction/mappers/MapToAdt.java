@@ -1,7 +1,7 @@
 package data.modeling.adt.abstraction.mappers;
 
-import data.modeling.adt.abstraction.exceptions.AdtException;
-import data.modeling.adt.abstraction.typedefs.AnyType;
+import data.modeling.adt.exceptions.AdtException;
+import data.modeling.adt.typedefs.AnyType;
 
 public interface MapToAdt<T, R extends AnyType> {
     boolean canMap(T value);

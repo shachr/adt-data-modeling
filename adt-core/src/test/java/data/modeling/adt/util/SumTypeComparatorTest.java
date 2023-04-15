@@ -1,6 +1,6 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.abstraction.typedefs.*;
+import data.modeling.adt.typedefs.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -1,11 +1,10 @@
 package data.modeling.adt.util;
 
-import com.google.common.collect.Streams;
-import data.modeling.adt.abstraction.typedefs.*;
+import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.typedefs.*;
 
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AnyTypeComparator {
     List<Difference> diffs = new ArrayList<>();
@@ -98,6 +97,7 @@ public class AnyTypeComparator {
         if(!obj1.getName().equals(obj2.getName())){
             diffs.add(new Difference("name is different", jsonPathTraversingContext.getJsonPointer(), obj1.getName(), obj2.getName()));
         } else {
+            compareAnnotations(jsonPathTraversingContext, obj1.getAnnotations(), obj2.getAnnotations());
             AnyTypeComparator anyTypeComparator = new AnyTypeComparator(jsonPathTraversingContext, obj1.getType(), obj2.getType());
             diffs.addAll(anyTypeComparator.findDiff());
         }
@@ -162,10 +162,48 @@ public class AnyTypeComparator {
             if (!fieldType1.getName().equals(fieldType2.getName())) {
                 diffs.add(new Difference("field name mismatch", context.getJsonPointer(), fieldType1.getName(), fieldType2.getName()));
             }
+            compareAnnotations(context, fieldType1.getAnnotations(), fieldType2.getAnnotations());
             // todo: traverse
             diffs.addAll(new AnyTypeComparator(context, fieldType1.getType(), fieldType2.getType()).findDiff());
         });
     }
+
+    private void compareAnnotations(JsonPathTraversingContext jsonPathTraversingContext, Set<Annotation> annotations1, Set<Annotation> annotations2) {
+        int index=-1;
+        Iterator<? extends Annotation> iterator1 = annotations1.iterator();
+        Iterator<? extends Annotation> iterator2 = annotations2.iterator();
+
+        while(iterator1.hasNext()) {
+            index++;
+            Annotation item1 = iterator1.next();
+            if (!iterator2.hasNext()) {
+                diffs.add(new Difference(
+                        "annotation not found: " + item1.getName(),
+                        jsonPathTraversingContext.getJsonPointer(),
+                        item1,
+                        null));
+            } else {
+                Annotation item2 = iterator2.next();
+                if(!item2.equals(item1)){
+                    diffs.add(new Difference(
+                            "annotation value mismatch: " + item2.getValue(),
+                            jsonPathTraversingContext.getJsonPointer(),
+                            item1.getName(),
+                            item2.getName()));
+                }
+            }
+        }
+
+        while(iterator2.hasNext()){
+            Annotation item2 = iterator2.next();
+            diffs.add(new Difference(
+                    "unexpected annotation: " + item2.getClass().getSimpleName(),
+                    jsonPathTraversingContext.getJsonPointer(),
+                    null,
+                    item2.getName()));
+        }
+    }
+
     private void compareCollections(Collection<? extends AnyType> coll1, Collection<? extends AnyType> coll2) {
         int index=-1;
         Iterator<? extends AnyType> iterator1 = coll1.iterator();

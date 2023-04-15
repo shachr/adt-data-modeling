@@ -1,8 +1,7 @@
 package data.modeling.adt.abstraction.monads;
 
-import data.modeling.adt.abstraction.exceptions.AdtException;
-import data.modeling.adt.abstraction.typedefs.NamedType;
-import data.modeling.adt.abstraction.typedefs.ProductType;
+import data.modeling.adt.exceptions.AdtException;
+import data.modeling.adt.typedefs.NamedType;
 
 import java.util.stream.Stream;
 

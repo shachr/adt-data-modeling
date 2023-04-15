@@ -1,18 +1,22 @@
 package data.modeling.adt.abstraction.collections;
 
-import data.modeling.adt.abstraction.typedefs.FieldType;
+import data.modeling.adt.typedefs.FieldType;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FieldTypeCollection  {
-    private final LinkedHashSet linkedHashSet = new LinkedHashSet<FieldType>();
+    private final LinkedHashSet<FieldType> fieldTypes = new LinkedHashSet<>();
+    private final Map<String, FieldType> fieldsMap = new HashMap<>();
 
     public boolean add(FieldType fieldType) {
-        fieldType.setIndex(linkedHashSet.size());
-        return linkedHashSet.add(fieldType);
+        fieldType.setIndex(fieldTypes.size());
+        fieldsMap.put(fieldType.getName(), fieldType);
+        return fieldTypes.add(fieldType);
+    }
+
+    public FieldType get(String name){
+        return fieldsMap.get(name);
     }
 
     public void addAll(Collection<FieldType> collection) {
@@ -20,7 +24,15 @@ public class FieldTypeCollection  {
     }
 
     public Set<FieldType> getFields(){
-        return linkedHashSet;
+        return fieldTypes;
+    }
+
+    public Set<FieldType> cloneFields(){
+        return fieldTypes.stream().map(fieldType-> {
+            FieldType cloneFieldType = new FieldType(fieldType.getName(), fieldType.getType());
+            cloneFieldType.getAnnotations().addAll(fieldType.getAnnotations());
+            return cloneFieldType;
+        }).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
@@ -28,11 +40,11 @@ public class FieldTypeCollection  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FieldTypeCollection that = (FieldTypeCollection) o;
-        return linkedHashSet.equals(that.linkedHashSet);
+        return fieldTypes.equals(that.fieldTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(linkedHashSet);
+        return Objects.hash(fieldTypes);
     }
 }

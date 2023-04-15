@@ -1,6 +1,6 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.abstraction.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.ReferenceNamedType;
 
 import java.util.HashSet;
 import java.util.Set;
