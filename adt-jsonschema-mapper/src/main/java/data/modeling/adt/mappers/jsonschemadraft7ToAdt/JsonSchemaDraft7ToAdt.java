@@ -28,6 +28,7 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
         ObjectMapper objectMapper = new ObjectMapper();
         this.jsonSchemaMap = objectMapper.readValue(jsonSchemaString, Map.class);
 
+        toAdtMapperRegistry.register(new JsonSchemaNullMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new JsonSchemaAllOfMapper(toAdtMapperRegistry, schemaContext));
         toAdtMapperRegistry.register(new JsonSchemaAnyOfMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new JsonSchemaArrayMapper(toAdtMapperRegistry, schemaContext));

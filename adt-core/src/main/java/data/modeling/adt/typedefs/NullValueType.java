@@ -1,5 +1,7 @@
 package data.modeling.adt.typedefs;
 
+import java.util.Objects;
+
 public class NullValueType implements CollectionType {
     private final AnyType elementType;
 
@@ -9,6 +11,19 @@ public class NullValueType implements CollectionType {
 
     public AnyType getItemType() {
         return elementType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NullValueType that = (NullValueType) o;
+        return Objects.equals(elementType, that.elementType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(elementType);
     }
 }
 

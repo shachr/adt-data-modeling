@@ -23,7 +23,7 @@ public class JsonSchemaSanityTestFixture {
             "    },\n" +
             "    \"tags\": {\n" +
             "      \"description\": \"Tags for the product\",\n" +
-            "      \"type\": \"array\",\n" +
+            "      \"type\": [\"array\", \"null\"],\n" +
             "      \"items\": {\n" +
             "        \"type\": \"string\"\n" +
             "      },\n" +

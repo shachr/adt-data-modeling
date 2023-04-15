@@ -47,7 +47,7 @@ public class JsonSchemaDraft7ToAdtTest {
                                 new JsonSchemaAnnotation("exclusiveMinimum", 0))
                         .withIsRequired(true)
                         .build(),
-                FieldType.builder("tags", new SetType(new StringType()))
+                FieldType.builder("tags", new NullValueType(new SetType(new StringType())))
                         .withAnnotations(
                                 new JsonSchemaAnnotation("minItems", 1),
                                 new JsonSchemaAnnotation("description", "Tags for the product")
