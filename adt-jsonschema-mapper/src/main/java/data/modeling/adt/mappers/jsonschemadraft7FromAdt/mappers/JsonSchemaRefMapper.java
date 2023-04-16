@@ -3,6 +3,7 @@ package data.modeling.adt.mappers.jsonschemadraft7FromAdt.mappers;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
+import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.typedefs.ReferenceNamedType;
@@ -38,7 +39,15 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
                 removeDefinitionPrefix(namedType.getName()),
                 toMap(this.fromAdtMapperRegistry.fromAdt(namedType.getType()))
         );
-        return MapBuilder.create().put("$ref", type.getReferenceName()).build().entrySet().stream();
+        MapBuilder mapBuilder = MapBuilder.create().put("$ref", type.getReferenceName());
+        namedType.getAnnotations().stream()
+                .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
+                .map(annotation -> (JsonSchemaAnnotation)annotation)
+                .forEach(jsonSchemaAnnotation -> {
+                    mapBuilder.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue());
+                });
+        
+        return mapBuilder.build().entrySet().stream();
     }
 
     private void addDefinition(String key, Map<String, Object> value){

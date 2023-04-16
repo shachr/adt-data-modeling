@@ -3,6 +3,9 @@ package data.modeling.adt.mappers.jsonschemadraft7FromAdt.util;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import static data.modeling.adt.util.StreamExtensions.toMap;
 
 public class MapBuilder {
     private final Map<String, Object> map;
@@ -36,5 +39,8 @@ public class MapBuilder {
 
     public void merge(Map<String, Object> mapToMerge) {
         this.map.putAll(mapToMerge);
+    }
+    public void merge(Stream<Map.Entry<String, Object>> mapToMerge) {
+        this.map.putAll(toMap(mapToMerge));
     }
 }

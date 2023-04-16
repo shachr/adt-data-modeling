@@ -1,0 +1,47 @@
+package data.modeling.adt.mappers;
+
+import static org.junit.Assert.*;
+
+import java.util.*;
+
+public class MapAssert {
+
+    public static <K,V>  void assertMapsEqual(Map<K,V> expected, Map<K,V>  actual) {
+        assertMapsEqual("", expected, actual);
+    }
+
+    public static <K,V> void assertMapsEqualIgnoreOrder(Map<K, V> expected, Map<K,V> actual) {
+        assertMapsEqual("", sortMap(expected), sortMap(actual));
+    }
+
+    private static <K,V> void assertMapsEqual(String path, Map<K,V>  expected, Map<K,V>  actual) {
+        assertEquals(path + "size is different", expected.size(), actual.size());
+        for (Map.Entry<K,V>  expectedEntry : expected.entrySet()) {
+            K key = expectedEntry.getKey();
+            V expectedValue = expectedEntry.getValue();
+            V actualValue = actual.get(key);
+            String entryPath = path + "key " + key + " : ";
+            if (expectedValue instanceof Map && actualValue instanceof Map) {
+                assertMapsEqual(entryPath, (Map<K,V>) expectedValue, (Map<K,V>) actualValue);
+            } else {
+                assertEquals(entryPath + "value is different", expectedValue, actualValue);
+            }
+        }
+    }
+
+    private static <K,V>  Map<K,V>  sortMap(Map<K,V>  map) {
+        Map<K,V> sortedMap = new TreeMap<>();
+        for (Map.Entry<K,V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
+            if (value instanceof Map) {
+                value = (V)sortMap((Map<K,V>) value);
+            } else if(value instanceof List){
+                Collections.sort((List)value);
+            }
+            sortedMap.put(key, value);
+        }
+        return sortedMap;
+    }
+}
+

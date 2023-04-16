@@ -22,6 +22,8 @@ public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<Strin
         this.namedType = namedType;
         this.schemaContext = schemaContext;
 
+        fromAdtMapperRegistry.register(new JsonSchemaNullMapper(fromAdtMapperRegistry));
+        fromAdtMapperRegistry.register(new JsonSchemaEnumMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaAllOfMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaObjectMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaOneOfMapper(fromAdtMapperRegistry));

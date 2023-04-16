@@ -41,7 +41,10 @@ public class JsonSchemaMainMapper extends JsonSchemaMapper<NamedType> {
                 });
         jsonSchemaMap.put("$id", type.getName());
         jsonSchemaMap.merge(toMap(fromAdtMapperRegistry.fromAdt(type.getType())));
-        jsonSchemaMap.put("definitions", ((JsonSchemaRefMapper)fromAdtMapperRegistry.getMapper(JsonSchemaRefMapper.class)).getDefinitions());
+        Map definitions = ((JsonSchemaRefMapper)fromAdtMapperRegistry.getMapper(JsonSchemaRefMapper.class)).getDefinitions();
+        if(!definitions.isEmpty()) {
+            jsonSchemaMap.put("definitions", definitions);
+        }
         return jsonSchemaMap.build().entrySet().stream();
     }
 }
