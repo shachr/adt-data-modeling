@@ -43,4 +43,12 @@ public class MapBuilder {
     public void merge(Stream<Map.Entry<String, Object>> mapToMerge) {
         this.map.putAll(toMap(mapToMerge));
     }
+
+    public boolean isEmpty() {
+        return this.map.isEmpty();
+    }
+
+    public Object remove(String key) {
+        return map.remove(key);
+    }
 }

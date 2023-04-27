@@ -33,7 +33,8 @@ public class JsonSchemaAllOfMapper extends JsonSchemaMapper<ProductType> {
     @Override
     public Stream<Map.Entry<String, Object>> fromAdt(ProductType type) throws AdtException {
         MapBuilder mapBuilder = MapBuilder.create();
-        Set<Map<String, Object>> allOf = new HashSet<>();
+        List<Map<String, Object>> allOf = new LinkedList<>();
+        mapBuilder.put("type", "object");
         mapBuilder.put("allOf", allOf);
         type.getExtendedProductTypes().forEach(LambdaExceptionUtil.consumer(referenceNamedType -> {
             MapBuilder allOfItemMap = MapBuilder.create();
@@ -41,19 +42,13 @@ public class JsonSchemaAllOfMapper extends JsonSchemaMapper<ProductType> {
             allOf.add(allOfItemMap.put("$ref", referenceNamedType.getReferenceName()).build());
         }));
 
-        MapBuilder allOfItemMap = MapBuilder.create();
-        MapBuilder propertiesMap = allOfItemMap.putNestedMap("properties");
-        type.getOwnFields().forEach(LambdaExceptionUtil.consumer(fieldType -> {
-            Map<String, Object> property = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));
-            fieldType.getAnnotations().stream()
-                    .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
-                    .map(annotation -> (JsonSchemaAnnotation)annotation)
-                    .forEach(annotation -> {
-                        property.putIfAbsent(annotation.getName(), annotation.getValue());
-                    });
-            propertiesMap.put(fieldType.getName(), property);
-        }));
-        allOf.add(allOfItemMap.build());
+        Map<String, Object> allOfItemMap = toMap((Stream<Map.Entry<String, Object>>) fromAdtMapperRegistry
+                .getMapper(JsonSchemaObjectMapper.class).fromAdt(type));
+        List<String> required = (List<String>)allOfItemMap.remove("required");
+        allOf.add(allOfItemMap);
+        if(null != required && !required.isEmpty()) {
+            mapBuilder.put("required", required);
+        }
         return mapBuilder.build().entrySet().stream();
     }
 }

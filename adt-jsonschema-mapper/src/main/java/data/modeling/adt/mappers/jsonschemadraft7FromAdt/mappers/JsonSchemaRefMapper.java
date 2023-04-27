@@ -39,6 +39,7 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
                 removeDefinitionPrefix(namedType.getName()),
                 toMap(this.fromAdtMapperRegistry.fromAdt(namedType.getType()))
         );
+
         MapBuilder mapBuilder = MapBuilder.create().put("$ref", type.getReferenceName());
         namedType.getAnnotations().stream()
                 .filter(annotation -> annotation instanceof JsonSchemaAnnotation)

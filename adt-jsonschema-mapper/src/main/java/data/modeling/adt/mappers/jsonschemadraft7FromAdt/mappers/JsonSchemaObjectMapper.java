@@ -29,23 +29,26 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
     public Stream<Map.Entry<String, Object>> fromAdt(ProductType type) throws AdtException {
         MapBuilder mapBuilder = MapBuilder.create();
         mapBuilder.put("type", "object");
-        MapBuilder propertiesMapBuilder = mapBuilder.putNestedMap("properties");
+        if(!type.getOwnFields().isEmpty()) {
+            MapBuilder propertiesMapBuilder = mapBuilder.putNestedMap("properties");
 
-        List<String> required = new ArrayList<>();
-        type.getOwnFields().forEach(LambdaExceptionUtil.consumer(fieldType -> {
-            if(fieldType.isRequired()){
-                required.add(fieldType.getName());
+            List<String> required = new ArrayList<>();
+            type.getOwnFields().forEach(LambdaExceptionUtil.consumer(fieldType -> {
+                if (fieldType.isRequired()) {
+                    required.add(fieldType.getName());
+                }
+                Map fieldMap = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));
+                fieldType.getAnnotations().stream()
+                        .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
+                        .map(annotation -> (JsonSchemaAnnotation) annotation)
+                        .forEach(jsonSchemaAnnotation ->
+                                fieldMap.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue()));
+                propertiesMapBuilder.put(fieldType.getName(), fieldMap);
+            }));
+
+            if (!required.isEmpty()) {
+                mapBuilder.put("required", required);
             }
-            Map fieldMap = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));
-            fieldType.getAnnotations().stream()
-                    .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
-                    .map(annotation -> (JsonSchemaAnnotation)annotation)
-                    .forEach(jsonSchemaAnnotation ->
-                            fieldMap.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue()));
-            propertiesMapBuilder.put(fieldType.getName(), fieldMap);
-        }));
-        if(!required.isEmpty()) {
-            mapBuilder.put("required", required);
         }
         return mapBuilder.build().entrySet().stream();
     }

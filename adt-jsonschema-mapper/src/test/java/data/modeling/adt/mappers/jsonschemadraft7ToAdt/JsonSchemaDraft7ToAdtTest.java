@@ -29,7 +29,7 @@ public class JsonSchemaDraft7ToAdtTest {
         ).collect(Collectors.toList());
     }
 
-    private ToAdtFixtureData<String> fixtureData;
+    private final ToAdtFixtureData<String> fixtureData;
 
 
     public JsonSchemaDraft7ToAdtTest(ToAdtFixtureData<String> fixtureData) {
@@ -56,5 +56,4 @@ public class JsonSchemaDraft7ToAdtTest {
         assertEquals(fixtureData.expectedDiffSize(), AnyTypeComparator.compare(expectedNamedType, namedType).size());
         assertEquals(expectedNamedType, namedType);
     }
-
 }
