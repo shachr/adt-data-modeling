@@ -9,8 +9,6 @@ import data.modeling.adt.typedefs.NamedType;
 
 import static data.modeling.adt.util.StreamExtensions.toMap;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 

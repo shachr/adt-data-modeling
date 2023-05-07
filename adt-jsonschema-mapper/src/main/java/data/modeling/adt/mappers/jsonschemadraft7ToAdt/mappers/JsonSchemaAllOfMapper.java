@@ -6,14 +6,14 @@ import data.modeling.adt.abstraction.mappers.MapToAdt;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ProductType;
-import data.modeling.adt.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.ReferenceObjectType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import data.modeling.adt.util.MapsUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JsonSchemaAllOfMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<ProductType> {
+public class JsonSchemaAllOfMapper extends JsonSchemaMapper<ProductType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -33,6 +33,7 @@ public class JsonSchemaAllOfMapper extends data.modeling.adt.mappers.jsonschemad
     public ProductType toAdt(Map<String, Object> value) throws AdtException {
         value.remove("type");
         List<Object> allOf = (List<Object>)value.remove("allOf");
+        boolean isSealed = !(Boolean)value.remove("additionalProperties", true);
         // if list has one item, there is no inheritance
         if(allOf.size() == 1){
             // expected to find an object w/ properties inside.
@@ -40,13 +41,13 @@ public class JsonSchemaAllOfMapper extends data.modeling.adt.mappers.jsonschemad
             return (ProductType) mapper.toAdt(allOf.get(0));
         } else {
             List<Map> jsonSchemaAllOfObjects = extractJsonSchemaProperties(allOf);
-            LinkedHashSet<ReferenceNamedType> extendedProductTypes = extractAllReferenceNamedTypes(allOf);
+            LinkedHashSet<ReferenceObjectType> extendedProductTypes = extractAllReferenceNamedTypes(allOf);
 
             if(!jsonSchemaAllOfObjects.isEmpty()) {
                 Map mergedJsonSchemaObjects = MapsUtil.deepMergeMaps(jsonSchemaAllOfObjects);
-                return new data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaObjectMapper(toAdtMapperRegistry, extendedProductTypes).toAdt(mergedJsonSchemaObjects);
+                return new JsonSchemaObjectMapper(toAdtMapperRegistry, extendedProductTypes).toAdt(mergedJsonSchemaObjects);
             } else {
-                return new ProductType(new HashSet<>(), extendedProductTypes);
+                return new ProductType(new HashSet<>(), extendedProductTypes, isSealed);
             }
         }
     }
@@ -59,17 +60,17 @@ public class JsonSchemaAllOfMapper extends data.modeling.adt.mappers.jsonschemad
         return jsonSchemaAllOfObjects;
     }
 
-    private LinkedHashSet<ReferenceNamedType> extractAllReferenceNamedTypes(List<Object> allOf) {
+    private LinkedHashSet<ReferenceObjectType> extractAllReferenceNamedTypes(List<Object> allOf) {
         Set<Object> jsonSchemaAllOfRefs = allOf.stream()
                 .filter(map->!isObjectWithProperties((Map)map))
                 .collect(Collectors.toSet());
 
-        LinkedHashSet<ReferenceNamedType> extendedProductTypes = jsonSchemaAllOfRefs.stream()
+        LinkedHashSet<ReferenceObjectType> extendedProductTypes = jsonSchemaAllOfRefs.stream()
                 .map(LambdaExceptionUtil.function(jsonSchemaElem -> {
                     AnyType anyType = toAdtMapperRegistry.toAdt(jsonSchemaElem);
-                    if(anyType instanceof ReferenceNamedType){
+                    if(anyType instanceof ReferenceObjectType){
                         // #definitions
-                        return (ReferenceNamedType)anyType;
+                        return (ReferenceObjectType)anyType;
                     } else {
                         // not supported
                         throw new AdtException("not supported");

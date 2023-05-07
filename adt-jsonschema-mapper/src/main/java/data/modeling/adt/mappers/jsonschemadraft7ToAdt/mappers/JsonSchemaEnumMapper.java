@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JsonSchemaEnumMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<EnumType> {
+public class JsonSchemaEnumMapper extends JsonSchemaMapper<EnumType> {
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
     public JsonSchemaEnumMapper(ToAdtMapperRegistry toAdtMapperRegistry) {

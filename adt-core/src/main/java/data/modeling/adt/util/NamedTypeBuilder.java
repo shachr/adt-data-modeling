@@ -3,7 +3,6 @@ package data.modeling.adt.util;
 import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.NamedType;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

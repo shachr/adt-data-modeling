@@ -1,19 +1,14 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.mappers;
 
-import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
-import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ProductType;
-import data.modeling.adt.typedefs.ReferenceNamedType;
 import data.modeling.adt.util.LambdaExceptionUtil;
-import data.modeling.adt.util.MapsUtil;
+
 import static data.modeling.adt.util.StreamExtensions.toMap;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class JsonSchemaAllOfMapper extends JsonSchemaMapper<ProductType> {

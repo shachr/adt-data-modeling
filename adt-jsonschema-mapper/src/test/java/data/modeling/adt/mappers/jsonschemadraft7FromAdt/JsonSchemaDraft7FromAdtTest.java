@@ -1,8 +1,5 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.MapAssert;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;

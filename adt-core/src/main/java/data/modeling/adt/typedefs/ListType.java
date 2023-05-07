@@ -1,6 +1,9 @@
 package data.modeling.adt.typedefs;
 
 
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.util.AdtVisitorUtil;
+
 import java.util.Objects;
 
 public class ListType implements CollectionType {
@@ -25,6 +28,11 @@ public class ListType implements CollectionType {
     @Override
     public int hashCode() {
         return Objects.hash(itemsType);
+    }
+
+    public void accept(AdtVisitor visitor) {
+        visitor.visit(this);
+        AdtVisitorUtil.visit(visitor, getItemType());
     }
 }
 

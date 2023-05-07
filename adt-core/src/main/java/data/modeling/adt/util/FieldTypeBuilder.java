@@ -11,7 +11,7 @@ public class FieldTypeBuilder {
     private String name;
     private AnyType type;
 
-    private Set<Annotation> annotations = new LinkedHashSet<>();
+    private Set<Annotation<?>> annotations = new LinkedHashSet<>();
     private boolean isRequired = false;
 
     public FieldTypeBuilder(String name, AnyType type) {
@@ -19,7 +19,7 @@ public class FieldTypeBuilder {
         this.type = type;
     }
 
-    public FieldTypeBuilder withAnnotations(Annotation... annotations){
+    public FieldTypeBuilder withAnnotations(Annotation<?>... annotations){
         this.annotations.addAll(Arrays.stream(annotations).collect(Collectors.toCollection(LinkedHashSet::new)));
         return this;
     }

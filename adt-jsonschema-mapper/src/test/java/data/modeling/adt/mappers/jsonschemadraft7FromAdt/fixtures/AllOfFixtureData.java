@@ -1,7 +1,5 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.TestResourceReader;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;
@@ -33,7 +31,7 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
         SchemaContext schemaContext = new SchemaContext();
         NamedType emptyObject = new NamedType("#/definitions/EmptyObject", new ProductType());
         NamedType namedType = NamedType.builder(schemaNamespace, ProductType.of(
-                Stream.of(new ReferenceNamedType(emptyObject.getName())).collect(Collectors.toCollection(LinkedHashSet::new)),
+                Stream.of(new ReferenceObjectType(emptyObject.getName())).collect(Collectors.toCollection(LinkedHashSet::new)),
                 Stream.of(
                     FieldType.builder("productId", new IntType())
                             .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))

@@ -1,5 +1,7 @@
 package data.modeling.adt.typedefs;
 
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
+
 import java.math.BigDecimal;
 
 public class DecimalType extends NumericType {
@@ -22,5 +24,8 @@ public class DecimalType extends NumericType {
 
     public static ConstantPrimitiveType constantOf(BigDecimal value){
         return new ConstantPrimitiveType(new DecimalType(value.precision(), value.scale()), value);
+    }
+    public boolean isValueOf(Object value) {
+        return value instanceof BigDecimal;
     }
 }

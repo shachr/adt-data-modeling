@@ -83,8 +83,8 @@ public class AnyTypeComparator {
         else if (obj1 instanceof CollectionType) {
             compareCollectionType((CollectionType) obj1, (CollectionType) obj2);
         }
-        else if(obj1 instanceof ReferenceNamedType){
-            compareReferenceNamedType((ReferenceNamedType)obj1, (ReferenceNamedType)obj2);
+        else if(obj1 instanceof ReferenceObjectType){
+            compareReferenceNamedType((ReferenceObjectType)obj1, (ReferenceObjectType)obj2);
         }
         else if(obj1 instanceof FieldType){
             compareFieldTypes((FieldType) obj1, (FieldType) obj2);
@@ -172,7 +172,7 @@ public class AnyTypeComparator {
         });
     }
 
-    private void compareAnnotations(JsonPathTraversingContext jsonPathTraversingContext, Set<Annotation> annotations1, Set<Annotation> annotations2) {
+    private void compareAnnotations(JsonPathTraversingContext jsonPathTraversingContext, Set<Annotation<?>> annotations1, Set<Annotation<?>> annotations2) {
         int index=-1;
         Iterator<? extends Annotation> iterator1 = annotations1.iterator();
         Iterator<? extends Annotation> iterator2 = annotations2.iterator();
@@ -240,7 +240,7 @@ public class AnyTypeComparator {
         }
     }
 
-    private void compareReferenceNamedType(ReferenceNamedType obj1, ReferenceNamedType obj2) {
+    private void compareReferenceNamedType(ReferenceObjectType obj1, ReferenceObjectType obj2) {
         if(!obj1.getReferenceName().equals(obj2.getReferenceName())){
             diffs.add(new Difference("reference name mismatch", jsonPathTraversingContext.getJsonPointer(), obj1.getReferenceName(), obj2.getReferenceName()));;
         }

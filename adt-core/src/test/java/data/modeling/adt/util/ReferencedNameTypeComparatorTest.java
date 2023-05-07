@@ -1,20 +1,20 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.ReferenceObjectType;
 import org.junit.Assert;
 import org.junit.Test;
 public class ReferencedNameTypeComparatorTest {
     @Test
     public void testCompareReferenceNamedType_sameObject() {
-        ReferenceNamedType obj1 = new ReferenceNamedType("ref1");
+        ReferenceObjectType obj1 = new ReferenceObjectType("ref1");
         AnyTypeComparator comparator = new AnyTypeComparator(obj1, obj1);
         Assert.assertEquals(0, comparator.findDiff().size());
     }
 
     @Test
     public void testCompareReferenceNamedType_differentReferenceName() {
-        ReferenceNamedType obj1 = new ReferenceNamedType("ref1");
-        ReferenceNamedType obj2 = new ReferenceNamedType("ref2");
+        ReferenceObjectType obj1 = new ReferenceObjectType("ref1");
+        ReferenceObjectType obj2 = new ReferenceObjectType("ref2");
         AnyTypeComparator comparator = new AnyTypeComparator(obj1, obj2);
         Assert.assertEquals(1, comparator.findDiff().size());
         AnyTypeComparator.Difference diff = comparator.findDiff().get(0);
@@ -26,8 +26,8 @@ public class ReferencedNameTypeComparatorTest {
 
     @Test
     public void testCompareReferenceNamedType_sameReferenceName() {
-        ReferenceNamedType obj1 = new ReferenceNamedType("ref1");
-        ReferenceNamedType obj2 = new ReferenceNamedType("ref1");
+        ReferenceObjectType obj1 = new ReferenceObjectType("ref1");
+        ReferenceObjectType obj2 = new ReferenceObjectType("ref1");
         AnyTypeComparator comparator = new AnyTypeComparator(obj1, obj2);
         Assert.assertEquals(0, comparator.findDiff().size());
     }

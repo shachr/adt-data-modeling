@@ -4,7 +4,6 @@ import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.SchemaTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.mappers.*;
-import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.NamedType;
 

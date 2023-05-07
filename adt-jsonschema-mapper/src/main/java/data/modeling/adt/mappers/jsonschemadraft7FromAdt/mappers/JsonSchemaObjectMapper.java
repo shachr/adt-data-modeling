@@ -4,11 +4,14 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
+import data.modeling.adt.typedefs.AdditionalFieldsType;
+import data.modeling.adt.typedefs.FieldType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import static data.modeling.adt.util.StreamExtensions.toMap;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
@@ -37,13 +40,17 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
                 if (fieldType.isRequired()) {
                     required.add(fieldType.getName());
                 }
-                Map fieldMap = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));
-                fieldType.getAnnotations().stream()
-                        .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
-                        .map(annotation -> (JsonSchemaAnnotation) annotation)
-                        .forEach(jsonSchemaAnnotation ->
-                                fieldMap.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue()));
-                propertiesMapBuilder.put(fieldType.getName(), fieldMap);
+                if(fieldType instanceof AdditionalFieldsType){
+                    mapBuilder.put("additionalProperties", toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType())));
+                } else {
+                    Map<String, Object> fieldMap = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));
+                    fieldType.getAnnotations().stream()
+                            .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
+                            .map(annotation -> (JsonSchemaAnnotation) annotation)
+                            .forEach(jsonSchemaAnnotation ->
+                                    fieldMap.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue()));
+                    propertiesMapBuilder.put(fieldType.getName(), fieldMap);
+                }
             }));
 
             if (!required.isEmpty()) {

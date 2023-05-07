@@ -56,7 +56,8 @@ public class SanityFixtureData implements ToAdtFixtureData<String> {
             "      \"type\": \"boolean\"\n" +
             "    }\n" +
             "  },\n" +
-            "  \"required\": [\"productId\", \"productName\", \"price\"]\n" +
+            "  \"required\": [\"productId\", \"productName\", \"price\"],\n" +
+            "  \"additionalProperties\": {\"type\": \"boolean\"}\n" +
             "}";
 
     @Override
@@ -110,7 +111,8 @@ public class SanityFixtureData implements ToAdtFixtureData<String> {
                         .build(),
                 FieldType.builder("isAvailable", new BoolType())
                         .withAnnotations(new JsonSchemaAnnotation("description", "Product availability"))
-                        .build()
+                        .build(),
+                new AdditionalFieldsType("additionalProperties", new MapType(new StringType(), new BoolType()))
         )).build();
 
         namedType.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));

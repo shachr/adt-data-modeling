@@ -2,13 +2,13 @@ package data.modeling.adt.annotations.golden;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 
-public final class Required extends Annotation {
+public final class Required extends Annotation<Boolean> {
 
-    private Required(boolean value) {
+    private Required(Boolean value) {
         super(value);
     }
 
-    public static Required of(boolean value) {
+    public static Required of(Boolean value) {
         return new Required(value);
     }
 }

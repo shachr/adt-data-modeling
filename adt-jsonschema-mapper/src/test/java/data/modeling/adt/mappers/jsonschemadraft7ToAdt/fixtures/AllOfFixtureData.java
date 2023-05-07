@@ -4,10 +4,8 @@ import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.fixtures.ToAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
-import data.modeling.adt.util.AnyTypeComparator;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,7 +88,7 @@ public class AllOfFixtureData implements ToAdtFixtureData<String> {
         expectedSchemaContext.registerNamedType(myDefinition);
 
         NamedType expectedNamedType = NamedType.builder(schemaNamespace, ProductType.of(
-                Stream.of(new ReferenceNamedType("#/definitions/MyDefinition")).collect(Collectors.toCollection(LinkedHashSet::new)),
+                Stream.of(new ReferenceObjectType("#/definitions/MyDefinition")).collect(Collectors.toCollection(LinkedHashSet::new)),
                 Stream.of(
                         FieldType.builder("prop1", new StringType()).build(),
                         FieldType.builder("prop2", new DoubleType()).build(),

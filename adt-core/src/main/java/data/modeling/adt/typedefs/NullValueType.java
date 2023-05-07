@@ -1,5 +1,8 @@
 package data.modeling.adt.typedefs;
 
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.util.AdtVisitorUtil;
+
 import java.util.Objects;
 
 public class NullValueType implements CollectionType {
@@ -24,6 +27,11 @@ public class NullValueType implements CollectionType {
     @Override
     public int hashCode() {
         return Objects.hash(elementType);
+    }
+
+    public void accept(AdtVisitor visitor) {
+        AdtVisitorUtil.visit(visitor, getItemType());
+        visitor.visit(this);
     }
 }
 

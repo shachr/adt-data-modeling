@@ -1,6 +1,7 @@
 package data.modeling.adt;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.typedefs.NamedType;
 
 import java.util.*;
@@ -11,32 +12,33 @@ import java.util.stream.Stream;
  *
  */
 public class SchemaContext {
-    private final Map<String, NamedType> namedTypes;
+    private final Map<String, NamedType> objectTypeMap;
     private final Map<String, Set<Annotation>> annotations;
 
     public SchemaContext() {
-        this.namedTypes = new HashMap<>();
+        this.objectTypeMap = new HashMap<>();
         this.annotations = new HashMap<>();
     }
 
     public SchemaContext(Stream<NamedType> stream) {
-        this.namedTypes = stream.collect(Collectors.toMap(
+        this.objectTypeMap = stream.collect(Collectors.toMap(
                 NamedType::getName,
                 namedType -> namedType
         ));
         this.annotations = new HashMap<>();
     }
 
-    public void registerNamedType(NamedType namedType) {
-        namedTypes.put(namedType.getName(), namedType);
+    public void registerNamedType(NamedType namedType)
+    {
+        objectTypeMap.put(namedType.getName(), namedType);
     }
 
     public NamedType getNamedType(String name) {
-        return namedTypes.get(name);
+        return objectTypeMap.get(name);
     }
 
     public boolean containsNamedType(String name) {
-        return namedTypes.containsKey(name);
+        return objectTypeMap.containsKey(name);
     }
 
     public void addAnnotation(String name, Annotation annotation) {
@@ -52,11 +54,15 @@ public class SchemaContext {
     }
 
     public int size() {
-        return namedTypes.size();
+        return objectTypeMap.size();
     }
 
     public Stream<NamedType> stream() {
-        return namedTypes.values().stream();
+        return objectTypeMap.values().stream();
+    }
+
+    public void accept(AdtVisitor visitor) {
+        this.objectTypeMap.values().forEach(objectType -> objectType.accept(visitor));
     }
 }
 

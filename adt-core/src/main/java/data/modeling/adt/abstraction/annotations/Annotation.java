@@ -16,9 +16,6 @@ public abstract class Annotation<T> {
     public String getName(){
         return this.getClass().getCanonicalName();
     }
-    public <R> R accept(AnnotationVisitor<R> visitor){
-        return visitor.visit(this);
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,13 +1,18 @@
 package data.modeling.adt.util;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 public class LambdaExceptionUtil {
+    public static <R> Supplier<R> supplier(SupplierWithException<R> supplierWithException) {
+        return () -> {
+            try {
+                return supplierWithException.get();
+            } catch (Exception ex) {
+                throwAsUnchecked(ex);
+                return null; // unreachable code
+            }
+        };
+    }
     public static <T, R> Function<T, R> function(FunctionWithException<T, R> functionWithException) {
         return arg -> {
             try {
@@ -72,6 +77,10 @@ public class LambdaExceptionUtil {
         };
     }
 
+    @FunctionalInterface
+    public interface SupplierWithException<R> {
+        R get() throws Exception;
+    }
     @FunctionalInterface
     public interface FunctionWithException<T, R> {
         R apply(T t) throws Exception;

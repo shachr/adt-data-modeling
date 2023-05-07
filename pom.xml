@@ -12,6 +12,7 @@
         <module>adt-hms-plugin</module>
         <module>adt-core</module>
         <module>adt-jsonschema-mapper</module>
+        <module>adt-schema-pipelines</module>
     </modules>
 
 </project>

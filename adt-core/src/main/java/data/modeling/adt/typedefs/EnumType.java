@@ -1,5 +1,7 @@
 package data.modeling.adt.typedefs;
 
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
@@ -42,5 +44,13 @@ public class EnumType implements SumType {
     @Override
     public int size() {
         return values.size();
+    }
+
+    public void accept(AdtVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public boolean isValueOf(Object value){
+        return this.baseType.isValueOf(value) && values.stream().anyMatch(constantPrimitiveType -> constantPrimitiveType.getConstant().equals(value));
     }
 }

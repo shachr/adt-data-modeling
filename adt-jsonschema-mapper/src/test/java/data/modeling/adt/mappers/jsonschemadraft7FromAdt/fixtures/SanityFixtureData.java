@@ -1,11 +1,8 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.TestResourceReader;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;
-import data.modeling.adt.mappers.fixtures.ToAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
 import data.modeling.adt.util.AnyTypeComparator;

@@ -46,5 +46,39 @@
       "type": "boolean"
     }
   },
-  "required": ["productId", "productName", "price"]
+  "required": ["productId", "productName", "price"],
+  "x-relationships": [
+    {
+      "entity": "http://example.com//company.json",
+      "type": "one-to-many",
+      "description": "The relationship between the invoice and the company it belongs to.",
+      "edges": [
+        {
+          "from": ["/properties/companyId", "/properties/createdAt"],
+          "to": ["/properties/id"],
+          "type": "foreign-key",
+          "description": "The foreign key relationship between the invoice and the company it belongs to."
+        }
+      ],
+      "relationshipProperties": [
+        "/properties/createdAt"
+      ]
+    },
+    {
+      "entity": "http://example.com/schemas/customer.json",
+      "type": "many-to-one",
+      "description": "The relationship between the invoice and the customer who made the purchase.",
+      "edges": [
+        {
+          "from": ["/properties/customerId"],
+          "to": ["/properties/id"],
+          "type": "foreign-key",
+          "description": "The foreign key relationship between the invoice and the customer who made the purchase."
+        }
+      ],
+      "relationshipProperties": [
+        "/properties/createdAt"
+      ]
+    }
+  ]
 }

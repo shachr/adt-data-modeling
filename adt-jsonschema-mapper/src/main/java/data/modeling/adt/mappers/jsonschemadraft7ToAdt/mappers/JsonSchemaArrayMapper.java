@@ -3,10 +3,13 @@ package data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
+import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ListType;
+import data.modeling.adt.typedefs.ObjectType;
 import data.modeling.adt.typedefs.SetType;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class JsonSchemaArrayMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<ListType> {
 
@@ -30,16 +33,17 @@ public class JsonSchemaArrayMapper extends data.modeling.adt.mappers.jsonschemad
         // todo: add logic
         // todo: support null + type, do not support any mixture of types.
         value.remove("type");
-        if(value.containsKey("items")) {
-            Map<String, Object> items = (Map<String, Object>) value.remove("items");
+        boolean hasPrefixItems = value.containsKey("prefixItems");
+        Map<String, Object> items = (Map<String, Object>) value.remove("items");
+        if(!hasPrefixItems && !Objects.isNull(items)) {
             Object isSet = value.remove("uniqueItems");
-            if(null != isSet && isSet.equals(true)) {
-                return new SetType(toAdtMapperRegistry.toAdt(items));
+            AnyType itemType = toAdtMapperRegistry.toAdt(items);
+            if (null != isSet && isSet.equals(true)) {
+                return new SetType(itemType);
             }
-            return new ListType(toAdtMapperRegistry.toAdt(items));
+            return new ListType(itemType);
         }
 
-        // todo: other scenarios ..
-        throw new AdtException("not supported");
+        return new ListType(new ObjectType());
     }
 }

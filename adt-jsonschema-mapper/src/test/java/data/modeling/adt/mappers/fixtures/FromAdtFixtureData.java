@@ -1,8 +1,6 @@
 package data.modeling.adt.mappers.fixtures;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import data.modeling.adt.SchemaContext;
-import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.util.AnyTypeComparator;
 
 import java.util.List;

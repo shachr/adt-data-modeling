@@ -1,22 +1,23 @@
 package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.util.FieldTypeBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class FieldType implements AnyType {
+public class FieldType implements LabeledType {
     private final String name;
     private AnyType type;
     private int index;
     private Boolean isRequired=false;
-    private final Set<Annotation> annotations;
+    private final Set<Annotation<?>> annotations;
 
     public FieldType(String name, AnyType type) {
         this(name, type, new HashSet<>());
     }
-    public FieldType(String name, AnyType type, Set<Annotation> annotations) {
+    public FieldType(String name, AnyType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
         this.index = index;
@@ -31,7 +32,7 @@ public class FieldType implements AnyType {
         return name;
     }
 
-    public Set<Annotation> getAnnotations() {
+    public Set<Annotation<?>> getAnnotations() {
         return annotations;
     }
 
@@ -39,7 +40,6 @@ public class FieldType implements AnyType {
     public AnyType getType(){
         return type;
     }
-//    public abstract <T> T accept(NamedTypeVisitor<T> visitor);
 
     public static FieldType of(String name, AnyType type){
         return new FieldType(name, type, new HashSet<>());
@@ -75,5 +75,12 @@ public class FieldType implements AnyType {
 
     public void setRequired(boolean required) {
         isRequired = required;
+    }
+
+    @Override
+    public void accept(AdtVisitor visitor) {
+        visitor.enterNamedType(this);
+        LabeledType.super.accept(visitor);
+        visitor.exitNamedType(this);
     }
 }

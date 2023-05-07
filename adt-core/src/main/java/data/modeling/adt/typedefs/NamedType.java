@@ -1,24 +1,23 @@
 package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
-import data.modeling.adt.abstraction.annotations.AnnotationVisitor;
+import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.util.NamedTypeBuilder;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class NamedType implements AnyType {
+public class NamedType implements LabeledType {
     private final String name;
     private AnyType type;
-    private final Set<Annotation> annotations;
+    private final Set<Annotation<?>> annotations;
 
     public NamedType(String name, AnyType type) {
         this(name, type, new LinkedHashSet<>());
     }
 
-    public NamedType(String name, AnyType type, Set<Annotation> annotations) {
+    public NamedType(String name, AnyType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
@@ -32,7 +31,7 @@ public class NamedType implements AnyType {
         return name;
     }
 
-    public Set<Annotation> getAnnotations() {
+    public Set<Annotation<?>> getAnnotations() {
         return annotations;
     }
 
@@ -59,12 +58,10 @@ public class NamedType implements AnyType {
         return name.equals(namedType.name) && type.equals(namedType.type) && annotations.equals(namedType.annotations);
     }
 
-    public <R> void accept(AnnotationVisitor<Annotation<R>> visitor){
-        annotations.stream().collect(Collectors.toSet()).forEach(annotation -> {
-            Annotation<R> newAnno = visitor.visit(annotation);
-            if(null != newAnno){
-                annotations.add(newAnno);
-            }
-        });
+    @Override
+    public void accept(AdtVisitor visitor) {
+        visitor.enterNamedType(this);
+        LabeledType.super.accept(visitor);
+        visitor.exitNamedType(this);
     }
 }
