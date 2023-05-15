@@ -39,66 +39,63 @@ where i left off:
                 1.4.1.3 codegen to determine whether conditions met per notification/delta event and publish
                 1.4.1.4 introduce Delta<T>(T old, T new), preserving the entity structure with Delta<T> type attributes
 
-4. Data Processing Strategy
-    4.1 runtime -> Databricks
-    4.2 data lineage ->  w/ open-lineage
-    4.3 data access -> pLap
-        4.3.1 central access control registry - unity?
-        4.3.2 use s3 pre-signed url rather than aws roles - can unity do that?
-    4.4. Development Assets and Data Assets
-        4.4.1 using Backstage plugins
-        4.4.2 declared (role) vs inferred(code) data lineage
-
-5. Eventing Strategy
-    5.1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
-    5.2 a producing SDK spec:
-        CloudEventBuilder cloudEventBuilder = CustomCloudEventBuilder.builder();
-        cloudEventBuilder.createFactEvent(entity).validate().build();
-        cloudEventBuilder.createNotificationEvents(oldEntity, newEntity).validate().build();
-        cloudEventBuilder.createSystemEvent(bean).validate().build();
-        cloudEventBuilder.createErrorEvent(entity).validate().build();
-        cloudEventBuilder.createCommand(entity).validate().build();
-
-        use native sdks to send the message (queue or stream):
-            queue: rabbitMQCloudEventSender.send(CloudEvent messageQueue)
-            stream: producer.send(new ProducerRecord<>(topic, "key", cloudEvent))
-
-    5.3 a consuming SDK spec
-        5.3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
-        4.3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
-
-    5.4. Data Validation
-        2.1 Json-schema for json payload validation
-        2.2 Protobuf-validations? for proto validation
-        2.3 Avro-validations? for proto validation
-        2.5 Delta has built in schema evolution support
-
-    5.5. Data Parsing
-        3.1 Parsing Json via Spark using ADT schema transformation to Spark-schema
-        3.2 Parsing Avro using Avro sdk
-        3.3 Parsing Proto using Proto sdk
-
-6. API Strategy
+API Strategy
     6.1 Compatibility, Versioning and Deprecation ( general guidelines )
-    6.2 Request-Response APIs:
-        6.2.1 Domain APIs (subgraph) vs Frontend/B4F APIs (supergraph)
-        6.2.2 When to use what: Rest, gRPC over HTTP/2 and graphQL
-        6.2.3 API evolution and Service versioning for each technology ( Rest, gRpc and GraphQL )
-        6.2.4 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
-    6.3 Event-Driven APIs:
-        6.3.1 when to use queue vs streaming: SQS vs Kafka
-        6.3.2 event standardization - CloudEvents headers, and tbd payload
-        6.3.3 domain channel standardization - per entity and pattern?
-        6.3.4 content standardization - how to distinguish between different content types
-        6.2.5 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+    6.2 Serialization system - json specific rules, vs mature serialization system that can be used as is.
+    6.3 Request-Response APIs:
+        6.3.1 Domain APIs (subgraph) vs Frontend/B4F APIs (supergraph)
+        6.3.2 When to use what: Rest, gRPC over HTTP/2 and graphQL
+        6.3.3 API evolution and Service versioning for each technology ( Rest, gRpc and GraphQL )
+        6.3.4 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+    6.4 Event-Driven APIs:
+        6.4.1 when to use queue vs streaming: SQS vs Kafka
+        6.4.2 event standardization - CloudEvents headers, and tbd payload
+        6.4.3 domain channel standardization - per entity and pattern? naming convention?
+        6.4.4 content standardization - how to distinguish between different content types
+        6.4.5 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
 
-7. Fabric Strategy
-    7.1 Service-mesh runtime ( k8s based )
-    7.2 Event-mesh runtime ( databricks based )
-    7.3 Data-mesh runtime ( databricks based )
+Fabric Strategy ( self-service infrastructure and easy-to-use tools )
+    2.1 Service strategy ( k8s based )
+    2.2 Eventing strategy ( databricks based )
+    2.3 Data Strategy ( databricks based )
 
-8. Identity and Authorization
-    TBD
+    Service Strategy
+        Identity and Authorization
 
-> Message Brokers is an excellent tool for Commands and Domain Events
-> Log Stream is an excellent tool for Integration Events
+    Data Strategy
+        4.1 runtime -> Databricks
+        4.2 data lineage ->  w/ open-lineage
+        4.3 data access -> pLap
+            4.3.1 central access control registry - unity?
+            4.3.2 use s3 pre-signed url rather than aws roles - can unity do that?
+        4.4. Development Assets and Data Assets
+            4.4.1 using Backstage plugins
+            4.4.2 declared (role) vs inferred(code) data lineage
+
+    Eventing Strategy
+        5.1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
+        5.2 a producing SDK spec:
+            Sending:
+            CloudEventBuilder cloudEventBuilder = CustomCloudEventBuilder.builder();
+            cloudEventBuilder.createFactEvent(entity).validate().build();
+            cloudEventBuilder.createNotificationEvents(oldEntity, newEntity).validate().build();
+            cloudEventBuilder.createSystemEvent(bean).validate().build();
+            cloudEventBuilder.createErrorEvent(entity).validate().build();
+            cloudEventBuilder.createCommand(entity).validate().build();
+
+            use native sdks to send the message (queue or stream):
+                queue: rabbitMQCloudEventSender.send(CloudEvent messageQueue)
+                stream: producer.send(new ProducerRecord<>(topic, "key", cloudEvent))
+
+            Claim Check?
+            FailOver?
+
+            Data Validation:
+                5.2.1 Json-schema for json payload validation
+                5.2.2 Protobuf-validations? for proto validation
+                5.2.3 Avro-validations? for proto validation
+                5.2.4 Delta has built in schema evolution support
+
+        5.3 a consuming SDK spec
+            5.3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
+            5.3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
