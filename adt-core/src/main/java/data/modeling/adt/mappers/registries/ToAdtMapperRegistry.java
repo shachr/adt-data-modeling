@@ -19,13 +19,14 @@ public class ToAdtMapperRegistry {
         toAdtMappers.remove(mapper);
     }
 
-    public <T, R extends AnyType> Optional<MapToAdt> findToMapper(Object value){
-        if(!Optional.ofNullable(value).isPresent()) return Optional.empty();
-        return toAdtMappers.stream().filter(mapToAdt -> mapToAdt.canMap(value)).findFirst();
+    public <T, R extends AnyType> Optional<MapToAdt<T, R>> findToMapper(Object value){
+        if(Optional.ofNullable(value).isEmpty()) return Optional.empty();
+        return toAdtMappers.stream().filter(mapToAdt -> mapToAdt.canMap(value)).findFirst()
+                .map(mapper -> (MapToAdt<T, R>)mapper);
     }
 
     public AnyType toAdt(Object value) throws AdtException {
-        Optional<MapToAdt> mapper = findToMapper(value);
+        Optional<MapToAdt<Object, AnyType>> mapper = findToMapper(value);
         if(!mapper.isPresent())
             throw new MapperNotFoundException(value);
 

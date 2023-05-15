@@ -7,7 +7,7 @@ import java.util.Map;
 public class JsonSchemaStringMapper extends JsonSchemaMapper<StringType> {
     @Override
     public boolean canMap(Map<String, Object> value) {
-        return value.containsKey("type") && value.get("type").equals("string");
+        return value.containsKey("pattern") || (value.containsKey("type") && value.get("type").equals("string"));
     }
 
     @Override

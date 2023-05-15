@@ -1,13 +1,14 @@
 package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 
 import java.util.Objects;
 
-public class ReferenceObjectType implements AnyType {
+public class ReferenceNamedType implements AnyType {
     private String refName;
 
-    public ReferenceObjectType(String refName) {
+    public ReferenceNamedType(String refName) {
         this.refName = refName;
     }
 
@@ -19,7 +20,7 @@ public class ReferenceObjectType implements AnyType {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReferenceObjectType that = (ReferenceObjectType) o;
+        ReferenceNamedType that = (ReferenceNamedType) o;
         return refName.equals(that.refName);
     }
 
@@ -28,7 +29,7 @@ public class ReferenceObjectType implements AnyType {
         return Objects.hash(refName);
     }
 
-    public void accept(AdtVisitor visitor) {
+    public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
 }

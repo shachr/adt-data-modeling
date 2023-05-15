@@ -2,12 +2,14 @@ package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.util.FieldTypeBuilder;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-public class FieldType implements LabeledType {
+public class FieldType implements LabeledType, Comparable<FieldType> {
     private final String name;
     private AnyType type;
     private int index;
@@ -47,7 +49,7 @@ public class FieldType implements LabeledType {
 
     @Override
     public int hashCode() {
-        return this.index;
+        return Objects.hashCode(name);
     }
 
     @Override
@@ -61,12 +63,17 @@ public class FieldType implements LabeledType {
                 && isRequired.equals(fieldType.isRequired);
     }
 
-    public int getIndex() {
+    public Integer getIndex() {
         return index;
     }
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public FieldType withIndex(int index) {
+        this.setIndex(index);
+        return this;
     }
 
     public Boolean isRequired() {
@@ -78,9 +85,30 @@ public class FieldType implements LabeledType {
     }
 
     @Override
-    public void accept(AdtVisitor visitor) {
-        visitor.enterNamedType(this);
+    public void accept(AdtVisitor visitor) throws AdtException {
+        visitor.enterLabeledType(this);
         LabeledType.super.accept(visitor);
-        visitor.exitNamedType(this);
+        visitor.exitLabeledType(this);
+    }
+
+    @Override
+    public void setType(AnyType anyType) {
+        type = anyType;
+    }
+
+    @Override
+    public int compareTo(FieldType otherFieldType) {
+        return Objects.isNull(otherFieldType)? 1 : otherFieldType.hashCode()-this.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "FieldType{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", index=" + index +
+                ", isRequired=" + isRequired +
+                ", annotations=" + annotations +
+                '}';
     }
 }

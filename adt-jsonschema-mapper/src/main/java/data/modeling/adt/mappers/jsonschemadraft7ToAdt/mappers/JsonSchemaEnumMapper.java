@@ -24,11 +24,12 @@ public class JsonSchemaEnumMapper extends JsonSchemaMapper<EnumType> {
 
     @Override
     public EnumType toAdt(Map<String, Object> value) throws AdtException {
+
         List<Object> enumValues = (List<Object>)value.remove("enum");
         PrimitiveType baseType = (PrimitiveType)toAdtMapperRegistry.toAdt(value);
         return new EnumType( baseType,
             enumValues.stream()
-                    .map(enumValue -> new ConstantPrimitiveType(baseType, enumValue))
+                    .map(enumValue -> new EnumType.EnumItemType(enumValue.toString(), new ConstantPrimitiveType(baseType, enumValue)))
                     .collect(Collectors.toSet())
         );
 

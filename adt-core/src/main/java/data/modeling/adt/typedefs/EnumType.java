@@ -1,6 +1,8 @@
 package data.modeling.adt.typedefs;
 
+import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -9,18 +11,18 @@ import java.util.stream.Collectors;
 
 public class EnumType implements SumType {
     private PrimitiveType baseType;
-    private Set<ConstantPrimitiveType> values;
+    private Set<EnumItemType> items;
 
-    public EnumType(PrimitiveType baseType, Set<ConstantPrimitiveType> values) {
+    public EnumType(PrimitiveType baseType, Set<EnumItemType> items) {
         this.baseType = baseType;
-        this.values = values;
+        this.items = items;
     }
 
-    public Set<ConstantPrimitiveType> getValues() {
-        return values;
+    public Set<EnumItemType> getItems() {
+        return items;
     }
 
-    public static <T extends PrimitiveType> EnumType of(T baseType, ConstantPrimitiveType... values){
+    public static <T extends PrimitiveType> EnumType of(T baseType, EnumItemType... values){
         return new EnumType(baseType, Arrays.stream(values).collect(Collectors.toSet()));
     }
 
@@ -33,24 +35,31 @@ public class EnumType implements SumType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EnumType enumType = (EnumType) o;
-        return baseType.equals(enumType.baseType) && values.equals(enumType.values);
+        return baseType.equals(enumType.baseType) && items.equals(enumType.items);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseType, values);
+        return Objects.hash(baseType, items);
     }
 
     @Override
     public int size() {
-        return values.size();
+        return items.size();
     }
 
-    public void accept(AdtVisitor visitor) {
+    public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
 
     public boolean isValueOf(Object value){
-        return this.baseType.isValueOf(value) && values.stream().anyMatch(constantPrimitiveType -> constantPrimitiveType.getConstant().equals(value));
+        return this.baseType.isValueOf(value) && items.stream().anyMatch(enumItemType -> enumItemType.value.getConstant().equals(value));
     }
+
+    @Override
+    public AnyType resolveSubSchemes(SchemaContext schemaContext) throws AdtException {
+        return this;
+    }
+
+    public record EnumItemType(String name, ConstantPrimitiveType value) implements AnyType{}
 }

@@ -7,7 +7,7 @@ import data.modeling.adt.mappers.fixtures.*;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures.AllOfFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures.SanityFixtureData;
 import data.modeling.adt.typedefs.NamedType;
-import data.modeling.adt.util.AnyTypeComparator;
+import data.modeling.adt.compatibility.AnyTypeComparator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,7 +37,7 @@ public class JsonSchemaDraft7ToAdtTest {
     }
 
     @Test
-    public void testMethod() throws JsonProcessingException, AdtException {
+    public void testMethod() throws AdtException {
         JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt(fixtureData.getInputSchema());
         SchemaContext expectedSchemaContext = fixtureData.getExpectedSchemaContext();
         NamedType expectedNamedType = expectedSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
@@ -48,7 +48,6 @@ public class JsonSchemaDraft7ToAdtTest {
 
         // Verify that the expected named type was generated
         assertEquals(fixtureData.expectedSchemaContextSize(), actualSchemaContext.size());
-
 
         var namedType = actualSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
 

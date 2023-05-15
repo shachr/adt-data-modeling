@@ -1,21 +1,36 @@
 package data.modeling.adt;
 
+import data.modeling.adt.abstraction.artifacts.Artifact;
+import data.modeling.adt.exceptions.AdtException;
+import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFile;
+import data.modeling.adt.mappers.javabeansFromAdt.util.JavaJarUtil;
 import data.modeling.adt.messages.*;
 import data.modeling.adt.pipelines.schemaconvertion.SchemaConversionPipeline;
+import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToPojo;
+import data.modeling.adt.pipelines.schemaconvertion.converters.JavaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaConverter;
+import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaFile;
 import data.modeling.adt.pipelines.schemaparsing.SchemaParsingPipeline;
 import data.modeling.adt.pipelines.schemaparsing.parsers.JsonSchemaTypeParser;
 import data.modeling.adt.pipelines.schemavalidation.SchemaValidationPipeline;
 import data.modeling.adt.pipelines.schemavalidation.validators.JsonSchemaValidator;
+import data.modeling.adt.util.FSUtil;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class Main {
     final static String APPLICATION_SCHEMA_JSON = "application/schema+json";
+    final static String BINARY_JAVA = "binary/java";
 
     public static final String SCHEMA_STRING = "{\n" +
-            "  \"$id\": \"foo\",\n" +
+            "  \"$id\": \"com.shachar.foo\",\n" +
             "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
             "  \"type\": \"object\",\n" +
             "  \"properties\": {\n" +
@@ -49,6 +64,7 @@ public class Main {
 
         schemaParsingPipeline.registerParser(new JsonSchemaTypeParser());
         schemaConversionPipeline.registerConverter(new JsonSchemaConverter());
+        schemaConversionPipeline.registerConverter(new JavaConverter());
         schemaValidationPipeline.registerConverter(new JsonSchemaValidator());
 
         // parse
@@ -62,12 +78,62 @@ public class Main {
     }
 
     private static void convertSchema(SchemaValidationMessage schemaValidationMessage, Throwable ex) throws Exception {
-        SchemaConvertionMessage schemaConvertionMessage = new SchemaConvertionMessage(APPLICATION_SCHEMA_JSON, "foo", schemaValidationMessage.getSchemaContext());
-        SchemaConvertedMessage schemaConvertedMessage = schemaConversionPipeline.apply(schemaConvertionMessage);
+        SchemaContext schemaContext = schemaValidationMessage.getSchemaContext();
+        SchemaConvertedMessage schemaConvertedMessage = schemaConversionPipeline.apply(
+                new SchemaConvertionMessage(APPLICATION_SCHEMA_JSON, "com.shachar.foo", schemaContext));
 
-        System.out.println(schemaValidationMessage.getSchemaContext().containsNamedType("foo"));
-        System.out.println("--");
-        System.out.println(schemaConvertedMessage.getSchemaContent());
+        System.out.println(schemaConvertedMessage.<JsonSchemaFile>getSchemaArtifactOf());
+
+
+        // convert to map of java file/java content
+        schemaContext.setName("com.shachar");
+        schemaContext = new AdtToPojo(schemaContext).apply();
+        schemaConvertedMessage = schemaConversionPipeline.apply(
+                new SchemaConvertionMessage(BINARY_JAVA, "com.shachar.foo", schemaContext));
+
+        schemaConvertedMessage.<JavaFile>getSchemaArtifactOf().forEach(javaFile -> {
+
+            System.out.println(javaFile.fileName());
+            System.out.println(javaFile.content());
+            System.out.println("---");
+        });
+//        javaCodeGen(schemaContext);
+    }
+
+    private static void javaCodeGen(SchemaContext schemaContext) throws Exception {
+        SchemaConvertedMessage schemaConvertedMessage;
+        // convert to map of java file/java content
+        schemaConvertedMessage = schemaConversionPipeline.apply(
+                new SchemaConvertionMessage(BINARY_JAVA, "com.shachar.foo", schemaContext));
+
+
+        // remove any existing content from the target path
+        Path targetPath = Paths.get("./");
+        FSUtil.recursivelyForceDeleteDirectory(targetPath);
+
+        // create .java files from map
+        try {
+
+            schemaConvertedMessage.<JavaFile>getSchemaArtifactOf().forEach(LambdaExceptionUtil.consumer(entry -> {
+                Path filePath = Paths.get(targetPath.toString(), entry.fileName().replace(".", "/") + ".java");
+                Files.createDirectories(filePath.getParent());
+                Files.writeString(filePath, entry.getValue(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+
+            }));
+        } catch(Exception e){
+            throw new AdtException("failed to generate .java files", e);
+        }
+
+
+        // compile and jar
+        try{
+            JavaJarUtil javaJarUtil = new JavaJarUtil();
+            javaJarUtil.toJar(targetPath, schemaContext.getName());
+        } catch (IOException | InterruptedException e) {
+            throw new AdtException("failed to compile and create a jar", e);
+        }
+
+        // todo: load jar and check instantiate, then validate
     }
 
     private static SchemaValidationMessage validateSchema(SchemaParsedMessage schemaParsedMessage) throws Exception {
@@ -78,7 +144,7 @@ public class Main {
         return schemaValidationMessage;
     }
 
-    private static SchemaParsedMessage parseSchema() throws Exception {
+    public static SchemaParsedMessage parseSchema() throws Exception {
         SchemaParsingMessage schemaParsingMessage = new SchemaParsingMessage(APPLICATION_SCHEMA_JSON, SCHEMA_STRING);
         return schemaParsingPipeline.apply(schemaParsingMessage);
     }

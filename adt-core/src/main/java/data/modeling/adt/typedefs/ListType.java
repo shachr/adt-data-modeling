@@ -2,6 +2,7 @@ package data.modeling.adt.typedefs;
 
 
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.util.AdtVisitorUtil;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class ListType implements CollectionType {
         return Objects.hash(itemsType);
     }
 
-    public void accept(AdtVisitor visitor) {
+    public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
         AdtVisitorUtil.visit(visitor, getItemType());
     }

@@ -1,7 +1,8 @@
 package data.modeling.adt.mappers.fixtures;
 
 import data.modeling.adt.SchemaContext;
-import data.modeling.adt.util.AnyTypeComparator;
+import data.modeling.adt.compatibility.AnyTypeComparator;
+import data.modeling.adt.compatibility.Difference;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface FromAdtFixtureData<T> extends FixtureData {
 
     T getExpectedSchema() throws Exception;
 
-    List<AnyTypeComparator.Difference> getExpectedDifferences();
+    List<Difference> getExpectedDifferences();
 }

@@ -1,38 +1,104 @@
-1. Schema Management
-    1.1. ADT composition forward transitive compatibility check
-        1.1.1. consistent universal compatibility checks
-        1.1.2. schema processing engine that uses a standard schema registry
-    1.2. consider using reactive-streams:
-        https://www.reactive-streams.org/
-        https://github.com/reactive-streams/reactive-streams-jvm/tree/v1.0.4#specification
+where i left off:
+* added full support for json-schema types such as subschemes, schema dependency,conditional schema.
+    - todo: add appropriate annotations such as if/else/then, etc.
+    - dependentRequired
+* java file artifact, that yet to be packaged.
 
-        OR camel routes ( comes with configuration ):
-        https://camel.apache.org/manual/routes.html
-    1.3. extract semantic context such as DDD domain concept, and relationships
-        1.3.1 standardize json-schema
-        1.3.2 standardize avro-schema
-        1.3.3 standardize proto-schema
-        1.3.3 enable external decoration for delta/parquet
+1. Domain Modeling Strategy
+    1. Schema Management
+        1.1 Schema Parsing To ADT
+            1.2.1. add support for json-schema subschema, such as schema composition, and conditional schema
+            1.2.2. add anyOf
+            1.2.3. if/else/then = oneOf, should be a special fieldType?
+            1.2.4. dependentSchemes = more schema composition, should be a special fieldType?
+            1.2.5. dependentRequired: https://json-schema.org/understanding-json-schema/reference/conditionals.html
+            1.2.6 visitor that can resolve given a schema context.
+            1.2.7 name anonymous types! -> todo: name ideally based on location unless not possible
 
-2. Data Validation
-    2.1 Json-schema for json payload validation
-    2.2 Protobuf-validations? for proto validation
-    2.3 Avro-validations? for proto validation
-    2.4 Parquet use spark or other framework to validate - may leverage a library
-    2.5 Delta has built in schema support
+        1.2. ADT composition forward transitive compatibility check
+            1.2.1. consistent universal compatibility checks with pipe and visitor support for extensions
 
-3. Data Parsing
-    3.1 Parsing Json via Spark using ADT schema transformation to Spark-schema
-    3.2 Parsing Avro using Avro sdk
-    3.3 Parsing Proto using Proto sdk
-    3.4 Parsing Parquet using Parquet sdk
-    3.5 Parsing Delta using Delta sdk
+        1.2. schema processing engine that uses a standard schema registry ( APICurio? )
+            1.2.1. consider using reactive-streams:
+                https://www.reactive-streams.org/
+                https://github.com/reactive-streams/reactive-streams-jvm/tree/v1.0.4#specification
 
-4. Processing Pipeline
-    using Databricks
+                OR camel routes ( comes with configuration ):
+                https://camel.apache.org/manual/routes.html
 
-5. Development Assets and Data Assets
-    using Backstage
+        1.3. extract semantic context such as DDD domain concept, and relationships
+            1.3.1 standardize json-schema
+            1.3.2 standardize avro-schema
+            1.3.3 standardize proto-schema
+            1.3.4 standardize ddl-schema? or ddl.zip?
 
-6. Identity and Authorization
+        1.4 support typed notifications and delta events
+            1.4.1 design notification, in the context of an entity using ADT
+                1.4.1.1 a schema modeling language to enable notification/delta design structure and conditions
+                1.4.1.2 codegen to use jsonpatch ( https://jsonpatch.com/ ) to calculate differences between old and new
+                1.4.1.3 codegen to determine whether conditions met per notification/delta event and publish
+                1.4.1.4 introduce Delta<T>(T old, T new), preserving the entity structure with Delta<T> type attributes
+
+4. Data Processing Strategy
+    4.1 runtime -> Databricks
+    4.2 data lineage ->  w/ open-lineage
+    4.3 data access -> pLap
+        4.3.1 central access control registry - unity?
+        4.3.2 use s3 pre-signed url rather than aws roles - can unity do that?
+    4.4. Development Assets and Data Assets
+        4.4.1 using Backstage plugins
+        4.4.2 declared (role) vs inferred(code) data lineage
+
+5. Eventing Strategy
+    5.1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
+    5.2 a producing SDK spec:
+        CloudEventBuilder cloudEventBuilder = CustomCloudEventBuilder.builder();
+        cloudEventBuilder.createFactEvent(entity).validate().build();
+        cloudEventBuilder.createNotificationEvents(oldEntity, newEntity).validate().build();
+        cloudEventBuilder.createSystemEvent(bean).validate().build();
+        cloudEventBuilder.createErrorEvent(entity).validate().build();
+        cloudEventBuilder.createCommand(entity).validate().build();
+
+        use native sdks to send the message (queue or stream):
+            queue: rabbitMQCloudEventSender.send(CloudEvent messageQueue)
+            stream: producer.send(new ProducerRecord<>(topic, "key", cloudEvent))
+
+    5.3 a consuming SDK spec
+        5.3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
+        4.3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
+
+    5.4. Data Validation
+        2.1 Json-schema for json payload validation
+        2.2 Protobuf-validations? for proto validation
+        2.3 Avro-validations? for proto validation
+        2.5 Delta has built in schema evolution support
+
+    5.5. Data Parsing
+        3.1 Parsing Json via Spark using ADT schema transformation to Spark-schema
+        3.2 Parsing Avro using Avro sdk
+        3.3 Parsing Proto using Proto sdk
+
+6. API Strategy
+    6.1 Compatibility, Versioning and Deprecation ( general guidelines )
+    6.2 Request-Response APIs:
+        6.2.1 Domain APIs (subgraph) vs Frontend/B4F APIs (supergraph)
+        6.2.2 When to use what: Rest, gRPC over HTTP/2 and graphQL
+        6.2.3 API evolution and Service versioning for each technology ( Rest, gRpc and GraphQL )
+        6.2.4 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+    6.3 Event-Driven APIs:
+        6.3.1 when to use queue vs streaming: SQS vs Kafka
+        6.3.2 event standardization - CloudEvents headers, and tbd payload
+        6.3.3 domain channel standardization - per entity and pattern?
+        6.3.4 content standardization - how to distinguish between different content types
+        6.2.5 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+
+7. Fabric Strategy
+    7.1 Service-mesh runtime ( k8s based )
+    7.2 Event-mesh runtime ( databricks based )
+    7.3 Data-mesh runtime ( databricks based )
+
+8. Identity and Authorization
     TBD
+
+> Message Brokers is an excellent tool for Commands and Domain Events
+> Log Stream is an excellent tool for Integration Events

@@ -1,11 +1,12 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures;
 
 import data.modeling.adt.SchemaContext;
+import data.modeling.adt.compatibility.Difference;
 import data.modeling.adt.mappers.TestResourceReader;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
-import data.modeling.adt.util.AnyTypeComparator;
+import data.modeling.adt.compatibility.AnyTypeComparator;
 
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class SanityFixtureData implements FromAdtFixtureData<Map<String, Object>
     }
 
     @Override
-    public List<AnyTypeComparator.Difference> getExpectedDifferences() {
+    public List<Difference> getExpectedDifferences() {
         return null;
     }
 }

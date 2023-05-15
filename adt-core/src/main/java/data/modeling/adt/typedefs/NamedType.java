@@ -2,6 +2,7 @@ package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.util.NamedTypeBuilder;
 
 import java.util.HashSet;
@@ -59,9 +60,14 @@ public class NamedType implements LabeledType {
     }
 
     @Override
-    public void accept(AdtVisitor visitor) {
-        visitor.enterNamedType(this);
+    public void accept(AdtVisitor visitor) throws AdtException {
+        visitor.enterLabeledType(this);
         LabeledType.super.accept(visitor);
-        visitor.exitNamedType(this);
+        visitor.exitLabeledType(this);
+    }
+
+    @Override
+    public void setType(AnyType anyType) {
+        type = anyType;
     }
 }

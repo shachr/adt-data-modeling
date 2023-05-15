@@ -1,16 +1,28 @@
 package data.modeling.adt.util;
 
+import data.modeling.adt.abstraction.compatibility.CompatibilityPolicy;
+import data.modeling.adt.annotations.golden.DefaultValue;
+import data.modeling.adt.compatibility.AnyTypeComparator;
+import data.modeling.adt.compatibility.Difference;
+import data.modeling.adt.compatibility.DifferenceTypes;
+import data.modeling.adt.compatibility.policies.BackwardCompatibilityPolicy;
+import data.modeling.adt.compatibility.policies.ForwardCompatibilityPolicy;
+import data.modeling.adt.compatibility.policies.FullCompatibilityPolicy;
 import data.modeling.adt.typedefs.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SumTypeComparatorTest {
+    CompatibilityPolicy backwardCompatibilityPolicy = new BackwardCompatibilityPolicy();
+    CompatibilityPolicy forwardCompatibilityPolicy = new ForwardCompatibilityPolicy();
+    CompatibilityPolicy fullCompatibilityPolicy = new FullCompatibilityPolicy();
 
     @Test
     public void compareSumType_shouldPassForMatchingUnionTypes() {
@@ -26,7 +38,8 @@ public class SumTypeComparatorTest {
         UnionType unionType2 = new UnionType(types2);
 
         // Compare the union types
-        List<AnyTypeComparator.Difference> differences = new AnyTypeComparator(unionType1, unionType2).findDiff();
+//        unionType1.compatiableWith(unionType2, )
+        List<Difference> differences = AnyTypeComparator.compare(unionType1, unionType2);
 
         // Verify that no differences were found
         assertEquals(0, differences.size());
@@ -39,23 +52,27 @@ public class SumTypeComparatorTest {
         UnionType unionType2 = new UnionType(Stream.of(new IntType()).collect(Collectors.toSet()));
 
         // Compare the union types
-        List<AnyTypeComparator.Difference> differences = new AnyTypeComparator(unionType1, unionType2).findDiff();
+        List<Difference> differences = AnyTypeComparator.compare(unionType1, unionType2);
 
         differences.forEach(System.out::println);
         // Verify that differences were found
         assertEquals(2, differences.size());
 
-        AnyTypeComparator.Difference difference1 = differences.get(0);
-        assertEquals("type is different", difference1.getMessage());
-        assertEquals("/0", difference1.getJsonPointer());
-        assertEquals("StringType", difference1.getExpected());
-        assertEquals("IntType", difference1.getActual());
+        Difference difference1 = differences.get(0);
+        assertEquals(DifferenceTypes.TypeChanged, difference1.differenceType());
+        assertEquals("/0", difference1.jsonPointer());
+        assertEquals("StringType", difference1.expected());
+        assertEquals("IntType", difference1.actual());
 
-        AnyTypeComparator.Difference difference2 = differences.get(1);
-        assertEquals("item not found: StringType", difference2.getMessage());
-        assertEquals("/", difference2.getJsonPointer());
-        assertEquals("StringType", difference2.getExpected().getClass().getSimpleName());
-        assertEquals(null, difference2.getActual());
+        Difference difference2 = differences.get(1);
+        assertEquals(DifferenceTypes.TypeRemoved, difference2.differenceType());
+        assertEquals("/1", difference2.jsonPointer());
+        assertEquals("StringType", difference2.expected().getClass().getSimpleName());
+        assertEquals(null, difference2.actual());
+
+        assertFalse(backwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(fullCompatibilityPolicy.isCompatible(differences));
     }
 
     @Test
@@ -65,15 +82,19 @@ public class SumTypeComparatorTest {
         EnumType enumType2 = new EnumType(new StringType(), Stream.of(StringType.constantOf("foo")).collect(Collectors.toSet()));
 
         // Compare the enum types
-        List<AnyTypeComparator.Difference> differences = new AnyTypeComparator(enumType1, enumType2).findDiff();
+        List<Difference> differences = AnyTypeComparator.compare(enumType1, enumType2);
 
         // Verify that differences were found
         assertEquals(1, differences.size());
 
         // Verify the difference message and JSON pointer
-        AnyTypeComparator.Difference difference = differences.get(0);
-        assertEquals("enum base type mismatch", difference.getMessage());
-        assertEquals("/", difference.getJsonPointer());
+        Difference difference = differences.get(0);
+        assertEquals(DifferenceTypes.TypeChanged, difference.differenceType());
+        assertEquals("/", difference.jsonPointer());
+
+        assertFalse(backwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(fullCompatibilityPolicy.isCompatible(differences));
     }
 
     @Test
@@ -83,9 +104,54 @@ public class SumTypeComparatorTest {
         EnumType enumType2 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
 
         // Compare the enum types
-        List<AnyTypeComparator.Difference> differences = new AnyTypeComparator(enumType1, enumType2).findDiff();
+        List<Difference> differences = AnyTypeComparator.compare(enumType1, enumType2);
 
         // Verify that differences were found
         assertEquals(0, differences.size());
+    }
+
+    @Test
+    public void compareEnumType_shouldFailForTypeAddedWithDefault() {
+        // additive enum change with default
+        EnumType enumType1 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
+        EnumType enumType2 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1), IntType.constantOf(2)).collect(Collectors.toSet()));
+
+
+        ProductType productType1 = ProductType.of(FieldType.builder("foo", enumType1).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType2 = ProductType.of(FieldType.builder("foo", enumType2).withAnnotations(new DefaultValue(1)).build());
+
+        // Compare the enum types
+        List<Difference> differences = AnyTypeComparator.compare(productType1, productType2);
+
+        // Verify that differences were found
+        assertEquals(1, differences.size());
+        assertEquals(DifferenceTypes.TypeAddedWithDefault, differences.get(0).differenceType());
+
+        assertTrue(backwardCompatibilityPolicy.isCompatible(differences));
+        assertTrue(forwardCompatibilityPolicy.isCompatible(differences));
+        assertTrue(fullCompatibilityPolicy.isCompatible(differences));
+    }
+
+    @Test
+    public void compareUnionType_shouldFailForTypeAddedWithDefault() {
+        // additive enum change with default
+        UnionType unionType1 = new UnionType(Stream.of(new IntType()).collect(Collectors.toCollection(LinkedHashSet::new)));
+        UnionType unionType2 = new UnionType(Stream.of(new IntType(), new StringType()).collect(Collectors.toCollection(LinkedHashSet::new)));
+
+        ProductType productType1 = ProductType.of(FieldType.builder("foo", unionType1).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType2 = ProductType.of(FieldType.builder("foo", unionType2).withAnnotations(new DefaultValue(1)).build());
+
+        // Compare the enum types
+        List<Difference> differences = AnyTypeComparator.compare(productType1, productType2);
+
+        // Verify that differences were found
+        differences.forEach(System.out::println);
+        assertEquals(false, differences.isEmpty());
+        assertEquals(1, differences.size());
+        assertEquals(DifferenceTypes.TypeAddedWithDefault, differences.get(0).differenceType());
+
+        assertTrue(backwardCompatibilityPolicy.isCompatible(differences));
+        assertTrue(forwardCompatibilityPolicy.isCompatible(differences));
+        assertTrue(fullCompatibilityPolicy.isCompatible(differences));
     }
 }

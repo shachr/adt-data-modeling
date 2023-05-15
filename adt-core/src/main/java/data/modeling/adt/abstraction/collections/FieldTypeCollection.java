@@ -19,8 +19,12 @@ public class FieldTypeCollection  {
         return fieldsMap.get(name);
     }
 
+    public boolean containsName(String name){
+        return fieldsMap.containsKey(name);
+    }
+
     public void addAll(Collection<FieldType> collection) {
-        collection.forEach(fieldType -> add(fieldType));
+        collection.forEach(this::add);
     }
 
     public Set<FieldType> getFields(){

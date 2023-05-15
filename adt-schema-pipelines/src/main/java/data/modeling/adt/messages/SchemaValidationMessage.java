@@ -5,20 +5,21 @@ import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.Message;
 import data.modeling.adt.abstraction.annotations.Annotation;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SchemaValidationMessage implements Message {
     private SchemaContext schemaContext;
-    private Set<ValidationError> validationErrors;
+    private List<ValidationError> validationErrors;
 
     public SchemaValidationMessage(SchemaContext schemaContext, Stream<ValidationError> validationErrorStream) {
         this.schemaContext = schemaContext;
-        validationErrors = validationErrorStream.collect(Collectors.toSet());
+        validationErrors = validationErrorStream.collect(Collectors.toList());
     }
 
-    public Set<ValidationError> getValidationErrors() {
+    public List<ValidationError> getValidationErrors() {
         return validationErrors;
     }
 

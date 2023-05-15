@@ -1,17 +1,14 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures;
 
 import data.modeling.adt.SchemaContext;
+import data.modeling.adt.compatibility.Difference;
 import data.modeling.adt.mappers.TestResourceReader;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
-import data.modeling.adt.util.AnyTypeComparator;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>> {
     final String schemaNamespace = "http://example.com/product.schema.json";
@@ -30,9 +27,9 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
     public SchemaContext getInputSchemaContext() {
         SchemaContext schemaContext = new SchemaContext();
         NamedType emptyObject = new NamedType("#/definitions/EmptyObject", new ProductType());
-        NamedType namedType = NamedType.builder(schemaNamespace, ProductType.of(
-                Stream.of(new ReferenceObjectType(emptyObject.getName())).collect(Collectors.toCollection(LinkedHashSet::new)),
-                Stream.of(
+        NamedType namedType = NamedType.builder(schemaNamespace, AllOfType.of(
+                new ReferenceNamedType(emptyObject.getName()),
+                ProductType.of(
                     FieldType.builder("productId", new IntType())
                             .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))
                             .withIsRequired(true)
@@ -91,7 +88,7 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
     }
 
     @Override
-    public List<AnyTypeComparator.Difference> getExpectedDifferences() {
+    public List<Difference> getExpectedDifferences() {
         return null;
     }
 }

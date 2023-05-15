@@ -24,6 +24,10 @@ public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<Strin
         fromAdtMapperRegistry.register(new JsonSchemaNullMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaEnumMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaAllOfMapper(fromAdtMapperRegistry));
+        fromAdtMapperRegistry.register(new JsonSchemaAnyOfMapper(fromAdtMapperRegistry));
+        //todo: there is no support for this in json-schema,
+        // instead, should run a schema processing pipeline that denormalize to json-schema friendly structures.
+//        fromAdtMapperRegistry.register(new JsonSchemaProductTypeWithExtendingReferences(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaObjectMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaOneOfMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaPrimitiveMapper());

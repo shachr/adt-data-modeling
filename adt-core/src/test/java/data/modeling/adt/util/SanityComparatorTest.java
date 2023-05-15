@@ -1,5 +1,12 @@
 package data.modeling.adt.util;
 
+import data.modeling.adt.abstraction.compatibility.CompatibilityPolicy;
+import data.modeling.adt.compatibility.AnyTypeComparator;
+import data.modeling.adt.compatibility.Difference;
+import data.modeling.adt.compatibility.DifferenceTypes;
+import data.modeling.adt.compatibility.policies.BackwardCompatibilityPolicy;
+import data.modeling.adt.compatibility.policies.ForwardCompatibilityPolicy;
+import data.modeling.adt.compatibility.policies.FullCompatibilityPolicy;
 import data.modeling.adt.typedefs.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,9 +17,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SanityComparatorTest {
+    CompatibilityPolicy backwardCompatibilityPolicy = new BackwardCompatibilityPolicy();
+    CompatibilityPolicy forwardCompatibilityPolicy = new ForwardCompatibilityPolicy();
+    CompatibilityPolicy fullCompatibilityPolicy = new FullCompatibilityPolicy();
 
     @Test
     public void testCompare() {
@@ -26,51 +36,65 @@ public class SanityComparatorTest {
         assertEquals(0, AnyTypeComparator.compare(namedType1, namedType2).size());
 
         // Different named types
-        namedType2 = new NamedType("person", new ProductType(Stream.of(
-                new FieldType("foo", new StringType()),
-                new FieldType("bar", new IntType())
-        ).collect(Collectors.toSet())));
+        FieldType foo = new FieldType("foo", new StringType());
+        FieldType bar = new FieldType("bar", new IntType());
+        namedType2 = new NamedType("person", ProductType.of(
+                foo,
+                bar
+        ));
 
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(namedType1, namedType2);
+        List<Difference> diffs = AnyTypeComparator.compare(namedType1, namedType2);
         assertEquals(2, diffs.size());
 
-        AnyTypeComparator.Difference diff1 = diffs.get(0);
-        assertEquals("unexpected field: foo", diff1.getMessage());
-        assertEquals("/", diff1.getJsonPointer());
-        assertEquals(null, diff1.getExpected());
-        assertEquals("foo", diff1.getActual());
+        Difference diff1 = diffs.get(0);
+        assertEquals(DifferenceTypes.FieldAddedOptional, diff1.differenceType());
+        assertEquals("/", diff1.jsonPointer());
+        assertEquals(null, diff1.expected());
+        assertEquals(foo, diff1.actual());
 
-        AnyTypeComparator.Difference diff2 = diffs.get(1);
-        assertEquals("unexpected field: bar", diff2.getMessage());
-        assertEquals("/", diff2.getJsonPointer());
-        assertEquals(null, diff2.getExpected());
-        assertEquals("bar", diff2.getActual());
+        Difference diff2 = diffs.get(1);
+        assertEquals(DifferenceTypes.FieldAddedOptional, diff2.differenceType());
+        assertEquals("/", diff2.jsonPointer());
+        assertEquals(null, diff2.expected());
+        assertEquals(bar, diff2.actual());
+
+        assertTrue(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(fullCompatibilityPolicy.isCompatible(diffs));
     }
 
     @Test
     void testCompareNamedTypeDifferentName() {
         NamedType nt1 = new NamedType("foo", new ListType(new IntType()));
         NamedType nt2 = new NamedType("bar", new ListType(new IntType()));
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
+        List<Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
         Assertions.assertEquals(1, diffs.size());
-        AnyTypeComparator.Difference diff = diffs.get(0);
-        Assertions.assertEquals("name is different", diff.getMessage());
-        Assertions.assertEquals("/", diff.getJsonPointer());
-        Assertions.assertEquals("foo", diff.getExpected());
-        Assertions.assertEquals("bar", diff.getActual());
+        Difference diff = diffs.get(0);
+        Assertions.assertEquals(DifferenceTypes.LabelChanged, diff.differenceType());
+        Assertions.assertEquals("/", diff.jsonPointer());
+        Assertions.assertEquals("foo", diff.expected());
+        Assertions.assertEquals("bar", diff.actual());
+
+        assertFalse(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(fullCompatibilityPolicy.isCompatible(diffs));
     }
 
     @Test
     void testCompareNamedTypeDifferentType() {
         NamedType nt1 = new NamedType("foo", new SetType(new IntType()));
         NamedType nt2 = new NamedType("foo", new StringType());
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
+        List<Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
         Assertions.assertEquals(1, diffs.size());
-        AnyTypeComparator.Difference diff = diffs.get(0);
-        Assertions.assertEquals("type is different", diff.getMessage());
-        Assertions.assertEquals("/", diff.getJsonPointer());
-        Assertions.assertEquals("SetType", diff.getExpected());
-        Assertions.assertEquals("StringType", diff.getActual());
+        Difference diff = diffs.get(0);
+        Assertions.assertEquals(DifferenceTypes.TypeChanged, diff.differenceType());
+        Assertions.assertEquals("/", diff.jsonPointer());
+        Assertions.assertEquals("SetType", diff.expected());
+        Assertions.assertEquals("StringType", diff.actual());
+
+        assertFalse(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(fullCompatibilityPolicy.isCompatible(diffs));
     }
 
     @Test
@@ -81,8 +105,12 @@ public class SanityComparatorTest {
         Set<AnyType> types2 = new HashSet<>();
         types2.add(new NullValueType(new IntType()));
         UnionType ut2 = new UnionType(types2);
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(ut1, ut2);
+        List<Difference> diffs = AnyTypeComparator.compare(ut1, ut2);
         Assertions.assertEquals(0, diffs.size());
+
+        assertTrue(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(fullCompatibilityPolicy.isCompatible(diffs));
     }
 
     @Test
@@ -93,8 +121,12 @@ public class SanityComparatorTest {
         Set<ConstantPrimitiveType> values2 = new HashSet<>();
         values2.add(StringType.constantOf("foo"));
         EnumType et2 = new EnumType(new StringType(), values2);
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(et1, et2);
+        List<Difference> diffs = AnyTypeComparator.compare(et1, et2);
         Assertions.assertEquals(0, diffs.size());
+
+        assertTrue(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertTrue(fullCompatibilityPolicy.isCompatible(diffs));
     }
     @Test
     void testCompareSumTypeEnumTypeDifferentBaseType() {
@@ -104,12 +136,16 @@ public class SanityComparatorTest {
         Set<ConstantPrimitiveType> values2 = new HashSet<>();
         values2.add(IntType.constantOf(1));
         EnumType et2 = new EnumType(new IntType(), values2);
-        List<AnyTypeComparator.Difference> diffs = AnyTypeComparator.compare(et1, et2);
+        List<Difference> diffs = AnyTypeComparator.compare(et1, et2);
         Assertions.assertEquals(1, diffs.size());
-        AnyTypeComparator.Difference diff = diffs.get(0);
-        Assertions.assertEquals("enum base type mismatch", diff.getMessage());
-        Assertions.assertEquals("/", diff.getJsonPointer());
-        Assertions.assertEquals("StringType", diff.getExpected());
-        Assertions.assertEquals("IntType", diff.getActual());
+        Difference diff = diffs.get(0);
+        Assertions.assertEquals(DifferenceTypes.TypeChanged, diff.differenceType());
+        Assertions.assertEquals("/", diff.jsonPointer());
+        Assertions.assertEquals("StringType", diff.expected());
+        Assertions.assertEquals("IntType", diff.actual());
+
+        assertFalse(backwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(diffs));
+        assertFalse(fullCompatibilityPolicy.isCompatible(diffs));
     }
 }

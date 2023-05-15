@@ -49,10 +49,10 @@
           "description": "Product availability",
           "type": "boolean"
         }
-      }
+      },
+      "required": ["productId", "productName", "price"]
     }
   ],
-  "required": ["productId", "productName", "price"],
   "definitions": {
     "EmptyObject": {
       "type": "object"

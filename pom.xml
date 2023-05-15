@@ -13,6 +13,7 @@
         <module>adt-core</module>
         <module>adt-jsonschema-mapper</module>
         <module>adt-schema-pipelines</module>
+        <module>adt-javabeans-mapper</module>
     </modules>
 
 </project>

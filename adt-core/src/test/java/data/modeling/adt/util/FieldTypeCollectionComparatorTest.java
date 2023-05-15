@@ -1,13 +1,16 @@
 package data.modeling.adt.util;
 
+import data.modeling.adt.compatibility.AnyTypeComparator;
+import data.modeling.adt.compatibility.DifferenceTypes;
 import data.modeling.adt.typedefs.FieldType;
 import data.modeling.adt.typedefs.IntType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.typedefs.StringType;
-import data.modeling.adt.util.AnyTypeComparator.Difference;
+import data.modeling.adt.compatibility.Difference;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,38 +22,38 @@ public class FieldTypeCollectionComparatorTest {
     @Test
     public void testCompareFieldTypeCollection() {
         // Create two sets of fields with different contents
-        Set<FieldType> fields1 = new HashSet<>();
+        Set<FieldType> fields1 = new LinkedHashSet<>();
         fields1.add(new FieldType("field1", new IntType()));
         fields1.add(new FieldType("field2", new ProductType()));
-        fields1.add(new FieldType("field3", new IntType()));
+        FieldType fieldType3 = new FieldType("field3", new IntType());
+        fields1.add(fieldType3);
 
-        Set<FieldType> fields2 = new HashSet<>();
+        Set<FieldType> fields2 = new LinkedHashSet<>();
         fields2.add(new FieldType("field1", new IntType()));
         fields2.add(new FieldType("field4", new StringType()));
 
         // Compare the two sets of fields
-        AnyTypeComparator comparator = new AnyTypeComparator(new ProductType(fields1), new ProductType(fields2));
-        List<Difference> diffs = comparator.findDiff();
+        List<Difference> diffs = AnyTypeComparator.compare(new ProductType(fields1), new ProductType(fields2));
         diffs.forEach(System.out::println);
         assertEquals(3, diffs.size());
 
         Difference diff1 = diffs.get(0);
-        assertEquals("/field2", diff1.getJsonPointer());
-        assertEquals("field2", diff1.getExpected());
-        assertEquals("field4", diff1.getActual());
-        assertTrue(diff1.getMessage().contains("field name mismatch"));
+        assertEquals("/field2", diff1.jsonPointer());
+        assertEquals("field2", diff1.expected());
+        assertEquals("field4", diff1.actual());
+        assertTrue(diff1.differenceType().equals(DifferenceTypes.FieldLabelChanged));
 
         Difference diff2 = diffs.get(1);
-        assertEquals("/field2", diff2.getJsonPointer());
-        assertEquals("ProductType", diff2.getExpected());
-        assertEquals("StringType", diff2.getActual());
-        assertTrue(diff2.getMessage().contains("type is different"));
+        assertEquals("/field2", diff2.jsonPointer());
+        assertEquals("ProductType", diff2.expected());
+        assertEquals("StringType", diff2.actual());
+        assertTrue(diff2.differenceType().equals(DifferenceTypes.TypeChanged));
 
         Difference diff3 = diffs.get(2);
-        assertEquals("/field3", diff3.getJsonPointer());
-        assertEquals("field3", diff3.getExpected());
-        assertEquals(null, diff3.getActual());
-        assertTrue(diff3.getMessage().contains("field not found: field3"));
+        assertEquals("/field3", diff3.jsonPointer());
+        assertEquals(fieldType3, diff3.expected());
+        assertEquals(null, diff3.actual());
+        assertTrue(diff3.differenceType().equals(DifferenceTypes.FieldRemovedOptional));
     }
 
 }

@@ -6,7 +6,7 @@ import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.NamedType;
-import data.modeling.adt.typedefs.ReferenceObjectType;
+import data.modeling.adt.typedefs.ReferenceNamedType;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static data.modeling.adt.util.StreamExtensions.toMap;
 
-public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceObjectType> {
+public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -28,12 +28,12 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceObjectType> {
     }
 
     @Override
-    public boolean canMap(ReferenceObjectType value) {
+    public boolean canMap(ReferenceNamedType value) {
         return true;
     }
 
     @Override
-    public Stream<Map.Entry<String, Object>> fromAdt(ReferenceObjectType type) throws AdtException {
+    public Stream<Map.Entry<String, Object>> fromAdt(ReferenceNamedType type) throws AdtException {
         NamedType namedType = this.schemaContext.getNamedType(type.getReferenceName());
         this.addDefinition(
                 removeDefinitionPrefix(namedType.getName()),

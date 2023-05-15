@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
-    private LinkedHashSet<ReferenceObjectType> extendedProducts;
+    private LinkedHashSet<ReferenceNamedType> extendedProducts;
     private SchemaContext schemaContext;
 
     public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, SchemaContext schemaContext) {
@@ -26,7 +26,7 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
         this.toAdtMapperRegistry = toAdtMapperRegistry;
     }
 
-    public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, LinkedHashSet<ReferenceObjectType> extendedProducts) {
+    public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, LinkedHashSet<ReferenceNamedType> extendedProducts) {
 
         this.toAdtMapperRegistry = toAdtMapperRegistry;
         this.extendedProducts = extendedProducts;
@@ -51,17 +51,17 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
                     (entry) ->
                     {
                         Map<String, Object> fieldMap = (Map<String, Object>) entry.getValue();
-                        FieldType fieldType = FieldType.of(entry.getKey(), toAdtMapperRegistry.toAdt(fieldMap));
-                        fieldMap.keySet().forEach(key -> {
-                            fieldType.getAnnotations().add(new JsonSchemaAnnotation(key, fieldMap.get(key)));
-                        });
+                        AnyType fieldAdtType = toAdtMapperRegistry.toAdt(fieldMap);
+                        FieldType fieldType = FieldType.of(entry.getKey(), fieldAdtType);
+                        fieldMap.keySet().forEach(key ->
+                                fieldType.getAnnotations().add(new JsonSchemaAnnotation(key, fieldMap.get(key))));
                         return fieldType;
                     }
             ));
         }
 
         if(!Objects.isNull(additionalProperties) && !(additionalProperties instanceof Boolean)){
-            AdditionalFieldsType fieldType = new AdditionalFieldsType("additionalProperties", new MapType(new StringType(), toAdtMapperRegistry.toAdt(additionalProperties)));
+            FieldAdditionalTypes fieldType = new FieldAdditionalTypes(ProductType.of(new FieldType("additionalProperties", new MapType(new StringType(), toAdtMapperRegistry.toAdt(additionalProperties)))));
             List<FieldType> fields = fieldTypeStream.collect(Collectors.toList());
             fields.add(fieldType);
             fieldTypeStream = fields.stream();

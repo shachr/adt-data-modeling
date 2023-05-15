@@ -1,6 +1,7 @@
 package data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures;
 
 import data.modeling.adt.SchemaContext;
+import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.fixtures.ToAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
@@ -112,7 +113,7 @@ public class SanityFixtureData implements ToAdtFixtureData<String> {
                 FieldType.builder("isAvailable", new BoolType())
                         .withAnnotations(new JsonSchemaAnnotation("description", "Product availability"))
                         .build(),
-                new AdditionalFieldsType("additionalProperties", new MapType(new StringType(), new BoolType()))
+                new FieldAdditionalTypes(ProductType.of(new FieldType("additionalProperties", new MapType(new StringType(), new BoolType()))))
         )).build();
 
         namedType.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));

@@ -1,10 +1,13 @@
 package data.modeling.adt.util;
 
+import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.NamedType;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NamedTypeBuilder {
     private String name;
@@ -17,7 +20,8 @@ public class NamedTypeBuilder {
         this.type = type;
     }
 
-    public NamedTypeBuilder withAnnotations(){
+    public NamedTypeBuilder withAnnotations(Annotation<?>... annotations){
+        this.annotations.addAll(Arrays.stream(annotations).collect(Collectors.toCollection(LinkedHashSet::new)));
         return this;
     }
 

@@ -1,6 +1,7 @@
 package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 
 import java.util.Objects;
 
@@ -20,7 +21,7 @@ public class MapType implements CollectionType {
         return itemType;
     }
 
-    public void accept(AdtVisitor visitor) {
+    public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
 

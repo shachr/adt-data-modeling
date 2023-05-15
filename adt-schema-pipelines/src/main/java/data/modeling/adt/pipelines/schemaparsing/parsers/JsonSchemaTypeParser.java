@@ -32,12 +32,12 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
 
     private LabeledType lastLabeledType;
     @Override
-    public void enterNamedType(LabeledType type) {
+    public void enterLabeledType(LabeledType type) {
         lastLabeledType = type;
     }
 
     @Override
-    public void exitNamedType(LabeledType type) {
+    public void exitLabeledType(LabeledType type) {
         lastLabeledType = null;
     }
 
@@ -52,7 +52,7 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
     }
 
     @Override
-    public void visit(ReferenceObjectType type) {
+    public void visit(ReferenceNamedType type) {
 
     }
 

@@ -1,6 +1,7 @@
 package data.modeling.adt.typedefs;
 
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
+import data.modeling.adt.exceptions.AdtException;
 
 public abstract class PrimitiveType implements AnyType {
     @Override
@@ -9,7 +10,13 @@ public abstract class PrimitiveType implements AnyType {
         if (obj == null || getClass() != obj.getClass()) return false;
         return true;
     }
-    public void accept(AdtVisitor visitor) {
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
 

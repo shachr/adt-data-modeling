@@ -1,12 +1,17 @@
 package data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers;
 
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
+import data.modeling.adt.typedefs.AnyOfType;
+import data.modeling.adt.typedefs.AnyType;
+import data.modeling.adt.typedefs.FieldType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaAnyOfNotSupported;
+import data.modeling.adt.util.LambdaExceptionUtil;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class JsonSchemaAnyOfMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<ProductType> {
+public class JsonSchemaAnyOfMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<AnyOfType> {
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
     public JsonSchemaAnyOfMapper(ToAdtMapperRegistry toAdtMapperRegistry) {
@@ -20,8 +25,13 @@ public class JsonSchemaAnyOfMapper extends data.modeling.adt.mappers.jsonschemad
     }
 
     @Override
-    public ProductType toAdt(Map<String, Object> value) throws JsonSchemaAnyOfNotSupported {
-        // todo: add logic
-        throw new JsonSchemaAnyOfNotSupported();
+    public AnyOfType toAdt(Map<String, Object> value) throws JsonSchemaAnyOfNotSupported {
+        List<Map<String, Object>> anyOf = (List<Map<String, Object>>)value.remove("anyOf");
+        Set<AnyType> typesFound = anyOf.stream()
+                .map(LambdaExceptionUtil.function(item-> toAdtMapperRegistry.toAdt(item)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        AnyOfType anyOfType = new AnyOfType(typesFound);
+        return anyOfType;
     }
 }

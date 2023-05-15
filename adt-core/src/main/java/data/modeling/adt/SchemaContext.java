@@ -3,6 +3,7 @@ package data.modeling.adt;
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,8 +15,14 @@ import java.util.stream.Stream;
 public class SchemaContext {
     private final Map<String, NamedType> objectTypeMap;
     private final Map<String, Set<Annotation>> annotations;
+    private String name;
 
     public SchemaContext() {
+        this("");
+    }
+
+    public SchemaContext(String name) {
+        this.name = name;
         this.objectTypeMap = new HashMap<>();
         this.annotations = new HashMap<>();
     }
@@ -62,7 +69,15 @@ public class SchemaContext {
     }
 
     public void accept(AdtVisitor visitor) {
-        this.objectTypeMap.values().forEach(objectType -> objectType.accept(visitor));
+        new LinkedHashSet<>(this.objectTypeMap.values()).forEach(LambdaExceptionUtil.consumer(objectType -> objectType.accept(visitor)));
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
 
