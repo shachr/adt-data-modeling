@@ -63,14 +63,17 @@ Fabric Strategy ( self-service infrastructure and easy-to-use tools )
         Identity and Authorization
 
     Data Strategy
-        4.1 runtime -> Databricks
-        4.2 data lineage ->  w/ open-lineage
-        4.3 data access -> pLap
-            4.3.1 central access control registry - unity?
-            4.3.2 use s3 pre-signed url rather than aws roles - can unity do that?
-        4.4. Development Assets and Data Assets
-            4.4.1 using Backstage plugins
-            4.4.2 declared (role) vs inferred(code) data lineage
+        4.1 Write vs read persistence
+            4.1.1 Infrastructure as Code (IaC)
+                4.1.1.1 Write Data Polyglot
+                4.1.1.2 Read Data Polyglot
+                    Data Lake ( storage, data access, catalog )
+                    ??
+            4.1.2 Data Governance
+        4.2 Data Processing Fabric -> Databricks
+            4.2.1 data lineage ->  w/ open-lineage
+                4.2.1.1 declared (role) vs inferred(code) data lineage
+        4.5. Development Assets and Data Assets Registry ( Backstage )
 
     Eventing Strategy
         5.1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
