@@ -61,6 +61,8 @@ Fabric Strategy ( self-service infrastructure and easy-to-use tools )
 
     Service Strategy
         Identity and Authorization
+        APIGateway
+        ServiceMesh
 
     Data Strategy
         4.1 Write vs read persistence
