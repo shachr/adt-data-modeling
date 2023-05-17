@@ -57,7 +57,7 @@ public class AnyTypeComparator {
     }
 
     private void compareProductType(ComparatorContext comparatorContext, ProductType productType1, ProductType productType2) {
-        compareCollections(comparatorContext, productType1.getExtendedProductTypes(), productType2.getExtendedProductTypes());
+        compareCollections(comparatorContext, productType1.getImplements(), productType2.getImplements());
         compareFieldTypeCollection(comparatorContext, productType1.getOwnFields(), productType2.getOwnFields());
     }
 

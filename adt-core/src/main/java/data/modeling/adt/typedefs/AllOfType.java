@@ -29,6 +29,14 @@ public class AllOfType implements CompositionType {
         return types;
     }
 
+    public void setTypes(Collection<? extends AnyType> types) {
+        this.types = types;
+    }
+
+    public void setTypes(Stream<? extends AnyType> types) {
+        this.types = types.collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     @Override
     public int size() {
         return getTypes().size();
@@ -38,11 +46,6 @@ public class AllOfType implements CompositionType {
     //  or add an annotation on the named type.
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
-    }
-
-    @Override
-    public AnyType resolveSubSchemes(SchemaContext schemaContext) throws AdtException {
-        throw new AdtException("not implemented");
     }
 
     @Override

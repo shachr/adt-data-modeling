@@ -1,4 +1,4 @@
-package data.modeling.adt.mappers.javabeansFromAdt.util;
+package data.modeling.adt.mappers.javabeansFromAdt.artifacts;
 
 import data.modeling.adt.abstraction.artifacts.Artifact;
 

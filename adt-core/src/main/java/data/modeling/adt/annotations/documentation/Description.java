@@ -1,4 +1,4 @@
-package data.modeling.adt.annotations.golden;
+package data.modeling.adt.annotations.documentation;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 

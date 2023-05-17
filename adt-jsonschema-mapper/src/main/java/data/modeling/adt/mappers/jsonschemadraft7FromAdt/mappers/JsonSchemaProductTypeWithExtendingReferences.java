@@ -24,7 +24,7 @@ public class JsonSchemaProductTypeWithExtendingReferences extends JsonSchemaMapp
 
     @Override
     public boolean canMap(ProductType value) {
-        return !value.getExtendedProductTypes().isEmpty();
+        return !value.getImplements().isEmpty();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class JsonSchemaProductTypeWithExtendingReferences extends JsonSchemaMapp
         List<Map<String, Object>> allOf = new LinkedList<>();
         mapBuilder.put("type", "object");
         mapBuilder.put("allOf", allOf);
-        type.getExtendedProductTypes().forEach(LambdaExceptionUtil.consumer(referenceNamedType -> {
+        type.getImplements().forEach(LambdaExceptionUtil.consumer(referenceNamedType -> {
             MapBuilder allOfItemMap = MapBuilder.create();
             fromAdtMapperRegistry.fromAdt(referenceNamedType);
             allOf.add(allOfItemMap.put("$ref", referenceNamedType.getReferenceName()).build());

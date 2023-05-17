@@ -4,6 +4,8 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.exceptions.MapperNotFoundException;
 import data.modeling.adt.abstraction.mappers.MapFromAdt;
 import data.modeling.adt.typedefs.AnyType;
+import data.modeling.adt.util.ReflectionUtil;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -16,7 +18,7 @@ public class FromAdtMapperRegistry {
 
     public <T extends AnyType, R> void register(MapFromAdt<T,R> mapper){
         fromAdtMappers.add(mapper);
-        typeArguments.put(mapper.getClass(), getFirstTypeArgument((mapper.getClass())));
+        typeArguments.put(mapper.getClass(), ReflectionUtil.getFirstTypeArgument((mapper.getClass())));
     }
 
     public MapFromAdt getMapper(Class mapperClass){
@@ -34,19 +36,6 @@ public class FromAdtMapperRegistry {
                     return mapperType.isInstance(value) || value.getClass().isAssignableFrom(mapperType);
                 })
                 .filter(mapFromAdt -> mapFromAdt.canMap(value)).findFirst();
-    }
-
-    private  Class<?> getFirstTypeArgument(Class<?> clazz) {
-        ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();
-        Type[] typeArguments = type.getActualTypeArguments();
-        Type typeArgument = typeArguments[0];
-        if (typeArgument instanceof Class) {
-            return (Class<?>) typeArgument;
-        } else if (typeArgument instanceof ParameterizedType) {
-            return (Class<?>) ((ParameterizedType) typeArgument).getRawType();
-        } else {
-            throw new IllegalStateException("Unable to determine first type argument for " + clazz.getName());
-        }
     }
 
     public <T extends AnyType, R> R fromAdt(T value) throws AdtException {

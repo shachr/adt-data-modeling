@@ -1,4 +1,4 @@
-package data.modeling.adt.annotations.golden;
+package data.modeling.adt.annotations.datagovernance;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.enums.DataHandlingClassifications;

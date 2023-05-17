@@ -30,11 +30,6 @@ public class AnyOfType implements CompositionType {
     }
 
     @Override
-    public AnyType resolveSubSchemes(SchemaContext schemaContext) throws AdtException {
-        throw new AdtException("not implemented");
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

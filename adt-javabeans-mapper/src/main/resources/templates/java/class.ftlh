@@ -13,21 +13,21 @@ import ${import};
 </#list>
 
 <#-- Output the class declaration -->
-public class ${className} {
+public class ${className}<#if inherits()?has_content> implements <#list inherits() as inheritedType>${inheritedType}<#if inheritedType?has_next>,</#if></#list></#if> {
 <#-- Output the class properties
 <#list namedType.annotations as annotation>
     <@generateAnnotation annotation/>
 </#list>
 -->
 <#list namedType.type.getOwnFields() as field>
-    private ${getTypeMapping().map(field.type)} ${escapeName(field.name)};
+    private ${toJavaType(field.type)} ${escapeName(field.name)};
 </#list>
 
 <#-- Output the class constructor-->
 <#if namedType.type.getResolvedConstructors()?size = 0 >
     public ${className}() {}
 
-    public ${className}(<#list namedType.type.getOwnFields() as field>${getTypeMapping().map(field.type)} ${escapeName(field.name)}<#if field?has_next>,</#if></#list>) {
+    public ${className}(<#list namedType.type.getOwnFields() as field>${toJavaType(field.type)} ${escapeName(field.name)}<#if field?has_next>,</#if></#list>) {
         <#list namedType.type.getOwnFields() as field>
         this.${escapeName(field.name)} = ${escapeName(field.name)}
         </#list>
@@ -35,7 +35,7 @@ public class ${className} {
 </#if>
 
 <#list namedType.type.getResolvedConstructors() as fields>
-    public ${className}(<#list fields as field>${getTypeMapping().map(field.type)} ${escapeName(field.name)}</#list>) {
+    public ${className}(<#list fields as field>${toJavaType(field.type)} ${escapeName(field.name)}</#list>) {
     <#list fields as field>
         this.${escapeName(field.name)} = ${escapeName(field.name)}
     </#list>
@@ -44,19 +44,19 @@ public class ${className} {
 <#-- Output the getter methods -->
 <#list namedType.type.getOwnFields() as field>
 <#if namedType.type.class.simpleName == "BoolType">
-    public ${getTypeMapping().map(field.type)} is${field.name?cap_first}() {
+    public ${toJavaType(field.type)} is${field.name?cap_first}() {
         return this.${field.name};
     }
 
-    public void set${field.name?cap_first}(${getTypeMapping().map(field.type)} value) {
+    public void set${field.name?cap_first}(${toJavaType(field.type)} value) {
         this.${field.name} = value;
     }
 <#else>
-    public ${getTypeMapping().map(field.type)} get${field.name?cap_first}() {
+    public ${toJavaType(field.type)} get${field.name?cap_first}() {
         return this.${field.name};
     }
 
-    public void set${field.name?cap_first}(${getTypeMapping().map(field.type)} value) {
+    public void set${field.name?cap_first}(${toJavaType(field.type)} value) {
         this.${field.name} = value;
     }
 </#if>

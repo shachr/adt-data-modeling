@@ -4,7 +4,11 @@ where i left off:
     - dependentRequired
 * java file artifact, that yet to be packaged.
 
-1. Domain Modeling Strategy
+Goal:
+- Support for a hexagonal architecture in support of API stewardship and data+ai
+
+Strategy:
+Domain Strategy
     1. Schema Management
         1.1 Schema Parsing To ADT
             1.2.1. add support for json-schema subschema, such as schema composition, and conditional schema
@@ -14,6 +18,7 @@ where i left off:
             1.2.5. dependentRequired: https://json-schema.org/understanding-json-schema/reference/conditionals.html
             1.2.6 visitor that can resolve given a schema context.
             1.2.7 name anonymous types! -> todo: name ideally based on location unless not possible
+            1.2.8 keep track of json-schema-idl: https://github.com/json-schema-org/vocab-idl/blob/main/charter.md
 
         1.2. ADT composition forward transitive compatibility check
             1.2.1. consistent universal compatibility checks with pipe and visitor support for extensions
@@ -40,47 +45,47 @@ where i left off:
                 1.4.1.4 introduce Delta<T>(T old, T new), preserving the entity structure with Delta<T> type attributes
 
 API Strategy
-    6.1 Compatibility, Versioning and Deprecation ( general guidelines )
-    6.2 Serialization system - json specific rules, vs mature serialization system that can be used as is.
-    6.3 Request-Response APIs:
-        6.3.1 Domain APIs (subgraph) vs Frontend/B4F APIs (supergraph)
-        6.3.2 When to use what: Rest, gRPC over HTTP/2 and graphQL
-        6.3.3 API evolution and Service versioning for each technology ( Rest, gRpc and GraphQL )
-        6.3.4 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
-    6.4 Event-Driven APIs:
-        6.4.1 when to use queue vs streaming: SQS vs Kafka
-        6.4.2 event standardization - CloudEvents headers, and tbd payload
-        6.4.3 domain channel standardization - per entity and pattern? naming convention?
-        6.4.4 content standardization - how to distinguish between different content types
-        6.4.5 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+    1 Compatibility, Versioning and Deprecation ( general guidelines )
+    2 Serialization system - json specific rules, vs mature serialization system that can be used as is.
+    3 Request-Response APIs:
+        3.1 Domain APIs (subgraph) vs Frontend/B4F APIs (supergraph)
+        3.2 When to use what: Rest, gRPC over HTTP/2 and graphQL ( https://spec.open-rpc.org/, https://avro.apache.org/docs/1.11.1/idl-language/, https://dubbo.apache.org/en/overview/tasks/triple/idl/ )
+        3.3 API evolution and Service versioning for each technology ( Rest, gRpc and GraphQL )
+        3.4 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
+    4 Event-Driven APIs:
+        4.1 when to use queue vs streaming: SQS vs Kafka
+        4.2 event standardization - CloudEvents headers, and tbd payload
+        4.3 domain channel standardization - per entity and pattern? naming convention?
+        4.4 content standardization - how to distinguish between different content types
+        4.5 Compatibility, Versioning and Deprecation ( specific guidelines per technology )
 
 Fabric Strategy ( self-service infrastructure and easy-to-use tools )
-    2.1 Service strategy ( k8s based )
-    2.2 Eventing strategy ( databricks based )
-    2.3 Data Strategy ( databricks based )
+    1 Service strategy ( k8s based )
+    2 Eventing strategy ( databricks based )
+    3 Data Strategy ( databricks based )
 
     Service Strategy
-        Identity and Authorization
-        APIGateway
-        ServiceMesh
+        1. Identity and Authorization
+        2. APIGateway
+        3. ServiceMesh
 
     Data Strategy
-        4.1 Write vs read persistence
-            4.1.1 Infrastructure as Code (IaC)
-                4.1.1.1 Write Data Polyglot
-                4.1.1.2 Read Data Polyglot
+        1 Write vs read persistence
+            1.1 Infrastructure as Code (IaC)
+                1.1.1 Write Data Polyglot
+                1.1.2 Read Data Polyglot
                     Data Lake ( storage, data access, catalog )
                     ??
-            4.1.2 Data Governance
-        4.2 Data Processing Fabric -> Databricks
-            4.2.1 data lineage ->  w/ open-lineage
-                4.2.1.1 declared (role) vs inferred(code) data lineage
-        4.5. Development Assets and Data Assets Registry ( Backstage )
+            1.2 Data Governance
+        2 Data Processing Fabric -> Databricks
+            2.1 data lineage ->  w/ open-lineage
+                2.1.1 declared (role) vs inferred(code) data lineage
+        3 Development Assets and Data Assets Registry ( Backstage )
 
     Eventing Strategy
-        5.1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
-        5.2 a producing SDK spec:
-            Sending:
+        1 queueing (consider AMQP or CNCF) and for streaming consider a CNCF project (Kafka or Pulsar).
+        2 a producing SDK spec:
+            2.1 Sending:
             CloudEventBuilder cloudEventBuilder = CustomCloudEventBuilder.builder();
             cloudEventBuilder.createFactEvent(entity).validate().build();
             cloudEventBuilder.createNotificationEvents(oldEntity, newEntity).validate().build();
@@ -88,19 +93,19 @@ Fabric Strategy ( self-service infrastructure and easy-to-use tools )
             cloudEventBuilder.createErrorEvent(entity).validate().build();
             cloudEventBuilder.createCommand(entity).validate().build();
 
-            use native sdks to send the message (queue or stream):
+            2.2 use native sdks to send the message (queue or stream):
                 queue: rabbitMQCloudEventSender.send(CloudEvent messageQueue)
                 stream: producer.send(new ProducerRecord<>(topic, "key", cloudEvent))
 
-            Claim Check?
-            FailOver?
+            2.3 Claim Check? FailOver?
 
-            Data Validation:
-                5.2.1 Json-schema for json payload validation
-                5.2.2 Protobuf-validations? for proto validation
-                5.2.3 Avro-validations? for proto validation
-                5.2.4 Delta has built in schema evolution support
+            2.4 Data Validation:
+                2.4.1 Json-schema for json payload validation
+                2.4.2 Protobuf-validations? for proto validation
+                2.4.3 Avro-validations? for proto validation
+                2.4.4 Delta has built in schema evolution support
 
-        5.3 a consuming SDK spec
-            5.3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
-            5.3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
+        3 a consuming SDK spec
+            3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
+            3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
+

@@ -18,15 +18,18 @@ public interface LabeledType extends AnyType {
 
     Set<Annotation<?>> getAnnotations();
 
-    default Optional<Annotation<?>> findAnnotation(Class<? extends Annotation<?>> annoClazz){
-        return getAnnotations().stream().filter(annotation -> annotation.getClass().equals(annoClazz)).findFirst();
-    }
-
-    default boolean testAnnotation(Class<? extends Annotation<?>> annoClazz, Predicate<Annotation<?>> predicate){
+    default <T extends Annotation<?>> Optional<T> findAnnotation(Class<T> annoClazz){
         return getAnnotations().stream()
                 .filter(annotation -> annotation.getClass().equals(annoClazz))
-                .allMatch(predicate::test);
+                .map(annotation -> (T)annotation)
+                .findFirst();
+    }
 
+    default <T extends Annotation<?>> boolean testAnnotation(Class<T> annoClazz, Predicate<T> predicate){
+        return getAnnotations().stream()
+                .filter(annotation -> annotation.getClass().equals(annoClazz))
+                .map(annotation -> (T)annotation)
+                .allMatch(predicate);
     }
 
     default void accept(AdtVisitor visitor) throws AdtException {

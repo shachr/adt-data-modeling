@@ -1,9 +1,9 @@
 package data.modeling.adt.pipelines.schemaconversion;
 
 import data.modeling.adt.SchemaContext;
-import data.modeling.adt.annotations.golden.DataHandlingClassification;
-import data.modeling.adt.annotations.golden.DefaultValue;
-import data.modeling.adt.annotations.golden.Description;
+import data.modeling.adt.annotations.datagovernance.DataHandlingClassification;
+import data.modeling.adt.annotations.syntactic.DefaultValue;
+import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.enums.DataHandlingClassifications;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.messages.SchemaParsingMessage;

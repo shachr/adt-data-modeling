@@ -2,9 +2,10 @@ package data.modeling.adt.pipelines.schemaparsing.parsers;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
-import data.modeling.adt.annotations.golden.DataHandlingClassification;
-import data.modeling.adt.annotations.golden.DefaultValue;
-import data.modeling.adt.annotations.golden.Description;
+import data.modeling.adt.annotations.datagovernance.DataHandlingClassification;
+import data.modeling.adt.annotations.idl.TypeDeclaration;
+import data.modeling.adt.annotations.syntactic.DefaultValue;
+import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.enums.DataHandlingClassifications;
 import data.modeling.adt.messages.SchemaParsingMessage;
 import data.modeling.adt.SchemaContext;
@@ -14,6 +15,7 @@ import data.modeling.adt.messages.SchemaParsedMessage;
 import data.modeling.adt.typedefs.*;
 import data.modeling.processing.abstraction.Task;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaParsedMessage>, AdtVisitor {
@@ -30,15 +32,22 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
         return schemaParsedMessage;
     }
 
-    private LabeledType lastLabeledType;
+    private NamedType lastNamedType;
+    private FieldType lastFieldType;
     @Override
     public void enterLabeledType(LabeledType type) {
-        lastLabeledType = type;
+        if(type instanceof NamedType)
+            lastNamedType = (NamedType)type;
+        else
+            lastFieldType = (FieldType)type;
     }
 
     @Override
     public void exitLabeledType(LabeledType type) {
-        lastLabeledType = null;
+        if(type instanceof FieldType)
+            lastFieldType = null;
+        else
+            lastNamedType = null;
     }
 
     @Override
@@ -52,23 +61,37 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
     }
 
     @Override
+    public void visit(AllOfType type) throws AdtException {
+
+    }
+
+    @Override
+    public void visit(AnyOfType type) throws AdtException {
+
+    }
+
+    @Override
     public void visit(ReferenceNamedType type) {
 
     }
 
     @Override
     public void visit(Set<Annotation<?>> annotations) {
-        for (Annotation<?> annotation : annotations) {
-            if (annotation.getName().equals("x-data-handling-classification")) {
-                DataHandlingClassifications classification = DataHandlingClassifications.fromString((String)annotation.getValue());
-                DataHandlingClassification dataHandlingClassification = new DataHandlingClassification(classification);
-                lastLabeledType.getAnnotations().add(dataHandlingClassification);
-            } else if (annotation.getName().equals("description")) {
-                lastLabeledType.getAnnotations().add(new Description((String)annotation.getValue()));
-            } else if(annotation.getName().equals("default")){
-                lastLabeledType.getAnnotations().add(new DefaultValue(annotation.getValue()));
+        LabeledType lastLabeledType = Objects.isNull(lastNamedType) ? lastFieldType : lastNamedType;
+        annotations.forEach(annotation -> {
+            switch (annotation.getName()) {
+                case "x-data-handling-classification" -> {
+                    DataHandlingClassifications classification = DataHandlingClassifications.fromString((String) annotation.getValue());
+                    DataHandlingClassification dataHandlingClassification = new DataHandlingClassification(classification);
+                    lastLabeledType.getAnnotations().add(dataHandlingClassification);
+                }
+                case "description" ->
+                        lastLabeledType.getAnnotations().add(new Description((String) annotation.getValue()));
+                case "default" -> lastLabeledType.getAnnotations().add(new DefaultValue(annotation.getValue()));
+                case "x-idl-type-declaration" ->
+                        lastLabeledType.getAnnotations().add(TypeDeclaration.of((String) annotation.getValue()));
             }
-        }
+        });
     }
 
     @Override

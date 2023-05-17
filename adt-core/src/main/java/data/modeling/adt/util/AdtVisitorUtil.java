@@ -19,6 +19,13 @@ public class AdtVisitorUtil {
             visitor.visit((NullValueType) type);
         } else if(type instanceof ReferenceNamedType){
             visitor.visit((ReferenceNamedType) type);
+        } else if(type instanceof SumType){
+            visitor.visit((SumType) type);
+        } else if(type instanceof AllOfType){
+            visitor.visit((AllOfType) type);
+        }  else if(type instanceof AnyOfType) {
+            visitor.visit((AnyOfType) type);
         }
+
     }
 }

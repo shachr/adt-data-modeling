@@ -29,24 +29,20 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
 
     @Override
     public ReferenceNamedType toAdt(Map<String, Object> value) throws AdtException {
-        // todo: add logic
         // register the reference such that we can lazy load it at the end
         String ref = value.remove("$ref").toString();
 
         // todo: the following won't work for open-api schemes
         String definitionName = ref.substring("#/definitions/".length());
-        ReferenceNamedType referenceNamedType = new ReferenceNamedType(ref);
+        String id = (String)jsonSchemaDoc.get("$id"); // todo: change to context property
+        ReferenceNamedType referenceNamedType = new ReferenceNamedType(createReferencedNamed(id, definitionName));
         this.getJsonSchemaReferences().addReference(referenceNamedType);
-
-        // read definition
-        Map definitions = (Map)this.jsonSchemaDoc.get("definitions");
-        Map definition = (Map)definitions.get(definitionName);
-        NamedType namedType = NamedType.of(referenceNamedType.getReferenceName(), this.adtMapperRegistry.toAdt(definition));
-        definition.keySet().forEach(key->{
-            namedType.getAnnotations().add(new JsonSchemaAnnotation(key.toString(), definition.get(key)));
-        });
-        schemaContext.registerNamedType(namedType);
 
         return referenceNamedType;
     }
+
+    public static String createReferencedNamed(String id, String definitionName){
+        return id+"_"+definitionName;
+    }
+
 }

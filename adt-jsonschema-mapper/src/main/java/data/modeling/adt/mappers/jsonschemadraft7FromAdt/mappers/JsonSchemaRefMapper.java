@@ -35,28 +35,10 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
     @Override
     public Stream<Map.Entry<String, Object>> fromAdt(ReferenceNamedType type) throws AdtException {
         NamedType namedType = this.schemaContext.getNamedType(type.getReferenceName());
-        this.addDefinition(
-                removeDefinitionPrefix(namedType.getName()),
-                toMap(this.fromAdtMapperRegistry.fromAdt(namedType.getType()))
-        );
+        this.definitions.put(namedType.getName(), toMap(this.fromAdtMapperRegistry.fromAdt(namedType.getType())));
 
-        MapBuilder mapBuilder = MapBuilder.create().put("$ref", type.getReferenceName());
-        namedType.getAnnotations().stream()
-                .filter(annotation -> annotation instanceof JsonSchemaAnnotation)
-                .map(annotation -> (JsonSchemaAnnotation)annotation)
-                .forEach(jsonSchemaAnnotation -> {
-                    mapBuilder.put(jsonSchemaAnnotation.getName(), jsonSchemaAnnotation.getValue());
-                });
-        
+        MapBuilder mapBuilder = MapBuilder.create().put("$ref", "#/definitions/" + type.getReferenceName());
         return mapBuilder.build().entrySet().stream();
-    }
-
-    private void addDefinition(String key, Map<String, Object> value){
-        definitions.put(key, value);
-    }
-
-    private String removeDefinitionPrefix(String ref) {
-        return ref.substring(prefix.length());
     }
 
     public Map<String, Object> getDefinitions() {

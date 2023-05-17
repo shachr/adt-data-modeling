@@ -1,6 +1,7 @@
 package data.modeling.adt.mappers.javabeansFromAdt.util;
 
 import data.modeling.adt.SchemaContext;
+import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.typedefs.ReferenceNamedType;
@@ -16,6 +17,7 @@ import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JavaFileUtil {
     public static String tmplFile = "/templates/java";
@@ -54,8 +56,10 @@ public class JavaFileUtil {
 
         final Template temp = cfg.getTemplate(templateLocation);
         AbstractMap.SimpleEntry<String, String> simpleEntry = toFullyQualifiedName(namedType.getName());
+        Set<String> inherits = getInherits(namedType);
         Set<String> imports = getImports(schemaContext, namedType);
-        JavaFileTemplate javaFile = new JavaFileTemplate(simpleEntry.getKey(), imports, simpleEntry.getValue(), namedType);
+
+        JavaFileTemplate javaFile = new JavaFileTemplate(simpleEntry.getKey(), imports, simpleEntry.getValue(), inherits, namedType);
         temp.process(javaFile, out);
 
         byte[] bufferContent = outputStream.toByteArray();
@@ -63,6 +67,18 @@ public class JavaFileUtil {
         String bufferString = new String(bufferContent, "UTF-8");
         return new JavaFile(fileName, bufferString);
     }
+
+    private Set<String> getInherits(NamedType namedType) {
+        if(namedType.getType() instanceof ProductType productType){
+            return productType.getImplements().stream()
+                    .map(ReferenceNamedType::getReferenceName)
+                    .map(JavaFileUtil::toFullyQualifiedName)
+                    .map(AbstractMap.SimpleEntry::getValue)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+        return new LinkedHashSet<>();
+    }
+
     public static AbstractMap.SimpleEntry<String, String> toFullyQualifiedName(String input) {
 
         if(isFullyQualifiedName(input)) {
@@ -106,16 +122,23 @@ public class JavaFileUtil {
     private static Set<String> getImports(SchemaContext schemaContext, NamedType namedType) {
         if(namedType.getType() instanceof ProductType){
             ProductType productType = (ProductType) namedType.getType();
-            return productType.resolveAllFields(schemaContext).stream()
-                    .filter(fieldType -> fieldType.getType() instanceof ReferenceNamedType)
-                    .map(fieldType -> ((ReferenceNamedType)fieldType.getType()).getReferenceName())
-                    .map(LambdaExceptionUtil.function(JavaFileUtil::toFullyQualifiedName))
-                    .map(entry-> entry.getKey() + "." + entry.getValue())
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            return Stream.concat(
+                // inherits
+                productType.getImplements().stream()
+                .map(ReferenceNamedType::getReferenceName)
+                .map(JavaFileUtil::toFullyQualifiedName)
+                .map(entry->entry.getKey() + "." + entry.getValue()),
+
+                // references
+                productType.resolveAllFields(schemaContext).stream()
+                .filter(fieldType -> fieldType.getType() instanceof ReferenceNamedType)
+                .map(fieldType -> ((ReferenceNamedType)fieldType.getType()).getReferenceName())
+                .map(LambdaExceptionUtil.function(JavaFileUtil::toFullyQualifiedName))
+                .map(entry-> entry.getKey() + "." + entry.getValue())
+
+            ).collect(Collectors.toCollection(LinkedHashSet::new));
         }
         return new LinkedHashSet<>();
     }
-    public record JavaFileTemplate(String packageName, Set<String> imports, String className, NamedType namedType)
-            implements JavaFileTemplateBase {}
 
 }

@@ -23,7 +23,7 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
 
     @Override
     public boolean canMap(ProductType value) {
-        return value.getExtendedProductTypes().isEmpty();
+        return value.getImplements().isEmpty();
     }
 
     @Override

@@ -3,7 +3,7 @@ package data.modeling.adt.pipelines.schemaconversion;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.compatibility.AnyTypeComparator;
 import data.modeling.adt.compatibility.Difference;
-import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToPojo;
+import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToIDL;
 import data.modeling.adt.typedefs.*;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class JsonSchemaToPojoPipelineTest {
 
         schemaContext.registerNamedType(base);
         schemaContext.registerNamedType(foo);
-        new AdtToPojo(schemaContext).apply();
+        new AdtToIDL(schemaContext).apply();
 
         NamedType fooResolved = schemaContext.getNamedType("foo");
         List<Difference> diffs =  AnyTypeComparator.compare(expectedNamedType, fooResolved);

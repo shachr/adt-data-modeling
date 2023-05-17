@@ -1,9 +1,9 @@
 package data.modeling.adt.pipelines.schemavalidation.validators;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
-import data.modeling.adt.annotations.golden.DataHandlingClassification;
-import data.modeling.adt.annotations.golden.DefaultValue;
-import data.modeling.adt.annotations.golden.Description;
+import data.modeling.adt.annotations.datagovernance.DataHandlingClassification;
+import data.modeling.adt.annotations.syntactic.DefaultValue;
+import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.messages.SchemaValidationMessage;
 import data.modeling.adt.typedefs.*;
 

@@ -26,7 +26,6 @@ public enum DataCompliances {
               values.add(e);
             }
           }
-
           return values;
         }
     }

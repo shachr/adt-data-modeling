@@ -2,7 +2,7 @@ package data.modeling.adt.pipelines.schemaconvertion.converters;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.javabeansFromAdt.JavaBeansFromAdt;
-import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFile;
+import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.messages.SchemaConvertedMessage;
 import data.modeling.adt.messages.SchemaConvertionMessage;
 import data.modeling.processing.abstraction.Task;
@@ -19,7 +19,7 @@ public class JavaConverter implements Task<SchemaConvertionMessage, SchemaConver
 
     @Override
     public SchemaConvertedMessage execute(SchemaConvertionMessage message) throws Exception {
-        AdtToPojo adtToSimplerObjects = new AdtToPojo(message.getSchemaContext());
+        AdtToIDL adtToSimplerObjects = new AdtToIDL(message.getSchemaContext());
         SchemaContext schemaContext = adtToSimplerObjects.apply();
 
         JavaBeansFromAdt javaBeansFromAdt = new JavaBeansFromAdt(schemaContext);

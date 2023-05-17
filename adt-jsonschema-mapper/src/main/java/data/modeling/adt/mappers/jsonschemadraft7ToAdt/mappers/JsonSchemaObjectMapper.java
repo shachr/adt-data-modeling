@@ -60,13 +60,13 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
             ));
         }
 
-        if(!Objects.isNull(additionalProperties) && !(additionalProperties instanceof Boolean)){
+        if(!Objects.isNull(additionalProperties) && !isSealed){
             FieldAdditionalTypes fieldType = new FieldAdditionalTypes(ProductType.of(new FieldType("additionalProperties", new MapType(new StringType(), toAdtMapperRegistry.toAdt(additionalProperties)))));
             List<FieldType> fields = fieldTypeStream.collect(Collectors.toList());
             fields.add(fieldType);
             fieldTypeStream = fields.stream();
         }
-
+        
         ProductType productType = ProductType.of(extendedProducts, fieldTypeStream, isSealed);
         List<String> required = (List<String>)value.remove("required");
         if(null != required){

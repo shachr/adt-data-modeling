@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EnumType implements SumType {
     private PrimitiveType baseType;
@@ -23,7 +24,11 @@ public class EnumType implements SumType {
     }
 
     public static <T extends PrimitiveType> EnumType of(T baseType, EnumItemType... values){
-        return new EnumType(baseType, Arrays.stream(values).collect(Collectors.toSet()));
+        return of(baseType, Arrays.stream(values));
+    }
+
+    public static <T extends PrimitiveType> EnumType of(T baseType, Stream<EnumItemType> enumItemTypeStream){
+        return new EnumType(baseType, enumItemTypeStream.collect(Collectors.toSet()));
     }
 
     public PrimitiveType getBaseType() {
@@ -54,11 +59,6 @@ public class EnumType implements SumType {
 
     public boolean isValueOf(Object value){
         return this.baseType.isValueOf(value) && items.stream().anyMatch(enumItemType -> enumItemType.value.getConstant().equals(value));
-    }
-
-    @Override
-    public AnyType resolveSubSchemes(SchemaContext schemaContext) throws AdtException {
-        return this;
     }
 
     public record EnumItemType(String name, ConstantPrimitiveType value) implements AnyType{}

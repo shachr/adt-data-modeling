@@ -13,6 +13,11 @@ public interface AdtVisitor {
     void visit(ProductType type) throws AdtException;
 
     void visit(SumType type) throws AdtException;
+
+    void visit(AllOfType type) throws AdtException;
+
+    void visit(AnyOfType type) throws AdtException;
+
     void visit(ReferenceNamedType type) throws AdtException;
 
     void visit(Set<Annotation<?>> annotations) throws AdtException;

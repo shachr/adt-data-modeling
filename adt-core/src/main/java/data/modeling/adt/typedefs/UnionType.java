@@ -27,11 +27,5 @@ public class UnionType implements SumType {
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
-
-    @Override
-    public AnyType resolveSubSchemes(SchemaContext schemaContext) throws AdtException {
-        // todo: resolve all product types within, recursively
-        throw new AdtException("not implemented");
-    }
 }
 

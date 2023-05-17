@@ -56,6 +56,16 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     }
 
     @Override
+    public void visit(AllOfType type) throws AdtException {
+
+    }
+
+    @Override
+    public void visit(AnyOfType type) throws AdtException {
+
+    }
+
+    @Override
     public void visit(ReferenceNamedType type) {
         //build dependency graph
     }

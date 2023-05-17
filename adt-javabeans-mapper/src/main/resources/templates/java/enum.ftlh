@@ -16,12 +16,12 @@ import ${import};
 public enum ${className} {
 
 <#list namedType.type.items as item>
-    ${escapeName(item.name())}("${getTypeMapping().map(item.value())}")<#if item?has_next>,<#else>;</#if>
+    ${escapeName(item.name())}("${toJavaType(item.value())}")<#if item?has_next>,<#else>;</#if>
 </#list>
 
-    private final ${getTypeMapping().map(namedType.type.baseType)} value;
+    private final ${toJavaType(namedType.type.baseType)} value;
 
-    ${className}(${getTypeMapping().map(namedType.type.baseType)} value) {
+    ${className}(${toJavaType(namedType.type.baseType)} value) {
         this.value = value;
     }
 

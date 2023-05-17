@@ -1,12 +1,11 @@
 package data.modeling.adt;
 
-import data.modeling.adt.abstraction.artifacts.Artifact;
 import data.modeling.adt.exceptions.AdtException;
-import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFile;
+import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaJarUtil;
 import data.modeling.adt.messages.*;
 import data.modeling.adt.pipelines.schemaconvertion.SchemaConversionPipeline;
-import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToPojo;
+import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToIDL;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JavaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaFile;
@@ -22,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class Main {
@@ -33,28 +31,45 @@ public class Main {
             "  \"$id\": \"com.shachar.foo\",\n" +
             "  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
             "  \"type\": \"object\",\n" +
-            "  \"properties\": {\n" +
-            "    \"id\": {\n" +
-            "      \"description\": \"the identifier of foo\",\n" +
-            "      \"type\": \"integer\"\n" +
-            "    },\n" +
-            "    \"name\": {\n" +
-            "      \"x-data-handling-classification\": \"PUBLIC\",\n" +
-            "      \"type\": \"string\"\n" +
-            "    },\n" +
-            "    \"color\": {\n" +
+            "  \"definitions\": {\n" +
+            "    \"ColorEnum\": {\n" +
             "      \"description\": \"the color\",\n" +
             "      \"x-data-handling-classification\": \"PUBLIC\",\n" +
             "      \"type\": \"string\",\n" +
             "      \"enum\": [\"red\", \"blue\", \"green\"],\n" +
             "      \"default\": \"blue\"\n" +
+            "    },\n" +
+            "    \"Entity\": {\n" +
+            "      \"type\": \"object\",\n" +
+            "      \"properties\": {\n" +
+            "        \"id\": {\n" +
+            "          \"description\": \"the identifier of foo\",\n" +
+            "          \"type\": \"integer\"\n" +
+            "        }\n" +
+            "      }\n" +
             "    }\n" +
             "  },\n" +
-            "  \"required\": [\n" +
-            "    \"id\",\n" +
-            "    \"name\"\n" +
+            "  \"allOf\": [\n" +
+            "    { \"$ref\": \"#/definitions/Entity\" },\n" +
+            "    {\n" +
+            "      \"type\": \"object\",\n" +
+            "      \"properties\": {\n" +
+            "        \"name\": {\n" +
+            "          \"x-data-handling-classification\": \"PUBLIC\",\n" +
+            "          \"type\": \"string\"\n" +
+            "        },\n" +
+            "        \"color\": {\n" +
+            "          \"$ref\": \"#/definitions/ColorEnum\"\n" +
+            "        }\n" +
+            "      },\n" +
+            "      \"required\": [\n" +
+            "        \"id\",\n" +
+            "        \"name\"\n" +
+            "      ]\n" +
+            "    }\n" +
             "  ]\n" +
             "}";
+
 
     static SchemaParsingPipeline schemaParsingPipeline = new SchemaParsingPipeline();
     static SchemaConversionPipeline schemaConversionPipeline = new SchemaConversionPipeline();
@@ -87,7 +102,7 @@ public class Main {
 
         // convert to map of java file/java content
         schemaContext.setName("com.shachar");
-        schemaContext = new AdtToPojo(schemaContext).apply();
+        schemaContext = new AdtToIDL(schemaContext).apply();
         schemaConvertedMessage = schemaConversionPipeline.apply(
                 new SchemaConvertionMessage(BINARY_JAVA, "com.shachar.foo", schemaContext));
 

@@ -1,5 +1,9 @@
 package data.modeling.adt.mappers.javabeansFromAdt.util;
 
+import data.modeling.adt.exceptions.AdtException;
+import data.modeling.adt.typedefs.AnyType;
+
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,12 +67,11 @@ public interface JavaFileTemplateBase {
           "while",
           "continue");
 
-  default AdtToJavaMapping getTypeMapping() {
-    return typeMapping;
+  default String toJavaType(AnyType anyType) throws AdtException {
+    return typeMapping.map(anyType);
   }
 
   default String escapeName(String name) {
-
     if (reservedWords.contains(name)) {
       return "`" + name + "`";
     }

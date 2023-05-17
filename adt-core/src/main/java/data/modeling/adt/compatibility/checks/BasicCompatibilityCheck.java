@@ -1,7 +1,7 @@
 package data.modeling.adt.compatibility.checks;
 
 import data.modeling.adt.abstraction.compatibility.CompatibilityCheck;
-import data.modeling.adt.annotations.golden.DefaultValue;
+import data.modeling.adt.annotations.syntactic.DefaultValue;
 import data.modeling.adt.compatibility.ComparatorContext;
 import data.modeling.adt.compatibility.Difference;
 import data.modeling.adt.compatibility.DifferenceTypes;
