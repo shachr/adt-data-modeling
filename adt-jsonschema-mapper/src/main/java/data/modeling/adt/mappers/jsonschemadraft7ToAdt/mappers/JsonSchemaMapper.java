@@ -7,8 +7,8 @@ import data.modeling.adt.util.TraversingContext;
 
 import java.util.Map;
 
-public abstract class JsonSchemaMapper<R extends AnyType>
-        implements MapToAdt<Map<String, Object>, R>
+public abstract class JsonSchemaMapper<T, R extends AnyType>
+        implements MapToAdt<T, R>
 {
     private String jsonSchemaId = "";
     private ReferenceNamedTypeCollector jsonSchemaReferences = new ReferenceNamedTypeCollector();

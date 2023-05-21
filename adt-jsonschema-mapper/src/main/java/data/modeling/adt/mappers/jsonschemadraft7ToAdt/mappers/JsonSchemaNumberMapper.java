@@ -7,7 +7,7 @@ import data.modeling.adt.typedefs.NumericType;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public class JsonSchemaNumberMapper extends JsonSchemaMapper<NumericType> {
+public class JsonSchemaNumberMapper extends JsonSchemaMapper<Map<String, Object>, NumericType> {
     @Override
     public boolean canMap(Map<String, Object> value) {
         return value.containsKey("type") && value.get("type").equals("number");

@@ -4,7 +4,7 @@ import data.modeling.adt.typedefs.StringType;
 
 import java.util.Map;
 
-public class JsonSchemaStringMapper extends JsonSchemaMapper<StringType> {
+public class JsonSchemaStringMapper extends JsonSchemaMapper<Map<String, Object>, StringType> {
     @Override
     public boolean canMap(Map<String, Object> value) {
         return value.containsKey("pattern") || (value.containsKey("type") && value.get("type").equals("string"));

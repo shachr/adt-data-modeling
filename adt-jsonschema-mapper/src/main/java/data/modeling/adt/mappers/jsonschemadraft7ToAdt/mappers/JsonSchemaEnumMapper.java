@@ -4,13 +4,13 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.ConstantPrimitiveType;
 import data.modeling.adt.typedefs.EnumType;
-import data.modeling.adt.typedefs.PrimitiveType;
+import data.modeling.adt.typedefs.ScalarType;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JsonSchemaEnumMapper extends JsonSchemaMapper<EnumType> {
+public class JsonSchemaEnumMapper extends JsonSchemaMapper<Map<String, Object>, EnumType> {
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
     public JsonSchemaEnumMapper(ToAdtMapperRegistry toAdtMapperRegistry) {
@@ -26,7 +26,7 @@ public class JsonSchemaEnumMapper extends JsonSchemaMapper<EnumType> {
     public EnumType toAdt(Map<String, Object> value) throws AdtException {
 
         List<Object> enumValues = (List<Object>)value.remove("enum");
-        PrimitiveType baseType = (PrimitiveType)toAdtMapperRegistry.toAdt(value);
+        ScalarType baseType = (ScalarType)toAdtMapperRegistry.toAdt(value);
         return new EnumType( baseType,
             enumValues.stream()
                     .map(enumValue -> new EnumType.EnumItemType(enumValue.toString(), new ConstantPrimitiveType(baseType, enumValue)))

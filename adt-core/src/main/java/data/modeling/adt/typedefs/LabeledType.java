@@ -11,10 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public interface LabeledType extends AnyType {
+public interface LabeledType<T extends AnyType> extends AnyType {
     String getName();
 
-    AnyType getType();
+    T getType();
+
+    void setType(T anyType);
 
     Set<Annotation<?>> getAnnotations();
 
@@ -37,6 +39,4 @@ public interface LabeledType extends AnyType {
         visitor.visit(new HashSet<>(this.getAnnotations()));
         this.getAnnotations().forEach(LambdaExceptionUtil.consumer(visitor::visit));
     }
-
-    void setType(AnyType anyType);
 }

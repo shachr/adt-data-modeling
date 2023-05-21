@@ -5,8 +5,8 @@ import data.modeling.adt.typedefs.*;
 
 public interface CompatibilityCheck {
 
-    void enterLabeledType(LabeledType labeledType);
-    void exitLabeledType(LabeledType labeledType);
+    void enterLabeledType(LabeledType<?> labeledType);
+    void exitLabeledType(LabeledType<?> labeledType);
 
     void enterCompositionType(CompositionType compositionType);
     void exitCompositionType(CompositionType compositionType);
@@ -15,7 +15,7 @@ public interface CompatibilityCheck {
 
     void compareNamedType(ComparatorContext comparatorContext, NamedType obj1, NamedType obj2);
 
-    void comparePrimitiveType(ComparatorContext comparatorContext, PrimitiveType primitiveType1, PrimitiveType primitiveType2);
+    void comparePrimitiveType(ComparatorContext comparatorContext, ScalarType scalarType1, ScalarType scalarType2);
 
     void compareReferenceNamedType(ComparatorContext comparatorContext, ReferenceNamedType obj1, ReferenceNamedType obj2);
 

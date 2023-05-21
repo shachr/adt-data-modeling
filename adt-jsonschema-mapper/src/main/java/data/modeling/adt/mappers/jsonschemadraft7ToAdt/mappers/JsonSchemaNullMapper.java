@@ -11,7 +11,7 @@ import data.modeling.adt.typedefs.NullValueType;
 import java.util.List;
 import java.util.Map;
 
-public class JsonSchemaNullMapper extends JsonSchemaMapper<NullValueType> {
+public class JsonSchemaNullMapper extends JsonSchemaMapper<Map<String, Object>, NullValueType> {
 
     private ToAdtMapperRegistry registry;
 

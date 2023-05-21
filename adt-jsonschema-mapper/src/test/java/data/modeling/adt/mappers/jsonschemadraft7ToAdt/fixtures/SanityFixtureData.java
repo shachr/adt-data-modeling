@@ -1,7 +1,6 @@
 package data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures;
 
 import data.modeling.adt.SchemaContext;
-import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.fixtures.ToAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.typedefs.*;
@@ -76,7 +75,7 @@ public class SanityFixtureData implements ToAdtFixtureData<String> {
         SchemaContext schemaContext = new SchemaContext();
 
         NamedType namedType = NamedType.builder(schemaNamespace, ProductType.of(
-                FieldType.builder("productId", new IntType())
+                FieldType.builder("productId", new Int32Type())
                         .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))
                         .withIsRequired(true)
                         .build(),
@@ -104,9 +103,9 @@ public class SanityFixtureData implements ToAdtFixtureData<String> {
                         .build(),
                 FieldType.builder("color", EnumType.of(
                                 new StringType(),
-                                StringType.constantOf("red"),
-                                StringType.constantOf("green"),
-                                StringType.constantOf("blue")
+                                new EnumType.EnumItemType("red", StringType.constantOf("red")),
+                                new EnumType.EnumItemType("green", StringType.constantOf("green")),
+                                new EnumType.EnumItemType("blue", StringType.constantOf("blue"))
                         ))
                         .withAnnotations(new JsonSchemaAnnotation("description", "Product color"))
                         .build(),

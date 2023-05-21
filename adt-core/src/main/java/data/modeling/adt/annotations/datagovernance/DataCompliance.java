@@ -1,11 +1,11 @@
 package data.modeling.adt.annotations.datagovernance;
 
-import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.DataGovernance;
 import data.modeling.adt.enums.DataCompliances;
 
 import java.util.Set;
 
-public final class DataCompliance extends Annotation<Set<DataCompliances>> {
+public final class DataCompliance extends DataGovernance<Set<DataCompliances>> {
 
     public DataCompliance(Set<DataCompliances> values) {
         super(values);

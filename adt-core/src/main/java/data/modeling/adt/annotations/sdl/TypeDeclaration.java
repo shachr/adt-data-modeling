@@ -1,9 +1,9 @@
-package data.modeling.adt.annotations.idl;
+package data.modeling.adt.annotations.sdl;
 
-import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.SDL;
 import data.modeling.adt.enums.TypeDeclarations;
 
-public final class TypeDeclaration extends Annotation<TypeDeclarations> {
+public final class TypeDeclaration extends SDL<TypeDeclarations> {
 
     public TypeDeclaration(TypeDeclarations value) {
         super(value);

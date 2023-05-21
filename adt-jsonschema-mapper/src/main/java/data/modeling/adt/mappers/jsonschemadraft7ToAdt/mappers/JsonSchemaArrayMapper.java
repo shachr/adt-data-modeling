@@ -11,7 +11,7 @@ import data.modeling.adt.typedefs.SetType;
 import java.util.Map;
 import java.util.Objects;
 
-public class JsonSchemaArrayMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<ListType> {
+public class JsonSchemaArrayMapper extends JsonSchemaMapper<Map<String, Object>, ListType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;

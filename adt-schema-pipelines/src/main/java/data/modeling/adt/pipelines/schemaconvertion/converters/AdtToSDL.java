@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AdtToIDL implements AdtVisitor {
+public class AdtToSDL implements AdtVisitor {
 
     // todo: [IDL] `patternProperties` keyword is purely validation oriented and not supported??
     // todo: [IDL] 'not' keyword is purely validation oriented and not supported??
@@ -23,7 +23,7 @@ public class AdtToIDL implements AdtVisitor {
     private final SchemaContext schemaContext;
     private LabeledType lastSeenLabeledType;
 
-    public AdtToIDL(SchemaContext schemaContext){
+    public AdtToSDL(SchemaContext schemaContext){
 
         this.schemaContext = schemaContext;
     }
@@ -112,14 +112,14 @@ public class AdtToIDL implements AdtVisitor {
 
         // todo: json-schema to codegen tool: https://www.jsonschema2pojo.org/ style
 
-        Map<Boolean, List<FieldType>> splitFieldList = productType.getOwnFields().stream()
+        ProductType productTypeNoAnon = resolveAnonymousFieldTypes(productType);
+        Map<Boolean, List<FieldType>> splitFieldList = productTypeNoAnon.getOwnFields().stream()
                 .collect(Collectors.partitioningBy((fieldType -> fieldType instanceof CompositionType)));
 
         // Get the list of non-resolvable fields
         List<FieldType> fieldsOfTypeNotComposition = splitFieldList.get(false);
         List<FieldType> fieldsOfTypeComposition = splitFieldList.get(true);
 
-        ProductType productTypeNoAnon = resolveAnonymousFieldTypes(productType);
         if(productType.getImplements().isEmpty() && fieldsOfTypeComposition.isEmpty()) {
             return productTypeNoAnon;
         }
@@ -128,7 +128,7 @@ public class AdtToIDL implements AdtVisitor {
 
 
         // extending products
-        Set<AnyType> extendingTypes = resolveExtendingReferences(productType);
+//        Set<AnyType> extendingTypes = resolveExtendingReferences(productType);
 
         // resolve inheritance
 //        Stream<ProductType> extendingProductTypes = extendingTypes.stream().map(
@@ -152,7 +152,21 @@ public class AdtToIDL implements AdtVisitor {
     }
 
     private ProductType resolveAnonymousFieldTypes(ProductType productType){
-        return ProductType.of(productType.getImplements(), productType.getOwnFields().stream()
+        // todo: resolve FieldAdditionalType first!!
+        Map<Boolean, List<FieldType>> partitions = productType.getOwnFields().stream()
+                .collect(Collectors.partitioningBy(field -> field instanceof FieldAdditionalTypes));
+        List<FieldType> additionalTypes = partitions.get(true);
+        Set<FieldType> fields = new LinkedHashSet<>(partitions.get(false));
+        if(!additionalTypes.isEmpty()){
+            additionalTypes.forEach(fieldType -> {
+                FieldAdditionalTypes fieldAdditionalTypes = (FieldAdditionalTypes)fieldType;
+                if(fieldAdditionalTypes.getType() instanceof ProductType productType1){
+                    fields.addAll(productType1.getOwnFields());
+                }
+            });
+        }
+
+        return ProductType.of(productType.getImplements(), fields.stream()
                 .peek(LambdaExceptionUtil.consumer(this::tryLabelAnonymousCompositionTypes)));
     }
 
@@ -203,12 +217,12 @@ public class AdtToIDL implements AdtVisitor {
         throw new AdtException("can't resolve");
     }
     private void tryLabelAnonymousCompositionTypes(FieldType fieldType) throws AdtException {
-        if(fieldType.getType() instanceof CompositionType){
+        if (fieldType.getType() instanceof CompositionType) {
             fieldType.setType(labelAnonymousCompositionTypes((CompositionType) fieldType.getType()));
         }
     }
     private ReferenceNamedType labelAnonymousCompositionTypes(CompositionType anyType) throws AdtException {
-        throw new AdtException("anonymous type found");
+        throw new AdtException("anonymous type found: " + anyType.getClass().toString());
 //        String name = generateUniqueFQN(schemaContext.getName());
 //        schemaContext.registerNamedType(new NamedType(name, anyType));
 //        return new ReferenceNamedType(name);
@@ -283,7 +297,7 @@ public class AdtToIDL implements AdtVisitor {
     }
 
     @Override
-    public void visit(PrimitiveType type) {
+    public void visit(ScalarType type) {
 
     }
 

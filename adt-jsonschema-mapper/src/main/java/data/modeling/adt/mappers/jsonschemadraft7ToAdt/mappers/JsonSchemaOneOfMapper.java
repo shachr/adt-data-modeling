@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JsonSchemaOneOfMapper extends JsonSchemaMapper<UnionType> {
+public class JsonSchemaOneOfMapper extends JsonSchemaMapper<Map<String, Object>, UnionType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;

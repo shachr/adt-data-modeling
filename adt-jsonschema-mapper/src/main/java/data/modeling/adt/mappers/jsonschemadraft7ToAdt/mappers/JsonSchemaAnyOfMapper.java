@@ -11,7 +11,7 @@ import data.modeling.adt.util.LambdaExceptionUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JsonSchemaAnyOfMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<AnyOfType> {
+public class JsonSchemaAnyOfMapper extends JsonSchemaMapper<Map<String, Object>, AnyOfType> {
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
     public JsonSchemaAnyOfMapper(ToAdtMapperRegistry toAdtMapperRegistry) {

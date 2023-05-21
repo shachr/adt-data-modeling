@@ -34,10 +34,10 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
 
     @Override
     public Stream<Map.Entry<String, Object>> fromAdt(ReferenceNamedType type) throws AdtException {
-        NamedType namedType = this.schemaContext.getNamedType(type.getReferenceName());
+        NamedType namedType = this.schemaContext.getNamedType(type.getReferenceName().replaceAll(prefix, ""));
         this.definitions.put(namedType.getName(), toMap(this.fromAdtMapperRegistry.fromAdt(namedType.getType())));
 
-        MapBuilder mapBuilder = MapBuilder.create().put("$ref", "#/definitions/" + type.getReferenceName());
+        MapBuilder mapBuilder = MapBuilder.create().put("$ref", prefix + namedType.getName());
         return mapBuilder.build().entrySet().stream();
     }
 

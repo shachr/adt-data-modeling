@@ -1,10 +1,8 @@
 package data.modeling.adt.typedefs;
 
-import data.modeling.adt.abstraction.visitors.AdtVisitor;
-
-public class IntType extends NumericType {
+public class Int32Type extends NumericType {
     public static ConstantPrimitiveType constantOf(int value){
-        return new ConstantPrimitiveType(new IntType(), value);
+        return new ConstantPrimitiveType(new Int32Type(), value);
     }
 
     @Override

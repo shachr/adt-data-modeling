@@ -30,7 +30,7 @@ public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<Strin
 //        fromAdtMapperRegistry.register(new JsonSchemaProductTypeWithExtendingReferences(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaObjectMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaOneOfMapper(fromAdtMapperRegistry));
-        fromAdtMapperRegistry.register(new JsonSchemaPrimitiveMapper());
+        fromAdtMapperRegistry.register(new JsonSchemaScalarMapper());
         fromAdtMapperRegistry.register(new JsonSchemaArrayMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaRefMapper(fromAdtMapperRegistry, schemaContext));
     }

@@ -26,11 +26,11 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
     @Override
     public SchemaContext getInputSchemaContext() {
         SchemaContext schemaContext = new SchemaContext();
-        NamedType emptyObject = new NamedType("#/definitions/EmptyObject", new ProductType());
+        NamedType emptyObject = new NamedType("EmptyObject", new ProductType());
         NamedType namedType = NamedType.builder(schemaNamespace, AllOfType.of(
-                new ReferenceNamedType(emptyObject.getName()),
+                new ReferenceNamedType("#/definitions/" + emptyObject.getName()),
                 ProductType.of(
-                    FieldType.builder("productId", new IntType())
+                    FieldType.builder("productId", new Int32Type())
                             .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))
                             .withIsRequired(true)
                             .build(),
@@ -58,9 +58,9 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
                             .build(),
                     FieldType.builder("color", EnumType.of(
                                     new StringType(),
-                                    StringType.constantOf("red"),
-                                    StringType.constantOf("green"),
-                                    StringType.constantOf("blue")
+                                    new EnumType.EnumItemType("red", StringType.constantOf("red")),
+                                    new EnumType.EnumItemType("green", StringType.constantOf("green")),
+                                    new EnumType.EnumItemType("blue", StringType.constantOf("blue"))
                             ))
                             .withAnnotations(new JsonSchemaAnnotation("description", "Product color"))
                             .build(),

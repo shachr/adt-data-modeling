@@ -18,7 +18,7 @@ public class JsonSchemaToAdtPipelineTest {
     final static String APPLICATION_SCHEMA_JSON = "application/schema+json";
 
     private static final NamedType expectedNamedType = NamedType.builder("foo", ProductType.of(
-            FieldType.builder("id", new IntType()).withAnnotations(
+            FieldType.builder("id", new Int32Type()).withAnnotations(
                     new JsonSchemaAnnotation("description", "the identifier of foo"),
                     new Description("the identifier of foo")
             ).withIsRequired(true).build(),
@@ -27,9 +27,9 @@ public class JsonSchemaToAdtPipelineTest {
                     new DataHandlingClassification(DataHandlingClassifications.Public)
             ).withIsRequired(true).build(),
             FieldType.builder("color", EnumType.of(new StringType(),
-                    StringType.constantOf("red"),
-                    StringType.constantOf("blue"),
-                    StringType.constantOf("green")))
+                    new EnumType.EnumItemType("red", StringType.constantOf("red")),
+                    new EnumType.EnumItemType("blue", StringType.constantOf("blue")),
+                    new EnumType.EnumItemType("green", StringType.constantOf("green"))))
                 .withAnnotations(
                     new JsonSchemaAnnotation("default", "blue"),
                     new DefaultValue("blue"),

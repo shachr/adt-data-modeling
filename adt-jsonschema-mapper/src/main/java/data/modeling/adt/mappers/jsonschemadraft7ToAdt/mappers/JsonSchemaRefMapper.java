@@ -9,7 +9,7 @@ import data.modeling.adt.typedefs.ReferenceNamedType;
 
 import java.util.Map;
 
-public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
+public class JsonSchemaRefMapper extends JsonSchemaMapper<Map<String, Object>, ReferenceNamedType> {
 
     private Map<String, Object> jsonSchemaDoc;
     private ToAdtMapperRegistry adtMapperRegistry;

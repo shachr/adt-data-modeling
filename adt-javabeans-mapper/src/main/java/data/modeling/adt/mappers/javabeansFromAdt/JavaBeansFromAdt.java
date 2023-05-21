@@ -2,8 +2,7 @@ package data.modeling.adt.mappers.javabeansFromAdt;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.SchemaTypeStream;
-import data.modeling.adt.annotations.idl.TypeDeclaration;
-import data.modeling.adt.enums.TypeDeclarations;
+import data.modeling.adt.annotations.sdl.TypeDeclaration;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFileUtil;

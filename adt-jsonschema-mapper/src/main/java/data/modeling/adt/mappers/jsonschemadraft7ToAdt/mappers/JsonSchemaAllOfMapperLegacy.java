@@ -13,7 +13,7 @@ import data.modeling.adt.util.MapsUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JsonSchemaAllOfMapperLegacy extends JsonSchemaMapper<ProductType> {
+public class JsonSchemaAllOfMapperLegacy extends JsonSchemaMapper<Map<String, Object>, ProductType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;

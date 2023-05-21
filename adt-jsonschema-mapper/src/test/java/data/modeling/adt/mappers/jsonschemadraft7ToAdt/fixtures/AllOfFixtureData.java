@@ -77,14 +77,14 @@ public class AllOfFixtureData implements ToAdtFixtureData<String> {
     public SchemaContext getExpectedSchemaContext() {
 
         SchemaContext expectedSchemaContext = new SchemaContext();
-        NamedType myDefinition = NamedType.builder("#/definitions/MyDefinition", ProductType.of(
+        NamedType myDefinition = NamedType.builder(schemaNamespace + "_MyDefinition", ProductType.of(
                 FieldType.builder("id", new StringType()).build(),
                 FieldType.builder("name", new StringType()).build()
         )).build();
         expectedSchemaContext.registerNamedType(myDefinition);
 
         NamedType expectedNamedType = NamedType.builder(schemaNamespace, AllOfType.of(
-                new ReferenceNamedType("#/definitions/MyDefinition"),
+                new ReferenceNamedType(schemaNamespace + "_MyDefinition"),
                 ProductType.of(
                         FieldType.builder("prop1", new StringType()).build(),
                         FieldType.builder("prop2", new DoubleType()).build()

@@ -10,16 +10,16 @@ import data.modeling.adt.typedefs.*;
 import java.util.Objects;
 
 public class BasicCompatibilityCheck implements CompatibilityCheck {
-    LabeledType lastSeenLabeledType;
+    LabeledType<?> lastSeenLabeledType;
     CompositionType lastCompositionType;
 
     @Override
-    public void enterLabeledType(LabeledType labeledType) {
+    public void enterLabeledType(LabeledType<?> labeledType) {
         lastSeenLabeledType = labeledType;
     }
 
     @Override
-    public void exitLabeledType(LabeledType labeledType) {
+    public void exitLabeledType(LabeledType<?> labeledType) {
         lastSeenLabeledType = null;
     }
 
@@ -75,9 +75,9 @@ public class BasicCompatibilityCheck implements CompatibilityCheck {
     }
 
     @Override
-    public void comparePrimitiveType(ComparatorContext context, PrimitiveType primitiveType1, PrimitiveType primitiveType2) {
-        if(!primitiveType1.equals(primitiveType2)){
-            context.getDiffs().add(new Difference(DifferenceTypes.TypeChanged, context.getJsonPathTraversingContext().getJsonPointer(), primitiveType1.getClass().getSimpleName(), primitiveType2.getClass().getSimpleName()));;
+    public void comparePrimitiveType(ComparatorContext context, ScalarType scalarType1, ScalarType scalarType2) {
+        if(!scalarType1.equals(scalarType2)){
+            context.getDiffs().add(new Difference(DifferenceTypes.TypeChanged, context.getJsonPathTraversingContext().getJsonPointer(), scalarType1.getClass().getSimpleName(), scalarType2.getClass().getSimpleName()));;
         }
     }
 

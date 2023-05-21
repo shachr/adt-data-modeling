@@ -1,11 +1,13 @@
 package data.modeling.adt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaJarUtil;
+import data.modeling.adt.mappers.jsonschemadraft7FromAdt.JsonSchemaDraft7FromAdt;
 import data.modeling.adt.messages.*;
 import data.modeling.adt.pipelines.schemaconvertion.SchemaConversionPipeline;
-import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToIDL;
+import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToSDL;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JavaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaFile;
@@ -17,11 +19,17 @@ import data.modeling.adt.util.FSUtil;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+import static data.modeling.adt.util.StreamExtensions.toMap;
 
 public class Main {
     final static String APPLICATION_SCHEMA_JSON = "application/schema+json";
@@ -90,6 +98,21 @@ public class Main {
             .whenComplete(LambdaExceptionUtil.biConsumer(Main::convertSchema)));
 
         future.get();
+
+        SchemaContext schemaContext = new SchemaContext();
+        new Protobuf3ToAdt(schemaContext, readFromResources()).stream().collect(Collectors.toList());
+        Map<String, Object> jsonSchemaMap = toMap(new JsonSchemaDraft7FromAdt(schemaContext.getNamedType("Person"), schemaContext)
+                .stream());
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println("---");
+        System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonSchemaMap));
+
+    }
+
+    private static String readFromResources() throws IOException {
+        try(InputStream stream = Main.class.getClassLoader().getResourceAsStream("example.proto")){
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     private static void convertSchema(SchemaValidationMessage schemaValidationMessage, Throwable ex) throws Exception {
@@ -102,7 +125,7 @@ public class Main {
 
         // convert to map of java file/java content
         schemaContext.setName("com.shachar");
-        schemaContext = new AdtToIDL(schemaContext).apply();
+        schemaContext = new AdtToSDL(schemaContext).apply();
         schemaConvertedMessage = schemaConversionPipeline.apply(
                 new SchemaConvertionMessage(BINARY_JAVA, "com.shachar.foo", schemaContext));
 

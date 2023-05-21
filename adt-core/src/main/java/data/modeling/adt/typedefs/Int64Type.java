@@ -1,9 +1,9 @@
 package data.modeling.adt.typedefs;
 
-public class LongType extends NumericType {
+public class Int64Type extends NumericType {
 
     public static ConstantPrimitiveType constantOf(long value){
-        return new ConstantPrimitiveType(new LongType(), value);
+        return new ConstantPrimitiveType(new Int64Type(), value);
     }
 
     @Override

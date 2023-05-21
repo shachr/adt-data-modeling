@@ -1,7 +1,7 @@
 package data.modeling.adt.typedefs;
 
 
-public interface CollectionType extends AnyType {
+public interface CollectionType extends ComplexType {
     AnyType getItemType();
 }
 

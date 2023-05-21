@@ -8,10 +8,10 @@ public class AdtToJavaMapping {
   public String map(AnyType anyType) throws AdtException {
     if(anyType instanceof BoolType){
       return this.map((BoolType) anyType);
-    } else if(anyType instanceof IntType){
-      return this.map((IntType) anyType);
-    } else if(anyType instanceof LongType){
-      return this.map((LongType) anyType);
+    } else if(anyType instanceof Int32Type){
+      return this.map((Int32Type) anyType);
+    } else if(anyType instanceof Int64Type){
+      return this.map((Int64Type) anyType);
     } else if(anyType instanceof FloatType){
       return this.map((FloatType) anyType);
     } else if(anyType instanceof DoubleType){
@@ -43,11 +43,11 @@ public class AdtToJavaMapping {
     return "Boolean";
   }
 
-  private String map(IntType integerType) {
+  private String map(Int32Type integerType) {
     return "Integer";
   }
 
-  private String map(LongType longType) {
+  private String map(Int64Type int64Type) {
     return "Long";
   }
 

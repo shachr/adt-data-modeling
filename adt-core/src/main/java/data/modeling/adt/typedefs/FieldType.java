@@ -9,10 +9,10 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class FieldType implements LabeledType, Comparable<FieldType> {
+public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
     private final String name;
     private AnyType type;
-    private int index;
+    private int index = 0;
     private Boolean isRequired=false;
     private final Set<Annotation<?>> annotations;
 
@@ -22,7 +22,6 @@ public class FieldType implements LabeledType, Comparable<FieldType> {
     public FieldType(String name, AnyType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
-        this.index = index;
         this.annotations = annotations;
     }
 

@@ -1,8 +1,8 @@
 package data.modeling.adt.annotations.datagovernance;
 
-import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.DataGovernance;
 
-public final class IsPersonalData extends Annotation<Boolean> {
+public final class IsPersonalData extends DataGovernance<Boolean> {
 
 
     public IsPersonalData(boolean value) {

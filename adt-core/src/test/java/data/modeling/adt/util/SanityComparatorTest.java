@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +35,7 @@ public class SanityComparatorTest {
 
         // Different named types
         FieldType foo = new FieldType("foo", new StringType());
-        FieldType bar = new FieldType("bar", new IntType());
+        FieldType bar = new FieldType("bar", new Int32Type());
         namedType2 = new NamedType("person", ProductType.of(
                 foo,
                 bar
@@ -65,8 +63,8 @@ public class SanityComparatorTest {
 
     @Test
     void testCompareNamedTypeDifferentName() {
-        NamedType nt1 = new NamedType("foo", new ListType(new IntType()));
-        NamedType nt2 = new NamedType("bar", new ListType(new IntType()));
+        NamedType nt1 = new NamedType("foo", new ListType(new Int32Type()));
+        NamedType nt2 = new NamedType("bar", new ListType(new Int32Type()));
         List<Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
         Assertions.assertEquals(1, diffs.size());
         Difference diff = diffs.get(0);
@@ -82,8 +80,8 @@ public class SanityComparatorTest {
 
     @Test
     void testCompareNamedTypeDifferentType() {
-        NamedType nt1 = new NamedType("foo", new SetType(new IntType()));
-        NamedType nt2 = new NamedType("foo", new StringType());
+        SetType nt1 = new SetType(new Int32Type());
+        StringType nt2 = new StringType();
         List<Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
         Assertions.assertEquals(1, diffs.size());
         Difference diff = diffs.get(0);
@@ -100,10 +98,10 @@ public class SanityComparatorTest {
     @Test
     void testCompareSumTypeUnionType() {
         Set<AnyType> types1 = new HashSet<>();
-        types1.add(new NullValueType(new IntType()));
+        types1.add(new NullValueType(new Int32Type()));
         UnionType ut1 = new UnionType(types1);
         Set<AnyType> types2 = new HashSet<>();
-        types2.add(new NullValueType(new IntType()));
+        types2.add(new NullValueType(new Int32Type()));
         UnionType ut2 = new UnionType(types2);
         List<Difference> diffs = AnyTypeComparator.compare(ut1, ut2);
         Assertions.assertEquals(0, diffs.size());
@@ -115,11 +113,11 @@ public class SanityComparatorTest {
 
     @Test
     void testCompareSumTypeEnumTypeSameBaseType() {
-        Set<ConstantPrimitiveType> values1 = new HashSet<>();
-        values1.add(StringType.constantOf("foo"));
+        Set<EnumType.EnumItemType> values1 = new HashSet<>();
+        values1.add(new EnumType.EnumItemType("foo", StringType.constantOf("foo")));
         EnumType et1 = new EnumType(new StringType(), values1);
-        Set<ConstantPrimitiveType> values2 = new HashSet<>();
-        values2.add(StringType.constantOf("foo"));
+        Set<EnumType.EnumItemType> values2 = new HashSet<>();
+        values2.add(new EnumType.EnumItemType("foo", StringType.constantOf("foo")));
         EnumType et2 = new EnumType(new StringType(), values2);
         List<Difference> diffs = AnyTypeComparator.compare(et1, et2);
         Assertions.assertEquals(0, diffs.size());
@@ -130,12 +128,12 @@ public class SanityComparatorTest {
     }
     @Test
     void testCompareSumTypeEnumTypeDifferentBaseType() {
-        Set<ConstantPrimitiveType> values1 = new HashSet<>();
-        values1.add(StringType.constantOf("foo"));
+        Set<EnumType.EnumItemType> values1 = new HashSet<>();
+        values1.add(new EnumType.EnumItemType("foo", StringType.constantOf("foo")));
         EnumType et1 = new EnumType(new StringType(), values1);
-        Set<ConstantPrimitiveType> values2 = new HashSet<>();
-        values2.add(IntType.constantOf(1));
-        EnumType et2 = new EnumType(new IntType(), values2);
+        Set<EnumType.EnumItemType> values2 = new HashSet<>();
+        values2.add(new EnumType.EnumItemType("1", Int32Type.constantOf(1)));
+        EnumType et2 = new EnumType(new Int32Type(), values2);
         List<Difference> diffs = AnyTypeComparator.compare(et1, et2);
         Assertions.assertEquals(1, diffs.size());
         Difference diff = diffs.get(0);

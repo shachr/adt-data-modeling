@@ -36,7 +36,7 @@ public class FieldAnnotationValidator {
                 } else if(isOfSumType && annotation instanceof DefaultValue){
                     // default value is mandatory
                     // default can be empty, PrimitiveType or a ReferencedObjectType.
-                    boolean isPrimitiveCondition = lastType instanceof PrimitiveType && !((PrimitiveType)lastType).isValueOf(annotation.getValue());
+                    boolean isPrimitiveCondition = lastType instanceof ScalarType && !((ScalarType)lastType).isValueOf(annotation.getValue());
                     boolean isPrimitiveEnumTypeCondition = lastType instanceof EnumType && !((EnumType) lastType).isValueOf(annotation.getValue());
                     // todo: default value of a union can be anything, how do we validate that the value make sense?
                     if(isPrimitiveCondition || isPrimitiveEnumTypeCondition) {

@@ -9,16 +9,14 @@ import data.modeling.adt.typedefs.NullValueType;
 import graphql.language.FieldDefinition;
 import graphql.language.NonNullType;
 import graphql.language.Type;
-import graphql.language.TypeName;
-import graphql.schema.GraphQLFieldDefinition;
 
 import java.util.Objects;
 
-public class FieldTypeMapper extends GraphQlSchemaMapper<FieldDefinition, FieldType> {
+public class FieldDefinitionMapper extends GraphQlSchemaMapper<FieldDefinition, FieldType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
-    public FieldTypeMapper(ToAdtMapperRegistry toAdtMapperRegistry){
+    public FieldDefinitionMapper(ToAdtMapperRegistry toAdtMapperRegistry){
 
         this.toAdtMapperRegistry = toAdtMapperRegistry;
     }
@@ -30,7 +28,7 @@ public class FieldTypeMapper extends GraphQlSchemaMapper<FieldDefinition, FieldT
     @Override
     public FieldType toAdt(FieldDefinition value) throws AdtException {
         Type type = value.getType();
-        FieldType fieldType = FieldType.builder(value.getName(), toAdtType(type)).build();
+        FieldType fieldType = FieldType.builder(value.getName(), toAdtMapperRegistry.toAdt(type)).build();
         if(!(fieldType.getType() instanceof NullValueType)) {
             fieldType.setRequired(true);
         }
@@ -38,14 +36,5 @@ public class FieldTypeMapper extends GraphQlSchemaMapper<FieldDefinition, FieldT
             fieldType.getAnnotations().add(new Description(value.getDescription().getContent()));
         }
         return fieldType;
-    }
-
-    private AnyType toAdtType(Type type) throws AdtException {
-        boolean isNonNullType = type instanceof NonNullType;
-        if(isNonNullType){
-            return toAdtMapperRegistry.toAdt(((NonNullType)type).getType());
-        } else {
-            return new NullValueType(toAdtMapperRegistry.toAdt(type));
-        }
     }
 }

@@ -87,7 +87,7 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     }
 
     @Override
-    public void visit(PrimitiveType type) {
+    public void visit(ScalarType type) {
 
     }
 

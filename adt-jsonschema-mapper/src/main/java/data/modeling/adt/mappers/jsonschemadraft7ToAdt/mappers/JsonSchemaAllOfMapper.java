@@ -8,7 +8,7 @@ import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.util.*;
 
-public class JsonSchemaAllOfMapper extends JsonSchemaMapper<AllOfType> {
+public class JsonSchemaAllOfMapper extends JsonSchemaMapper<Map<String, Object>, AllOfType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;

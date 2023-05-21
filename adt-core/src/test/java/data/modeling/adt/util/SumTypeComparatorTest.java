@@ -28,13 +28,13 @@ public class SumTypeComparatorTest {
     public void compareSumType_shouldPassForMatchingUnionTypes() {
         // Create matching union types
         List<AnyType> types1 = new ArrayList<>();
-        types1.add(new NamedType("type1", new StringType()));
-        types1.add(new NamedType("type2", new IntType()));
+        types1.add(new StringType());
+        types1.add(new Int32Type());
         UnionType unionType1 = new UnionType(types1);
 
         List<AnyType> types2 = new ArrayList<>();
-        types2.add(new NamedType("type1", new StringType()));
-        types2.add(new NamedType("type2", new IntType()));
+        types2.add(new StringType());
+        types2.add(new Int32Type());
         UnionType unionType2 = new UnionType(types2);
 
         // Compare the union types
@@ -49,7 +49,7 @@ public class SumTypeComparatorTest {
     public void compareSumType_shouldFailForMismatchingUnionTypes() {
         // Create mismatching union types
         UnionType unionType1 = new UnionType(Stream.of(new StringType(), new StringType()).collect(Collectors.toSet()));
-        UnionType unionType2 = new UnionType(Stream.of(new IntType()).collect(Collectors.toSet()));
+        UnionType unionType2 = new UnionType(Stream.of(new Int32Type()).collect(Collectors.toSet()));
 
         // Compare the union types
         List<Difference> differences = AnyTypeComparator.compare(unionType1, unionType2);
@@ -78,8 +78,8 @@ public class SumTypeComparatorTest {
     @Test
     public void compareSumType_shouldFailForMismatchingEnumTypes() {
         // Create mismatching enum types
-        EnumType enumType1 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
-        EnumType enumType2 = new EnumType(new StringType(), Stream.of(StringType.constantOf("foo")).collect(Collectors.toSet()));
+        EnumType enumType1 = new EnumType(new Int32Type(), Stream.of(new EnumType.EnumItemType("1", Int32Type.constantOf(1))).collect(Collectors.toSet()));
+        EnumType enumType2 = new EnumType(new StringType(), Stream.of(new EnumType.EnumItemType("foo", StringType.constantOf("foo"))).collect(Collectors.toSet()));
 
         // Compare the enum types
         List<Difference> differences = AnyTypeComparator.compare(enumType1, enumType2);
@@ -100,22 +100,25 @@ public class SumTypeComparatorTest {
     @Test
     public void compareSumType_shouldPassForMatchingEnumTypes() {
         // Create mismatching enum types
-        EnumType enumType1 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
-        EnumType enumType2 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
+        EnumType enumType1 = new EnumType(new Int32Type(), Stream.of(new EnumType.EnumItemType("1", Int32Type.constantOf(1))).collect(Collectors.toSet()));
+        EnumType enumType2 = new EnumType(new StringType(), Stream.of(new EnumType.EnumItemType("1", Int32Type.constantOf(1))).collect(Collectors.toSet()));
 
         // Compare the enum types
         List<Difference> differences = AnyTypeComparator.compare(enumType1, enumType2);
 
         // Verify that differences were found
-        assertEquals(0, differences.size());
+        assertEquals(1, differences.size());
     }
 
     @Test
     public void compareEnumType_shouldFailForTypeAddedWithDefault() {
         // additive enum change with default
-        EnumType enumType1 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1)).collect(Collectors.toSet()));
-        EnumType enumType2 = new EnumType(new IntType(), Stream.of(IntType.constantOf(1), IntType.constantOf(2)).collect(Collectors.toSet()));
-
+        EnumType enumType1 = new EnumType(new Int32Type(), Stream.of(new EnumType.EnumItemType("1", Int32Type.constantOf(1)))
+                .collect(Collectors.toSet()));
+        EnumType enumType2 = new EnumType(new StringType(), Stream.of(
+                new EnumType.EnumItemType("1", Int32Type.constantOf(1)),
+                new EnumType.EnumItemType("2", Int32Type.constantOf(2)))
+                .collect(Collectors.toSet()));
 
         ProductType productType1 = ProductType.of(FieldType.builder("foo", enumType1).withAnnotations(new DefaultValue(1)).build());
         ProductType productType2 = ProductType.of(FieldType.builder("foo", enumType2).withAnnotations(new DefaultValue(1)).build());
@@ -124,19 +127,20 @@ public class SumTypeComparatorTest {
         List<Difference> differences = AnyTypeComparator.compare(productType1, productType2);
 
         // Verify that differences were found
-        assertEquals(1, differences.size());
-        assertEquals(DifferenceTypes.TypeAddedWithDefault, differences.get(0).differenceType());
+        assertEquals(2, differences.size());
+        assertEquals(DifferenceTypes.TypeChanged, differences.get(0).differenceType());
+        assertEquals(DifferenceTypes.TypeAddedWithDefault, differences.get(1).differenceType());
 
-        assertTrue(backwardCompatibilityPolicy.isCompatible(differences));
-        assertTrue(forwardCompatibilityPolicy.isCompatible(differences));
-        assertTrue(fullCompatibilityPolicy.isCompatible(differences));
+        assertFalse(backwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(forwardCompatibilityPolicy.isCompatible(differences));
+        assertFalse(fullCompatibilityPolicy.isCompatible(differences));
     }
 
     @Test
     public void compareUnionType_shouldFailForTypeAddedWithDefault() {
         // additive enum change with default
-        UnionType unionType1 = new UnionType(Stream.of(new IntType()).collect(Collectors.toCollection(LinkedHashSet::new)));
-        UnionType unionType2 = new UnionType(Stream.of(new IntType(), new StringType()).collect(Collectors.toCollection(LinkedHashSet::new)));
+        UnionType unionType1 = new UnionType(Stream.of(new Int32Type()).collect(Collectors.toCollection(LinkedHashSet::new)));
+        UnionType unionType2 = new UnionType(Stream.of(new Int32Type(), new StringType()).collect(Collectors.toCollection(LinkedHashSet::new)));
 
         ProductType productType1 = ProductType.of(FieldType.builder("foo", unionType1).withAnnotations(new DefaultValue(1)).build());
         ProductType productType2 = ProductType.of(FieldType.builder("foo", unionType2).withAnnotations(new DefaultValue(1)).build());

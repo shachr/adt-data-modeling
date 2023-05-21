@@ -15,6 +15,7 @@
         <module>adt-schema-pipelines</module>
         <module>adt-javabeans-mapper</module>
         <module>adt-graphql-mapper</module>
+        <module>adt-protobuf-mapper</module>
     </modules>
 
 </project>

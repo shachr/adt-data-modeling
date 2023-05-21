@@ -6,13 +6,14 @@ import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnn
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaMissingId;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.AnyType;
+import data.modeling.adt.typedefs.ComplexType;
 import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.util.Map;
 import java.util.Objects;
 
-public class JsonSchemaMainMapper extends data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.JsonSchemaMapper<NamedType> {
+public class JsonSchemaMainMapper extends JsonSchemaMapper<Map<String, Object>, NamedType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -45,7 +46,7 @@ public class JsonSchemaMainMapper extends data.modeling.adt.mappers.jsonschemadr
     }
 
     private NamedType registerNamedType(String name, Map<String, Object> map) throws AdtException {
-        AnyType anyType = toAdtMapperRegistry.toAdt(map);
+        ComplexType anyType = (ComplexType)toAdtMapperRegistry.toAdt(map);
         NamedType namedType = new NamedType(name, anyType);
         map.keySet().forEach(key -> {
             namedType.getAnnotations().add(new JsonSchemaAnnotation(key, map.get(key)));

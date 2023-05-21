@@ -5,6 +5,9 @@ import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.exceptions.AdtException;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UnionType implements SumType {
     private Collection<? extends AnyType> types;
@@ -26,6 +29,10 @@ public class UnionType implements SumType {
     //  or add an annotation on the named type.
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
+    }
+
+    public static UnionType of(Stream<? extends AnyType> types) {
+        return new UnionType(types.collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 }
 

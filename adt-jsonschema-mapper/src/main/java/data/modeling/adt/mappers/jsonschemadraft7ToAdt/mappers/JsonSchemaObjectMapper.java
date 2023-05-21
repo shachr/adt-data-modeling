@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
+public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>, ProductType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private LinkedHashSet<ReferenceNamedType> extendedProducts;

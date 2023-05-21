@@ -1,6 +1,5 @@
 package data.modeling.adt.typedefs;
 
-import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.exceptions.AdtException;
 
@@ -11,10 +10,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnumType implements SumType {
-    private PrimitiveType baseType;
+    private ScalarType baseType;
     private Set<EnumItemType> items;
 
-    public EnumType(PrimitiveType baseType, Set<EnumItemType> items) {
+    public EnumType(ScalarType baseType, Set<EnumItemType> items) {
         this.baseType = baseType;
         this.items = items;
     }
@@ -23,15 +22,15 @@ public class EnumType implements SumType {
         return items;
     }
 
-    public static <T extends PrimitiveType> EnumType of(T baseType, EnumItemType... values){
+    public static <T extends ScalarType> EnumType of(T baseType, EnumItemType... values){
         return of(baseType, Arrays.stream(values));
     }
 
-    public static <T extends PrimitiveType> EnumType of(T baseType, Stream<EnumItemType> enumItemTypeStream){
+    public static <T extends ScalarType> EnumType of(T baseType, Stream<EnumItemType> enumItemTypeStream){
         return new EnumType(baseType, enumItemTypeStream.collect(Collectors.toSet()));
     }
 
-    public PrimitiveType getBaseType() {
+    public ScalarType getBaseType() {
         return baseType;
     }
 

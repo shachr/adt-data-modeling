@@ -23,9 +23,42 @@ public class Main {
                                 "  isActive: Boolean!\n" +
                                 "  salary : Float\n" +
                                 "  role: Role\n" +
-                                "}"
+                                "  roleList: [Role]\n" +
+                                "  stringList: [String]\n" +
+                                "}" +
+                                "union SearchResult = Role | Employee\n" +
+                                "input ReviewInput {\n" +
+                                "  stars: Int!\n" +
+                                "  commentary: String\n" +
+                                "}" +
+                                "interface Character {\n" +
+                                "  id: ID!\n" +
+                                "  name: String!\n" +
+                                "  friends: [Character]\n" +
+                                "  appearsIn: [Episode]!\n" +
+                                "}" +
+                                "type Human implements Character {\n" +
+                                "  id: ID!\n" +
+                                "  name: String!\n" +
+                                "  friends: [Character]\n" +
+                                "  appearsIn: [Episode]!\n" +
+                                "  starships: [Starship]\n" +
+                                "  totalCredits: Int\n" +
+                                "}" +
+                                "type Droid implements Character {\n" +
+                                "  id: ID!\n" +
+                                "  name: String!\n" +
+                                "  friends: [Character]\n" +
+                                "  appearsIn: [Episode]!\n" +
+                                "  primaryFunction: String\n" +
+                                "}" +
+                                "extend type Droid {\n" +
+                                "  user: Human!\n" +
+                                "}\n" +
+                                "scalar LocalDate\n"
         ).stream().forEach(x -> {
-            System.out.println(x);
+
+            System.out.println(x.getName());
         });
     }
 }

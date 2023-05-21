@@ -1,10 +1,8 @@
 package data.modeling.adt.mappers.jsonschemadraft7FromAdt.mappers;
 
-import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MultipleOfConverter;
-import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.*;
 
 import java.util.HashSet;
@@ -12,29 +10,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class JsonSchemaPrimitiveMapper extends JsonSchemaMapper<PrimitiveType> {
+public class JsonSchemaScalarMapper extends JsonSchemaMapper<ScalarType> {
 
-    public JsonSchemaPrimitiveMapper() {
+    public JsonSchemaScalarMapper() {
 
     }
 
     @Override
-    public boolean canMap(PrimitiveType value) {
+    public boolean canMap(ScalarType value) {
         return value instanceof StringType || value instanceof NumericType || value instanceof BoolType;
     }
 
     @Override
-    public Stream<Map.Entry<String, Object>> fromAdt(PrimitiveType type) throws AdtException {
+    public Stream<Map.Entry<String, Object>> fromAdt(ScalarType type) throws AdtException {
         MapBuilder mapBuilder = new MapBuilder();
         if(type instanceof StringType) {
             mapBuilder.put("type", "string");
         } else if(type instanceof BoolType){
                 mapBuilder.put("type", "boolean");
         } else if(type instanceof NumericType){
-            if( type instanceof IntType){
+            if( type instanceof Int32Type){
                 mapBuilder.put("type", "integer");
             } else {
-
                 if(type instanceof DecimalType){
                     DecimalType decimalType = (DecimalType)type;
 

@@ -9,22 +9,22 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class NamedType implements LabeledType {
+public class NamedType implements LabeledType<ComplexType> {
     private final String name;
-    private AnyType type;
+    private ComplexType type;
     private final Set<Annotation<?>> annotations;
 
-    public NamedType(String name, AnyType type) {
+    public NamedType(String name, ComplexType type) {
         this(name, type, new LinkedHashSet<>());
     }
 
-    public NamedType(String name, AnyType type, Set<Annotation<?>> annotations) {
+    public NamedType(String name, ComplexType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
     }
 
-    public static NamedTypeBuilder builder(String name, AnyType type){
+    public static NamedTypeBuilder builder(String name, ComplexType type){
         return new NamedTypeBuilder(name, type);
     }
 
@@ -37,12 +37,16 @@ public class NamedType implements LabeledType {
     }
 
 
-    public AnyType getType(){
+    public ComplexType getType(){
         return type;
     }
-//    public abstract <T> T accept(NamedTypeVisitor<T> visitor);
 
-    public static NamedType of(String name, AnyType type){
+    @Override
+    public void setType(ComplexType anyType) {
+        type = anyType;
+    }
+
+    public static NamedType of(String name, ComplexType type){
         return new NamedType(name, type, new HashSet<>());
     }
 
@@ -64,10 +68,5 @@ public class NamedType implements LabeledType {
         visitor.enterLabeledType(this);
         LabeledType.super.accept(visitor);
         visitor.exitLabeledType(this);
-    }
-
-    @Override
-    public void setType(AnyType anyType) {
-        type = anyType;
     }
 }

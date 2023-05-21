@@ -6,7 +6,7 @@ import data.modeling.adt.util.AdtVisitorUtil;
 
 import java.util.Objects;
 
-public class NullValueType implements CollectionType {
+public class NullValueType implements TypeModifier {
     private final AnyType elementType;
 
     public NullValueType(AnyType elementType) {

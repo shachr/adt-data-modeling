@@ -3,7 +3,7 @@ package data.modeling.adt.pipelines.schemaparsing.parsers;
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.annotations.datagovernance.DataHandlingClassification;
-import data.modeling.adt.annotations.idl.TypeDeclaration;
+import data.modeling.adt.annotations.sdl.TypeDeclaration;
 import data.modeling.adt.annotations.syntactic.DefaultValue;
 import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.enums.DataHandlingClassifications;
@@ -77,7 +77,7 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
 
     @Override
     public void visit(Set<Annotation<?>> annotations) {
-        LabeledType lastLabeledType = Objects.isNull(lastNamedType) ? lastFieldType : lastNamedType;
+        LabeledType<?> lastLabeledType = !Objects.isNull(lastFieldType) ? lastFieldType : lastNamedType;
         annotations.forEach(annotation -> {
             switch (annotation.getName()) {
                 case "x-data-handling-classification" -> {
@@ -105,7 +105,7 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
     }
 
     @Override
-    public void visit(PrimitiveType type) {
+    public void visit(ScalarType type) {
 
     }
 

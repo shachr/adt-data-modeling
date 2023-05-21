@@ -23,7 +23,7 @@ public interface AdtVisitor {
     void visit(Set<Annotation<?>> annotations) throws AdtException;
     void visit(Annotation<?> annotation) throws AdtException;
     void visit(NumericType type) throws AdtException;
-    void visit(PrimitiveType type) throws AdtException;
+    void visit(ScalarType type) throws AdtException;
     void visit(CollectionType type) throws AdtException;
     void visit(TemporalType type) throws AdtException;
     void visit(AnyType type) throws AdtException;

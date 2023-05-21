@@ -1,8 +1,6 @@
 package data.modeling.adt.typedefs;
 
-import java.math.BigDecimal;
-
-public class StringType extends PrimitiveType {
+public class StringType extends ScalarType {
     public static ConstantPrimitiveType constantOf(String value){
         return new ConstantPrimitiveType(new StringType(), value);
     }

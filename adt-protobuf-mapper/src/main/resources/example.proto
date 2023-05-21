@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+  optional string name = 1;
+  optional int32 id = 2;
+  optional string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    optional string number = 1;
+    optional PhoneType type = 2;
+  }
+
+  repeated PhoneNumber phones = 4;
+}
+
+message AddressBook {
+  repeated Person people = 1;
+}
+
+message SampleMessage {
+  oneof test_oneof {
+    string name = 4;
+    AddressBook addressBook = 9;
+  }
+}
+
+enum EnumAllowingAlias {
+  option allow_alias = true;
+  EAA_UNSPECIFIED = 0;
+  EAA_STARTED = 1;
+  EAA_RUNNING = 1;
+  EAA_FINISHED = 2;
+}
+
+enum EnumNotAllowingAlias {
+  ENAA_UNSPECIFIED = 0;
+  ENAA_STARTED = 1;
+  // ENAA_RUNNING = 1;  // Uncommenting this line will cause a warning message.
+  ENAA_FINISHED = 2;
+}

@@ -1,9 +1,9 @@
 package data.modeling.adt.annotations.datagovernance;
 
-import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.DataGovernance;
 import data.modeling.adt.enums.DataHandlingClassifications;
 
-public final class DataHandlingClassification extends Annotation<DataHandlingClassifications> {
+public final class DataHandlingClassification extends DataGovernance<DataHandlingClassifications> {
 
     public DataHandlingClassification(DataHandlingClassifications value) {
         super(value);

@@ -1,8 +1,8 @@
 package data.modeling.adt.annotations.documentation;
 
-import data.modeling.adt.abstraction.annotations.Annotation;
+import data.modeling.adt.abstraction.annotations.Documentation;
 
-public final class Description extends Annotation<String> {
+public final class Description extends Documentation<String> {
 
     public Description(String value) {
         super(value);
