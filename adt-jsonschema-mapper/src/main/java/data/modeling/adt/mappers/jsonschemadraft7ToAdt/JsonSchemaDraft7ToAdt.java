@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
 
-    protected ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
     protected Map<String, Object> jsonSchemaMap;
     protected SchemaContext schemaContext;
 

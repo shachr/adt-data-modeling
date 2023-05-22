@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
 
     // proto docs: https://protobuf.dev/programming-guides/proto3/
+    //  https://protobuf.dev/programming-guides/dos-donts/
+
     private final SchemaContext schemaContext;
 
     public Protobuf3AdtVisitor(){
@@ -63,8 +65,9 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
                         return readOptionStatement(elm.optionStatement());
                     else if(!Objects.isNull(elm.oneof()))
                         return Stream.of(readOneOf(elm.oneof()));
-                    else if(!Objects.isNull(elm.mapField()))
+                    else if(!Objects.isNull(elm.mapField())) {
                         return readMapField(elm.mapField());
+                    }
                     else if(!Objects.isNull(elm.reserved()))
                         return Stream.empty();
                     else if(!Objects.isNull(elm.emptyStatement_()))
@@ -74,10 +77,12 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
                 }))
                         .toList();
 
-        schemaContext.registerNamedType(new NamedType(name, ProductType.of(typeList.stream()
+        ProductType productType = ProductType.of(typeList.stream()
                 .filter(type -> type instanceof FieldType)
                 .map(type->(FieldType)type)
-                .sorted(Comparator.comparingInt(FieldType::getIndex)))));
+                .sorted(Comparator.comparingInt(FieldType::getIndex)));
+        
+        schemaContext.registerNamedType(new NamedType(name, productType));
         return Stream.empty();
     }
 
@@ -92,8 +97,15 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
         return Stream.of(fieldType);
     }
 
-    private Stream<AnyType> readMapField(Protobuf3Parser.MapFieldContext mapField) throws AdtException {
-        return Stream.of(new MapType(toAdt("", mapField.keyType().getText()), toAdt("", mapField.type_().getText())));
+    private Stream<FieldType> readMapField(Protobuf3Parser.MapFieldContext mapField) throws AdtException {
+        FieldType fieldType = new FieldType(
+                mapField.mapName().getText(),
+                new MapType(
+                        toAdt("", mapField.keyType().getText()),
+                        toAdt("", mapField.type_().getText())));
+
+        fieldType.setIndex(Integer.parseInt(mapField.fieldNumber().getText()));
+        return Stream.of(fieldType);
     }
 
     private FieldType readOneOf(Protobuf3Parser.OneofContext oneof) {

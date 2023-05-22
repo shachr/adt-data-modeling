@@ -23,6 +23,7 @@ public class JavaBeansFromAdt implements SchemaTypeStream<JavaFile> {
 
     @Override
     public Stream<JavaFile> stream() throws AdtException {
+        // todo: add mapper registry
         JavaFileUtil javaFileUtil = new JavaFileUtil(schemaContext);
         // convert to java beans using a template
         return schemaContext.stream().map(LambdaExceptionUtil.function(namedType -> {

@@ -15,14 +15,16 @@ import java.util.stream.Stream;
 
 public class Protobuf3ToAdt implements NamedTypeStream {
 
+    // todo: add mapper registry
     private File protoFilename;
     private String protoContent;
     private SchemaContext schemaContext;
 
     public Protobuf3ToAdt(SchemaContext schemaContext, File protoFilename){
-        this.schemaContext = schemaContext;
-        this.protoFilename = protoFilename;
-        this.protoContent = null;
+        throw new RuntimeException("not implemented");
+//        this.schemaContext = schemaContext;
+//        this.protoFilename = protoFilename;
+//        this.protoContent = null;
     }
 
     public Protobuf3ToAdt(SchemaContext schemaContext, String protoContent){

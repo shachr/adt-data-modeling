@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 public class GraphQLToAdt implements NamedTypeStream {
 
-    protected ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
     protected TypeDefinitionRegistry typeDefinitionRegistry;
     private final String graphqlString;
     protected SchemaContext schemaContext;

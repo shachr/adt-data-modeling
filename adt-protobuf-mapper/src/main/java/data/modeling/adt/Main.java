@@ -7,7 +7,9 @@ import java.nio.charset.StandardCharsets;
 public class Main {
     public static void main(String[] args) throws Exception {
         // Create a CharStream from your Proto file
-        new Protobuf3ToAdt(new SchemaContext(), readFromResources());
+        SchemaContext schemaContext = new SchemaContext();
+        new Protobuf3ToAdt(schemaContext, readFromResources()).stream();
+        System.out.println(schemaContext);
 
     }
 

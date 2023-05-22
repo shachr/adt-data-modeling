@@ -5,7 +5,7 @@ where i left off:
 * java file artifact, that yet to be packaged.
 
 Goal:
-- Support for a hexagonal architecture in support of API stewardship and data+ai
+- Support for clean architecture in support of API stewardship and data+ai
 
 Strategy:
 Domain Strategy

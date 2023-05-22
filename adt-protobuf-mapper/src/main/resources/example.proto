@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+// codegen via: protoc -I=src/main/resources --java_out=src/main/resources src/main/resources/example.proto
 package tutorial;
 
 option java_multiple_files = true;
@@ -10,6 +10,7 @@ message Person {
   optional string name = 1;
   optional int32 id = 2;
   optional string email = 3;
+  map<string, string> additional = 4;
 
   enum PhoneType {
     MOBILE = 0;
@@ -22,7 +23,7 @@ message Person {
     optional PhoneType type = 2;
   }
 
-  repeated PhoneNumber phones = 4;
+  repeated PhoneNumber phones = 5;
 }
 
 message AddressBook {

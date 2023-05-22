@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 
 public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<String, Object>> {
 
-    protected FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
-
     private NamedType namedType;
     protected SchemaContext schemaContext;
 

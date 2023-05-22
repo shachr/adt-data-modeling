@@ -20,6 +20,9 @@ public class AdtToSDL implements AdtVisitor {
     // todo: [IDL] `min/maxProperties` keyword, is not forward transitive, thus not supported?
     // todo: [IDL] anything other `additionalProperties`: true, is sealing a class, should fail on an extension attempt
 
+
+    // todo: https://github.com/json-schema-org/vocab-idl
+
     private final SchemaContext schemaContext;
     private LabeledType lastSeenLabeledType;
 

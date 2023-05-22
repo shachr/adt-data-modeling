@@ -34,6 +34,11 @@ public interface LabeledType<T extends AnyType> extends AnyType {
                 .allMatch(predicate);
     }
 
+    default <T extends Annotation<?>> boolean testAnnotation(Class<T> annoClazz){
+        return getAnnotations().stream()
+                .anyMatch(annotation -> annotation.getClass().equals(annoClazz));
+    }
+
     default void accept(AdtVisitor visitor) throws AdtException {
         AdtVisitorUtil.visit(visitor, getType());
         visitor.visit(new HashSet<>(this.getAnnotations()));
