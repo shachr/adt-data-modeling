@@ -81,7 +81,7 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
                 .filter(type -> type instanceof FieldType)
                 .map(type->(FieldType)type)
                 .sorted(Comparator.comparingInt(FieldType::getIndex)));
-        
+
         schemaContext.registerNamedType(new NamedType(name, productType));
         return Stream.empty();
     }
@@ -158,7 +158,7 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
             case "sfixed64" -> new SInt64Type();
             case "float" -> new FloatType();
             case "double" -> new DoubleType();
-            case "bytes" -> new BytesType();
+            case "bytes" -> new BinaryType();
             default -> new ReferenceNamedType(protoType);
         };
         if(label.equals("repeated")){

@@ -97,7 +97,7 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     }
 
     @Override
-    public void visit(TemporalType type) {
+    public void visit(TimestampType type) {
 
     }
 

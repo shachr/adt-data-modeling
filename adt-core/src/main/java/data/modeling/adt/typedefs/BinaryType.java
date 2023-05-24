@@ -1,8 +1,9 @@
 package data.modeling.adt.typedefs;
 
-public class DurationType extends TemporalType{
+public class BinaryType extends ScalarType {
+
     @Override
     public boolean isValueOf(Object value) {
-        return false;
+        return value instanceof Byte[];
     }
 }

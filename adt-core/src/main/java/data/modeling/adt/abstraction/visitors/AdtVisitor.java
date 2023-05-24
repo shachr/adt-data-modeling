@@ -25,6 +25,6 @@ public interface AdtVisitor {
     void visit(NumericType type) throws AdtException;
     void visit(ScalarType type) throws AdtException;
     void visit(CollectionType type) throws AdtException;
-    void visit(TemporalType type) throws AdtException;
+    void visit(TimestampType type) throws AdtException;
     void visit(AnyType type) throws AdtException;
 }

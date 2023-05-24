@@ -20,8 +20,8 @@ public class AdtToJavaMapping {
       return this.map((DecimalType) anyType);
     } else if(anyType instanceof StringType){
       return this.map((StringType) anyType);
-    } else if(anyType instanceof TemporalType){
-      return this.map((TemporalType) anyType);
+    } else if(anyType instanceof TimestampType){
+      return this.map((TimestampType) anyType);
     } else if(anyType instanceof SetType){
       return this.map((SetType) anyType);
     } else if(anyType instanceof ListType){
@@ -67,17 +67,17 @@ public class AdtToJavaMapping {
     return "String";
   }
 
-  private String map(TemporalType temporalType) throws AdtException {
+  private String map(TimestampType timestampType) throws AdtException {
     final String clazz;
 
-    if (temporalType instanceof DateType) {
+    if (timestampType instanceof DateType) {
       clazz = "java.time.LocalDate";
-    } else if (temporalType instanceof DateTimeType) {
+    } else if (timestampType instanceof DateTimeType) {
         clazz = "java.time.ZonedDateTime";
-    } else if (temporalType instanceof DateTimeLocalType) {
+    } else if (timestampType instanceof DateTimeLocalType) {
       clazz = "java.time.LocalDateTime";
     } else {
-      throw new AdtException(temporalType.getClass().toString());
+      throw new AdtException(timestampType.getClass().toString());
     }
     return clazz;
   }

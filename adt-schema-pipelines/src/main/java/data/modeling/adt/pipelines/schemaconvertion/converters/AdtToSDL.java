@@ -310,7 +310,7 @@ public class AdtToSDL implements AdtVisitor {
     }
 
     @Override
-    public void visit(TemporalType type) {
+    public void visit(TimestampType type) {
 
     }
 

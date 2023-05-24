@@ -115,7 +115,7 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
     }
 
     @Override
-    public void visit(TemporalType type) {
+    public void visit(TimestampType type) {
 
     }
 

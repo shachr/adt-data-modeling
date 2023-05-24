@@ -1,9 +1,9 @@
 package data.modeling.adt.typedefs;
 
-public class BytesType extends ScalarType {
+public class ByteType extends ScalarType {
 
     @Override
     public boolean isValueOf(Object value) {
-        return value instanceof Boolean;
+        return value instanceof Byte;
     }
 }

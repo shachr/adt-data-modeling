@@ -5,7 +5,7 @@ import data.modeling.adt.exceptions.AdtException;
 
 import java.time.LocalDateTime;
 
-public class DateTimeType extends TemporalType {
+public class DateTimeType extends TimestampType {
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.visit(this);
     }
