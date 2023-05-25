@@ -7,11 +7,7 @@ import data.modeling.adt.typedefs.NamedType;
 import java.util.stream.Stream;
 
 public interface NamedTypeStream {
+    ToAdtMapperRegistry getMapperRegistry();
 
-    ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
-
-    default ToAdtMapperRegistry getMapperRegistry(){
-        return toAdtMapperRegistry;
-    }
     Stream<NamedType> stream() throws AdtException;
 }

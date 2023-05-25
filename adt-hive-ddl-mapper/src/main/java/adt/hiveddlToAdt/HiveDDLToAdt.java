@@ -10,9 +10,10 @@ import org.apache.spark.sql.types.StructType;
 import java.util.stream.Stream;
 
 public class HiveDDLToAdt implements NamedTypeStream {
-    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
     private StructType structType;
     private String name;
+
+    private  ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
 
     public HiveDDLToAdt(String name, String ddl){
         this(name, StructType.fromDDL(ddl));
@@ -40,6 +41,11 @@ public class HiveDDLToAdt implements NamedTypeStream {
         toAdtMapperRegistry.register(new StructFieldMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new TimestampNTZTypeMapper());
         toAdtMapperRegistry.register(new TimestampTypeMapper());
+    }
+
+    @Override
+    public ToAdtMapperRegistry getMapperRegistry() {
+        return toAdtMapperRegistry;
     }
 
     @Override

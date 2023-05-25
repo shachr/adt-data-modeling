@@ -2,6 +2,7 @@ package data.modeling.adt;
 
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.exceptions.AdtException;
+import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.NamedType;
 import data.modeling.antlr4.Protobuf3Lexer;
 import data.modeling.antlr4.Protobuf3Parser;
@@ -20,6 +21,8 @@ public class Protobuf3ToAdt implements NamedTypeStream {
     private String protoContent;
     private SchemaContext schemaContext;
 
+    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
+
     public Protobuf3ToAdt(SchemaContext schemaContext, File protoFilename){
         throw new RuntimeException("not implemented");
 //        this.schemaContext = schemaContext;
@@ -32,6 +35,11 @@ public class Protobuf3ToAdt implements NamedTypeStream {
         this.protoFilename = null;
 
         this.protoContent = protoContent;
+    }
+
+    @Override
+    public ToAdtMapperRegistry getMapperRegistry() {
+        return toAdtMapperRegistry;
     }
 
     @Override

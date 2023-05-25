@@ -32,7 +32,7 @@ public class FieldTypeComparatorTest {
         assertEquals(DifferenceTypes.TypeChanged, diff2.differenceType());
         assertEquals("/field1", diff2.jsonPointer());
         assertEquals("StringType", diff2.expected());
-        assertEquals("IntType", diff2.actual());
+        assertEquals("Int32Type", diff2.actual());
     }
 }
 

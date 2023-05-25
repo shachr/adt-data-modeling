@@ -101,8 +101,9 @@ public class Main {
 
         SchemaContext schemaContext = new SchemaContext();
         new Protobuf3ToAdt(schemaContext, readFromResources()).stream().collect(Collectors.toList());
-        Map<String, Object> jsonSchemaMap = toMap(new JsonSchemaDraft7FromAdt(schemaContext.getNamedType("Person"), schemaContext)
-                .stream());
+        Map<String, Object> jsonSchemaMap = new JsonSchemaDraft7FromAdt(schemaContext.getNamedType("Person"), schemaContext)
+                .stream()
+                .findFirst().get();
         ObjectMapper objectMapper = new ObjectMapper();
         System.out.println("---");
         System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonSchemaMap));

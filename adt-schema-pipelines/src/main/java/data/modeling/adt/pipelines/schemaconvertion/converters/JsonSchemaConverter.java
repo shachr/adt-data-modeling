@@ -26,7 +26,7 @@ public class JsonSchemaConverter implements Task<SchemaConvertionMessage, Schema
         NamedType namedType = message.getSchemaContext().getNamedType(message.getTypeName());
         JsonSchemaDraft7FromAdt mapper = new JsonSchemaDraft7FromAdt(namedType, message.getSchemaContext());
         // todo: can stream be passed to objectmapper?
-        Map<String, Object> map = toMap(mapper.stream());
+        Map<String, Object> map = mapper.stream().findFirst().get();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonSchemaFile jsonSchemaFile = new JsonSchemaFile(namedType.getName(), objectMapper.writer().writeValueAsString(map));
         Set<JsonSchemaFile> files = new LinkedHashSet<>();

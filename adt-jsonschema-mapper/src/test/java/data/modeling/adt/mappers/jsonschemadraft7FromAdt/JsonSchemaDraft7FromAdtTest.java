@@ -42,7 +42,7 @@ public class JsonSchemaDraft7FromAdtTest {
 
         Map<String, Object> expectedMap = fixtureData.getExpectedSchema();
         JsonSchemaDraft7FromAdt fromAdt = new JsonSchemaDraft7FromAdt(namedType, schemaContext);
-        Map<String, Object> actualmap = toMap(fromAdt.stream());
+        Map<String, Object> actualmap = fromAdt.stream().findFirst().get();
         MapAssert.assertMapsEqualIgnoreOrder(expectedMap, actualmap);
     }
 }

@@ -140,7 +140,7 @@ public class SanityComparatorTest {
         Assertions.assertEquals(DifferenceTypes.TypeChanged, diff.differenceType());
         Assertions.assertEquals("/", diff.jsonPointer());
         Assertions.assertEquals("StringType", diff.expected());
-        Assertions.assertEquals("IntType", diff.actual());
+        Assertions.assertEquals("Int32Type", diff.actual());
 
         assertFalse(backwardCompatibilityPolicy.isCompatible(diffs));
         assertFalse(forwardCompatibilityPolicy.isCompatible(diffs));

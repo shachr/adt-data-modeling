@@ -21,6 +21,8 @@ public class GraphQLToAdt implements NamedTypeStream {
     private final String graphqlString;
     protected SchemaContext schemaContext;
 
+    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();;
+
     public GraphQLToAdt(String graphQLString)  {
         this(graphQLString, new SchemaContext());
     }
@@ -39,6 +41,11 @@ public class GraphQLToAdt implements NamedTypeStream {
         toAdtMapperRegistry.register(new InputInputValueDefinitionMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new NonNullTypeMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new InterfaceTypeDefinitionMapper(toAdtMapperRegistry, typeDefinitionRegistry));
+    }
+
+    @Override
+    public ToAdtMapperRegistry getMapperRegistry() {
+        return toAdtMapperRegistry;
     }
 
     @Override

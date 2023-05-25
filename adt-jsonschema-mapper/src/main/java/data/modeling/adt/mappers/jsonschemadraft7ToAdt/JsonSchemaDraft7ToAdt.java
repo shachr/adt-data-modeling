@@ -17,6 +17,7 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
 
     protected Map<String, Object> jsonSchemaMap;
     protected SchemaContext schemaContext;
+    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
 
     public JsonSchemaDraft7ToAdt(String jsonSchemaString) throws JsonSchemaJsonProcessingException {
         this(jsonSchemaString, new SchemaContext());
@@ -43,6 +44,11 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
         toAdtMapperRegistry.register(new JsonSchemaOneOfMapper(toAdtMapperRegistry, schemaContext));
         toAdtMapperRegistry.register(new JsonSchemaEnumMapper(toAdtMapperRegistry));
         toAdtMapperRegistry.register(new JsonSchemaStringMapper());
+    }
+
+    @Override
+    public ToAdtMapperRegistry getMapperRegistry() {
+        return toAdtMapperRegistry;
     }
 
     @Override

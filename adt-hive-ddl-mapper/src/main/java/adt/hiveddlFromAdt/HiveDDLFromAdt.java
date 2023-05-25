@@ -7,13 +7,9 @@ import data.modeling.adt.abstraction.monads.SchemaTypeStream;
 import data.modeling.adt.annotations.documentation.Identifier;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.FieldType;
 import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.typedefs.ProductType;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.IntegerType;
-import org.apache.spark.sql.types.StringType;
 import org.apache.spark.sql.types.StructType;
 
 import java.util.Arrays;
@@ -25,9 +21,7 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
     private SchemaContext schemaContext;
     private NamedType namedType;
 
-    private final FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
-
-    FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
+    private FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
 
     public HiveDDLFromAdt(SchemaContext schemaContext, NamedType namedType) {
 

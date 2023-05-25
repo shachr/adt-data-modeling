@@ -62,7 +62,7 @@ public class SumTypeComparatorTest {
         assertEquals(DifferenceTypes.TypeChanged, difference1.differenceType());
         assertEquals("/0", difference1.jsonPointer());
         assertEquals("StringType", difference1.expected());
-        assertEquals("IntType", difference1.actual());
+        assertEquals("Int32Type", difference1.actual());
 
         Difference difference2 = differences.get(1);
         assertEquals(DifferenceTypes.TypeRemoved, difference2.differenceType());
