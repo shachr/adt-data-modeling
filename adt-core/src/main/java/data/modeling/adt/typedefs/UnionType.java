@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 public class UnionType implements SumType {
     private Collection<? extends AnyType> types;
 
+    // todo: ideally only ScalarType, ReferencedNamedType and NullValueType should be acceptable
     public UnionType(Collection<? extends AnyType> types) {
         this.types = types;
     }

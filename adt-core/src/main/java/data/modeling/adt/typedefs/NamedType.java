@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class NamedType implements LabeledType<ComplexType> {
-    private final String name;
+    private String name;
     private ComplexType type;
     private final Set<Annotation<?>> annotations;
 
@@ -30,6 +30,10 @@ public class NamedType implements LabeledType<ComplexType> {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String value) {
+        name = value;
     }
 
     public Set<Annotation<?>> getAnnotations() {

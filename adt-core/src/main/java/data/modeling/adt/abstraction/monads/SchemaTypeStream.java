@@ -7,11 +7,7 @@ import java.util.stream.Stream;
 
 public interface SchemaTypeStream<T> {
 
-    FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
-
-    default FromAdtMapperRegistry getMapperRegistry(){
-        return fromAdtMapperRegistry;
-    }
+    FromAdtMapperRegistry getMapperRegistry();
 
     Stream<T> stream() throws AdtException;
 }

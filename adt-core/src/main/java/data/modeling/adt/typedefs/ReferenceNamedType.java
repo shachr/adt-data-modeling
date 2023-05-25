@@ -19,6 +19,9 @@ public class ReferenceNamedType implements AnyType {
     public String getReferenceName() {
         return refName;
     }
+    public void setReferenceName(String value) {
+        refName = value;
+    }
 
     @Override
     public boolean equals(Object o) {

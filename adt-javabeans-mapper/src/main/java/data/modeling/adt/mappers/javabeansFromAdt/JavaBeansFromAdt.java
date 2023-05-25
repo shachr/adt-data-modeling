@@ -6,6 +6,7 @@ import data.modeling.adt.annotations.sdl.TypeDeclaration;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFileUtil;
+import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.EnumType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
@@ -16,9 +17,16 @@ import java.util.stream.Stream;
 public class JavaBeansFromAdt implements SchemaTypeStream<JavaFile> {
     protected SchemaContext schemaContext;
 
+    private final FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
+
     public JavaBeansFromAdt(SchemaContext schemaContext){
 
         this.schemaContext = schemaContext;
+    }
+
+    @Override
+    public FromAdtMapperRegistry getMapperRegistry() {
+        return fromAdtMapperRegistry;
     }
 
     @Override

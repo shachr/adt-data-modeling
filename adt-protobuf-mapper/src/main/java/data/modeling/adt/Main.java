@@ -1,5 +1,7 @@
 package data.modeling.adt;
 
+import data.modeling.adt.util.ResourcesUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -14,9 +16,7 @@ public class Main {
     }
 
     private static String readFromResources() throws IOException {
-        try(InputStream stream = Main.class.getClassLoader().getResourceAsStream("example.proto")){
-            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-        }
+        return new ResourcesUtil(Main.class.getClassLoader()).asString("example.proto");
     }
 }
 

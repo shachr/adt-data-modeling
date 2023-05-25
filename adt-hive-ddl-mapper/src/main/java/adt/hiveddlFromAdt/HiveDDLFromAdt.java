@@ -25,6 +25,8 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
     private SchemaContext schemaContext;
     private NamedType namedType;
 
+    private final FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
+
     FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
 
     public HiveDDLFromAdt(SchemaContext schemaContext, NamedType namedType) {
@@ -98,6 +100,10 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
         System.out.println("--");
     }
 
+    @Override
+    public FromAdtMapperRegistry getMapperRegistry() {
+        return fromAdtMapperRegistry;
+    }
 
     @Override
     public Stream<String> stream() throws AdtException {
@@ -111,13 +117,5 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
 //                        .filter(field->field.testAnnotation(Identifier.class))
 //                        .map(FieldType::getName)
 //                        .map("primary key(%s)"::formatted));
-    }
-
-    private DataType toSparkType(AnyType type) throws AdtException {
-        if(type instanceof data.modeling.adt.typedefs.StringType)
-            return new StringType();
-        if(type instanceof data.modeling.adt.typedefs.Int32Type)
-            return new IntegerType();
-        throw new AdtException("not implemented");
     }
 }

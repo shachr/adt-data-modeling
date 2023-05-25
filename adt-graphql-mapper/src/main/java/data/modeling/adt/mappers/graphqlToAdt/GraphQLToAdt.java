@@ -47,8 +47,8 @@ public class GraphQLToAdt implements NamedTypeStream {
         //  the assumption atm is that scalars are fixed, its wrong, should support several built-in scalars
         //  however, use case should be able to determine the scalars that are needed.
         return typeDefinitionRegistry.types().values().stream()
-                .map(LambdaExceptionUtil.function(typeDefinition ->
-                    toAdtMapperRegistry.toAdt(typeDefinition)))
-                .map(type -> (NamedType) type);
+                .map(LambdaExceptionUtil.function(toAdtMapperRegistry::toAdt))
+                .map(type -> (NamedType) type)
+                .peek(namedType -> schemaContext.registerNamedType(namedType));
     }
 }

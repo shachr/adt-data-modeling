@@ -17,6 +17,7 @@
         <module>adt-graphql-mapper</module>
         <module>adt-protobuf-mapper</module>
         <module>adt-hive-ddl-mapper</module>
+        <module>adt-examples</module>
     </modules>
 
 </project>

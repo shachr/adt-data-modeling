@@ -18,13 +18,14 @@ public class JsonSchemaRefMapper extends JsonSchemaMapper<ReferenceNamedType> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
     private SchemaContext schemaContext;
-    final Map<String, Object> definitions = new LinkedHashMap<>();
+    final Map<String, Object> definitions;
     final String prefix = "#/definitions/";
 
     public JsonSchemaRefMapper(FromAdtMapperRegistry fromAdtMapperRegistry, SchemaContext schemaContext) {
 
         this.fromAdtMapperRegistry = fromAdtMapperRegistry;
         this.schemaContext = schemaContext;
+        this.definitions= new LinkedHashMap<>();
     }
 
     @Override

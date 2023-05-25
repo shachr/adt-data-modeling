@@ -40,6 +40,11 @@ public class SchemaContext {
         objectTypeMap.put(namedType.getName(), namedType);
     }
 
+    public void removeNamedType(NamedType namedType)
+    {
+        objectTypeMap.remove(namedType.getName());
+    }
+
     public NamedType getNamedType(String name) {
         return objectTypeMap.get(name);
     }

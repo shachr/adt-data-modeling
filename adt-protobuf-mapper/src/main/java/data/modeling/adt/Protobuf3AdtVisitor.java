@@ -25,6 +25,14 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
 
         this.schemaContext = schemaContext;
     }
+
+    @Override
+    public SchemaContext visitImportStatement(Protobuf3Parser.ImportStatementContext ctx) {
+        return super.visitImportStatement(ctx);
+        // todo: start a new protoToAdt with the same schema context
+        //  and avoid cyclic reference using shared traversing context.
+    }
+
     @Override
     public SchemaContext visitPackageStatement(Protobuf3Parser.PackageStatementContext ctx) {
         String packageName = ctx.fullIdent().getText();

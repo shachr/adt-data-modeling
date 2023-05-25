@@ -10,21 +10,23 @@ import data.modeling.adt.typedefs.NamedType;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<String, Object>> {
+import static data.modeling.adt.util.StreamExtensions.toMap;
 
-    private NamedType namedType;
+public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map<String, Object>> {
+
+    private final NamedType namedType;
     protected SchemaContext schemaContext;
+    private final FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
 
     public JsonSchemaDraft7FromAdt(NamedType namedType, SchemaContext schemaContext) {
         this.namedType = namedType;
         this.schemaContext = schemaContext;
-
         fromAdtMapperRegistry.register(new JsonSchemaNullMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaEnumMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaAllOfMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaAnyOfMapper(fromAdtMapperRegistry));
-        //todo: there is no support for this in json-schema,
-        // instead, should run a schema processing pipeline that denormalize to json-schema friendly structures.
+        //todo: initially the schema adapter was denormalizing the schema,
+        // this should happen as part of schema processing
 //        fromAdtMapperRegistry.register(new JsonSchemaProductTypeWithExtendingReferences(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaObjectMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaOneOfMapper(fromAdtMapperRegistry));
@@ -34,7 +36,12 @@ public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map.Entry<Strin
     }
 
     @Override
-    public Stream<Map.Entry<String, Object>> stream() throws AdtException {
-        return new JsonSchemaMainMapper(fromAdtMapperRegistry, schemaContext).fromAdt(namedType);
+    public FromAdtMapperRegistry getMapperRegistry() {
+        return fromAdtMapperRegistry;
+    }
+
+    @Override
+    public Stream<Map<String, Object>> stream() throws AdtException {
+        return Stream.of(toMap(new JsonSchemaMainMapper(fromAdtMapperRegistry, schemaContext).fromAdt(namedType)));
     }
 }
