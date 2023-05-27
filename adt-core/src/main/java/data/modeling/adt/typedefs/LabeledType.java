@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public interface LabeledType<T extends AnyType> extends AnyType {
+public interface LabeledType<T extends AnyType> extends AdtType {
     String getName();
 
     T getType();

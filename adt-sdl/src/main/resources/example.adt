@@ -1,0 +1,62 @@
+// import json "./file.json"
+import graphql "./file.gql" > pipe
+
+set compatibility "backward-transitive"
+
+type Person {
+    id: PersonId
+    name: String
+    age: Integer
+}
+
+type FooID {
+    id: Guid
+}
+
+type BookId {
+    id: Guid
+}
+
+union PrimaryKey = FooID | BookId
+
+context graphQLContext {
+
+    set compatibility "forward-transitive"
+
+    type BarID {
+        id: Guid
+    }
+
+    type BookId {
+        id: Guid
+    }
+
+    union PrimaryKey = FooID | BookId
+}
+
+context jsonSchemaContext {
+    type PersonId {
+        id: Guid
+    }
+
+    type PersonId {
+        id: Guid
+    }
+
+    modify union PrimaryKey = PersonId | FooID
+    modify type Person extends Foo {
+        @id
+        id: String
+        @size(min=1, max=50)
+        name: String
+    } remove age
+
+    modify anyOf Person > toType
+    modify allOf Person > toType
+
+    //asdg
+    /*
+    asdfa
+    */
+}
+    rename("^.*$", "a.b.c.$1")

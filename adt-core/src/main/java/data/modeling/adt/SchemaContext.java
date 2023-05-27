@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 public class SchemaContext {
     private final Map<String, NamedType> objectTypeMap;
     private final Map<String, Set<Annotation>> annotations;
+
+    private final Set<SchemaContextSetting> settings = new LinkedHashSet<>();
     private String name;
 
     public SchemaContext() {
@@ -83,6 +85,14 @@ public class SchemaContext {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void set(String settingName, Object value) {
+        settings.add(new SchemaContextSetting(settingName, value));
+    }
+
+    public Set<SchemaContextSetting> getSettings(){
+        return settings;
     }
 }
 

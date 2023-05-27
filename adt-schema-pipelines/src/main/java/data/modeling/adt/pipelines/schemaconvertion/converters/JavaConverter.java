@@ -19,7 +19,7 @@ public class JavaConverter implements Task<SchemaConvertionMessage, SchemaConver
 
     @Override
     public SchemaConvertedMessage execute(SchemaConvertionMessage message) throws Exception {
-        AdtToSDL adtToSimplerObjects = new AdtToSDL(message.getSchemaContext());
+        SchemaCompositionToAdt adtToSimplerObjects = new SchemaCompositionToAdt(message.getSchemaContext());
         SchemaContext schemaContext = adtToSimplerObjects.apply();
 
         JavaBeansFromAdt javaBeansFromAdt = new JavaBeansFromAdt(schemaContext);

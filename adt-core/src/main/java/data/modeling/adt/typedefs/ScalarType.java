@@ -3,7 +3,7 @@ package data.modeling.adt.typedefs;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.exceptions.AdtException;
 
-public abstract class ScalarType implements AnyType {
+public abstract class ScalarType implements AdtType {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

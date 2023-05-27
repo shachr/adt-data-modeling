@@ -18,6 +18,7 @@
         <module>adt-protobuf-mapper</module>
         <module>adt-hive-ddl-mapper</module>
         <module>adt-examples</module>
+        <module>adt-sdl</module>
     </modules>
 
 </project>

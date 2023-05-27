@@ -9,9 +9,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class ProductType implements CompositionType {
+public final class ProductType implements CompositionType, AdtType {
     private final FieldTypeCollection fieldTypeCollection = new FieldTypeCollection();
-    private final LinkedHashSet<ReferenceNamedType> implements_;
+    private LinkedHashSet<ReferenceNamedType> implements_;
 
     private final Set<ProductTypeConstructor> constructors = new LinkedHashSet<>();
 
@@ -49,6 +49,10 @@ public final class ProductType implements CompositionType {
 
     public FieldType getField(String name) {
         return fieldTypeCollection.get(name);
+    }
+
+    public void setImplements(LinkedHashSet<ReferenceNamedType> value){
+        implements_ = value;
     }
 
     public LinkedHashSet<ReferenceNamedType> getImplements(){

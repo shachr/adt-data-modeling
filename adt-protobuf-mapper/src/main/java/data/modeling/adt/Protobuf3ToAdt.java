@@ -45,7 +45,7 @@ public class Protobuf3ToAdt implements NamedTypeStream {
     @Override
     public Stream<NamedType> stream() throws AdtException {
 
-// Create a CharStream from your Proto file
+        // Create a CharStream from your Proto file
         CharStream input = CharStreams.fromString(protoContent);
 
         // Create a lexer that feeds off the input CharStream

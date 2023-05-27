@@ -3,7 +3,7 @@ package data.modeling.adt.pipelines.schemaconversion;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.compatibility.AnyTypeComparator;
 import data.modeling.adt.compatibility.Difference;
-import data.modeling.adt.pipelines.schemaconvertion.converters.AdtToSDL;
+import data.modeling.adt.pipelines.schemaconvertion.converters.SchemaCompositionToAdt;
 import data.modeling.adt.typedefs.*;
 import org.junit.Test;
 
@@ -34,9 +34,9 @@ public class JsonSchemaToPojoPipelineTest {
                 new FieldType("age", new Int32Type())
         )).build();
 
-        NamedType foo = NamedType.builder("foo", ProductType.of(
-                Stream.of(new ReferenceNamedType("base")).collect(Collectors.toCollection(LinkedHashSet::new)),
-                Stream.of(
+        NamedType foo = NamedType.builder("foo", AllOfType.of(
+                new ReferenceNamedType("base"),
+                ProductType.of(Stream.of(
                     FieldType.builder("id", new Int32Type()).build(),
                     FieldType.builder("name", new StringType()).build(),
                     new FieldAdditionalTypes(ProductType.of(
@@ -50,11 +50,11 @@ public class JsonSchemaToPojoPipelineTest {
                     new FieldAdditionalTypes(
                             ProductType.of(FieldType.builder("state", new StringType()).build()))
                 ))
-        ).build();
+        )).build();
 
         schemaContext.registerNamedType(base);
         schemaContext.registerNamedType(foo);
-        new AdtToSDL(schemaContext).apply();
+        new SchemaCompositionToAdt(schemaContext).apply();
 
         NamedType fooResolved = schemaContext.getNamedType("foo");
         List<Difference> diffs =  AnyTypeComparator.compare(expectedNamedType, fooResolved);

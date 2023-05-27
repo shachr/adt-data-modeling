@@ -11,22 +11,36 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AdtToSDL implements AdtVisitor {
+public class SchemaCompositionToAdt implements AdtVisitor {
 
     // todo: [IDL] `patternProperties` keyword is purely validation oriented and not supported??
     // todo: [IDL] 'not' keyword is purely validation oriented and not supported??
     // todo: [IDL] `unevaluatedProperties` keyword is purely validation oriented and not supported??
     // todo: [IDL] `propertyNames` keyword is purely validation oriented and not supported??
     // todo: [IDL] `min/maxProperties` keyword, is not forward transitive, thus not supported?
-    // todo: [IDL] anything other `additionalProperties`: true, is sealing a class, should fail on an extension attempt
-
-
+    // todo: [IDL] `additionalProperties`: false, is sealing a class, should fail on an extension attempt
     // todo: https://github.com/json-schema-org/vocab-idl
+
+    /*
+    allOf:
+    To adapt allOf to a Product type, one of the following conditions must be met:
+     - All items in the allOf array are $ref references.
+     - All first items in the allOf array are $ref references, and all last items are of type object.
+     - All items in the allOf array are of type object and have compatible property types, allowing for property merging.
+
+    anyOf:
+    To adapt anyOf to a Product type, one of the following conditions must be met:
+     - All items in the anyOf array are of type object and have the same set of properties.
+
+     if/else/then:
+     To adapt if/else/then to a Product type, one of the following conditions must be met:
+     TBD
+     */
 
     private final SchemaContext schemaContext;
     private LabeledType lastSeenLabeledType;
 
-    public AdtToSDL(SchemaContext schemaContext){
+    public SchemaCompositionToAdt(SchemaContext schemaContext){
 
         this.schemaContext = schemaContext;
     }
@@ -37,12 +51,12 @@ public class AdtToSDL implements AdtVisitor {
     }
 
     @Override
-    public void enterLabeledType(LabeledType type) {
+    public void enterLabeledType(LabeledType<?> type) {
         lastSeenLabeledType = type;
     }
 
     @Override
-    public void exitLabeledType(LabeledType type) {
+    public void exitLabeledType(LabeledType<?> type) {
         lastSeenLabeledType = null;
     }
 
@@ -65,45 +79,103 @@ public class AdtToSDL implements AdtVisitor {
     }
 
     private CompositionType allOfTypeToIDL(AllOfType allOfType){
-        // todo: support interfaces, open-api style, e.g. allOf
-        //  interfaces are referenced from product types, cannot have other references, e.g. from fields
-        if(allOfType.getTypes().size()>1) {
-            LinkedHashSet<AnyType> potentialInterfaces = allOfType.getTypes().stream()
-                    .limit(allOfType.getTypes().size() - 1)
+
+        /*
+        To adapt allOf to a Product type, one of the following conditions must be met:
+         - All items in the allOf array are $ref references.
+         - All items in the allOf array start with types of ReferenceNamedType and end with ProductType types.
+         - All items in the allOf array are of type object and have compatible property types, allowing for property merging.
+         */
+
+        if(allOfType.getTypes().isEmpty()){
+            return new ProductType();
+        } else if(checkIsValidForProductType(allOfType)){
+
+            Map<Boolean, List<AnyType>> partitionMap = allOfType
+                    .getTypes().stream()
+                    .map(item->(AnyType)item)
+                    .collect(Collectors.partitioningBy(item->item instanceof ProductType));
+
+            LinkedHashSet<ReferenceNamedType> referenceNamedTypes = partitionMap.get(false).stream()
+                    .map(item->(ReferenceNamedType)item)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
-            // IDLized and label anonymous composition types
-            potentialInterfaces = potentialInterfaces.stream()
-                    .map(LambdaExceptionUtil.function(type -> {
-                        if(type instanceof CompositionType) {
-                            // todo: fail and ask to label
-                            CompositionType compositionType = compositionTypeToIDL((CompositionType) type);
-                            return labelAnonymousCompositionTypes(compositionType);
-                        }
-                        else {
-                            return type;
-                        }
-                    }))
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            List<ProductType> productTypes = partitionMap.get(true).stream()
+                    .map(LambdaExceptionUtil.function(item -> productTypeToIDL((ProductType)item)))
+                    .toList();
 
-            AnyType extendingProduct = allOfType.getTypes().stream()
-                    .reduce((prev, curr) -> curr).get();
+            ProductType mergedProductType = productTypes.stream()
+                    .reduce(this::mergeProductTypes)
+                    .orElse(new ProductType());
 
-            boolean IsInterfaces = potentialInterfaces.stream().allMatch(type -> type instanceof ReferenceNamedType || type instanceof ProductType);
-            boolean isExtendingProduct = extendingProduct instanceof ProductType;
-
-            if (IsInterfaces && isExtendingProduct) {
-                return ProductType.of(potentialInterfaces.stream()
-                                .map(type -> (ReferenceNamedType)type)
-                                .collect(Collectors.toCollection(LinkedHashSet::new)),
-                        ((ProductType) extendingProduct).getOwnFields().stream()
-                );
-            }
+            mergedProductType.setImplements(referenceNamedTypes);
+            return mergedProductType;
+//
+//            LinkedHashSet<AnyType> potentialInterfaces = allOfType.getTypes().stream()
+//                    .limit(allOfType.getTypes().size() - 1)
+//                    .collect(Collectors.toCollection(LinkedHashSet::new));
+//
+//            // IDLized and label anonymous composition types
+//            potentialInterfaces = potentialInterfaces.stream()
+//                    .map(LambdaExceptionUtil.function(type -> {
+//                        if(type instanceof CompositionType) {
+//                            // todo: fail and ask to label
+//                            CompositionType compositionType = compositionTypeToIDL((CompositionType) type);
+//                            return labelAnonymousCompositionTypes(compositionType);
+//                        }
+//                        else {
+//                            return type;
+//                        }
+//                    }))
+//                    .collect(Collectors.toCollection(LinkedHashSet::new));
+//
+//            AnyType extendingProduct = allOfType.getTypes().stream()
+//                    .reduce((prev, curr) -> curr).get();
+//
+//            boolean IsInterfaces = potentialInterfaces.stream().allMatch(type -> type instanceof ReferenceNamedType || type instanceof ProductType);
+//            boolean isExtendingProduct = extendingProduct instanceof ProductType;
+//
+//            if (IsInterfaces && isExtendingProduct) {
+//                return ProductType.of(potentialInterfaces.stream()
+//                                .map(type -> (ReferenceNamedType)type)
+//                                .collect(Collectors.toCollection(LinkedHashSet::new)),
+//                        ((ProductType) extendingProduct).getOwnFields().stream()
+//                );
+//            }
         }
 
         return allOfType;
     }
 
+    private boolean checkIsValidForProductType(AllOfType allOfType) {
+        List<? extends AnyType> types = allOfType.getTypes().stream().toList();
+
+        int lastIndex = types.size() - 1;
+
+        boolean isValid = true;
+        boolean isRefFound = false;
+        boolean isProductTypeFound = false;
+
+        for (int i = 0; i < lastIndex; i++) {
+            AnyType item = types.get(i);
+            if(!(item instanceof ReferenceNamedType || item instanceof ProductType)) {
+                isValid = false;
+                break;
+            }
+            if(item instanceof ReferenceNamedType) {
+                if(isProductTypeFound) {
+                    isValid = false;
+                    break;
+                }
+                isRefFound = true;
+            } else {
+                isProductTypeFound = true;
+            }
+        }
+
+        isValid = isValid && (isRefFound || isProductTypeFound);
+        return isValid;
+    }
 
     private CompositionType sumTypeToIDL(SumType sumType) throws AdtException {
         //  !(compositionType instanceof EnumType)
