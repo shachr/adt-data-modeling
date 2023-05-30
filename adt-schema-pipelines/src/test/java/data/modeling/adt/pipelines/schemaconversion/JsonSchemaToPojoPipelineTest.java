@@ -58,6 +58,7 @@ public class JsonSchemaToPojoPipelineTest {
 
         NamedType fooResolved = schemaContext.getNamedType("foo");
         List<Difference> diffs =  AnyTypeComparator.compare(expectedNamedType, fooResolved);
+        diffs.forEach(System.out::println);
         assertEquals(0, diffs.size());
         assertEquals(expectedNamedType, fooResolved);
     }

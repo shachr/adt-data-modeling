@@ -6,6 +6,7 @@ import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.typedefs.*;
 import data.modeling.adt.util.LambdaExceptionUtil;
+import data.modeling.adt.util.StreamUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,45 +64,89 @@ public class SchemaCompositionToAdt implements AdtVisitor {
     @Override
     public void visit(ProductType type) throws AdtException {
         if(lastSeenLabeledType instanceof NamedType) {
-            ProductType productType = productTypeToIDL(type);
+            ProductType productType = productTypeFieldsToAdt(type);
             lastSeenLabeledType.setType(productType);
         }
     }
     private CompositionType compositionTypeToIDL(CompositionType compositionType) throws AdtException {
-        if(compositionType instanceof ProductType) {
-            return productTypeToIDL((ProductType) compositionType);
-        } else if(compositionType instanceof AllOfType){
-            allOfTypeToIDL((AllOfType) compositionType);
-        }  else if(compositionType instanceof SumType) {
-            return sumTypeToIDL((SumType) compositionType);
+        if(compositionType instanceof ProductType productType) {
+            return productTypeFieldsToAdt(productType);
+        } else if(compositionType instanceof AllOfType allOfType) {
+            return allOfTypeToProductType(allOfType);
+        } else if(compositionType instanceof AnyOfType anyOfType){
+            return anyOfToProductType(anyOfType);
+        }  else if(compositionType instanceof SumType sumType) {
+            return sumTypeToIDL(sumType);
         }
         return compositionType;
     }
 
-    private CompositionType allOfTypeToIDL(AllOfType allOfType){
-
-        /*
-        To adapt allOf to a Product type, one of the following conditions must be met:
-         - All items in the allOf array are $ref references.
-         - All items in the allOf array start with types of ReferenceNamedType and end with ProductType types.
-         - All items in the allOf array are of type object and have compatible property types, allowing for property merging.
-         */
-
-        if(allOfType.getTypes().isEmpty()){
+    private ProductType anyOfToProductType(AnyOfType anyOfType) throws AdtException{
+        if(anyOfType.getTypes().isEmpty()){
             return new ProductType();
-        } else if(checkIsValidForProductType(allOfType)){
+        }
+        else if(checkAnyOfValidForProductType(anyOfType)){
+            Map<Boolean, List<AnyType>> partitions =  anyOfType.getTypes().stream().collect(Collectors.partitioningBy(item -> item instanceof ProductType));
+            Stream<ProductType> productTypes = partitions.get(true).stream().map(item -> (ProductType)item);
+            Stream<ProductType> productTypes2 = partitions.get(false).stream()
+                    .map(item -> (ReferenceNamedType)item)
+                    .map(ref -> (ProductType)schemaContext.getNamedType(ref.getReferenceName()).getType());
+            Stream<ProductType> mergedStream = StreamUtil.concatStreams(productTypes, productTypes2);
+            return mergedStream.reduce(this::mergeProductTypes).get();
+        }
+        throw new AdtException("not supported");
+    }
+
+
+    private boolean checkAnyOfValidForProductType(AnyOfType anyOfType) {
+        List<? extends AnyType> types = anyOfType.getTypes().stream().toList();
+
+        int lastIndex = types.size() - 1;
+        boolean isValid = true;
+
+        for (int i = 0; i < lastIndex; i++) {
+            AnyType item = types.get(i);
+            if(item instanceof ReferenceNamedType referenceNamedType){
+                NamedType namedType = schemaContext.getNamedType(referenceNamedType.getReferenceName());
+                if(!(namedType.getType() instanceof ProductType)){
+                    isValid = false;
+                    break;
+                }
+            } else if(!(item instanceof ProductType)){
+                isValid = false;
+                break;
+            }
+        }
+
+        return isValid;
+    }
+
+
+    /**
+     *To adapt allOf to a Product type, one of the following conditions must be met:
+     * 1) All items in the allOf array are $ref references.
+     * 2) All items in the allOf array start with types of ReferenceNamedType and end with ProductType types.
+     * 3) All items in the allOf array are of type object and have compatible property types, allowing for property merging.
+     * @param allOfType the allOf type
+     * @return product type
+     * @throws AdtException when its impossible to adapt to product type
+     */
+    private ProductType allOfTypeToProductType(AllOfType allOfType) throws AdtException {
+        if (allOfType.getTypes().isEmpty()) {
+            return new ProductType();
+        } else if (checkAllOfIsValidForProductType(allOfType)) {
 
             Map<Boolean, List<AnyType>> partitionMap = allOfType
                     .getTypes().stream()
-                    .map(item->(AnyType)item)
-                    .collect(Collectors.partitioningBy(item->item instanceof ProductType));
+                    .map(item -> (AnyType) item)
+                    .collect(Collectors.partitioningBy(item -> item instanceof ProductType));
 
             LinkedHashSet<ReferenceNamedType> referenceNamedTypes = partitionMap.get(false).stream()
-                    .map(item->(ReferenceNamedType)item)
+                    .map(item -> (ReferenceNamedType) item)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
             List<ProductType> productTypes = partitionMap.get(true).stream()
-                    .map(LambdaExceptionUtil.function(item -> productTypeToIDL((ProductType)item)))
+                    .map(LambdaExceptionUtil.function(item -> productTypeFieldsToAdt((ProductType) item)))
                     .toList();
 
             ProductType mergedProductType = productTypes.stream()
@@ -110,44 +155,12 @@ public class SchemaCompositionToAdt implements AdtVisitor {
 
             mergedProductType.setImplements(referenceNamedTypes);
             return mergedProductType;
-//
-//            LinkedHashSet<AnyType> potentialInterfaces = allOfType.getTypes().stream()
-//                    .limit(allOfType.getTypes().size() - 1)
-//                    .collect(Collectors.toCollection(LinkedHashSet::new));
-//
-//            // IDLized and label anonymous composition types
-//            potentialInterfaces = potentialInterfaces.stream()
-//                    .map(LambdaExceptionUtil.function(type -> {
-//                        if(type instanceof CompositionType) {
-//                            // todo: fail and ask to label
-//                            CompositionType compositionType = compositionTypeToIDL((CompositionType) type);
-//                            return labelAnonymousCompositionTypes(compositionType);
-//                        }
-//                        else {
-//                            return type;
-//                        }
-//                    }))
-//                    .collect(Collectors.toCollection(LinkedHashSet::new));
-//
-//            AnyType extendingProduct = allOfType.getTypes().stream()
-//                    .reduce((prev, curr) -> curr).get();
-//
-//            boolean IsInterfaces = potentialInterfaces.stream().allMatch(type -> type instanceof ReferenceNamedType || type instanceof ProductType);
-//            boolean isExtendingProduct = extendingProduct instanceof ProductType;
-//
-//            if (IsInterfaces && isExtendingProduct) {
-//                return ProductType.of(potentialInterfaces.stream()
-//                                .map(type -> (ReferenceNamedType)type)
-//                                .collect(Collectors.toCollection(LinkedHashSet::new)),
-//                        ((ProductType) extendingProduct).getOwnFields().stream()
-//                );
-//            }
+        } else {
+            throw new AdtException("not supported");
         }
-
-        return allOfType;
     }
 
-    private boolean checkIsValidForProductType(AllOfType allOfType) {
+    private boolean checkAllOfIsValidForProductType(AllOfType allOfType) {
         List<? extends AnyType> types = allOfType.getTypes().stream().toList();
 
         int lastIndex = types.size() - 1;
@@ -181,152 +194,59 @@ public class SchemaCompositionToAdt implements AdtVisitor {
         //  !(compositionType instanceof EnumType)
         return sumType;
     }
-    private ProductType productTypeToIDL(ProductType productType) throws AdtException {
-        // todo: throw exception when there is no way to unwrap, this will impact conversion to code gen
-        //  or languages that do not support all the ADT types that are mostly aligned with json-schema.
-
+    private ProductType productTypeFieldsToAdt(ProductType productType) throws AdtException {
         // todo: json-schema to codegen tool: https://www.jsonschema2pojo.org/ style
 
-        ProductType productTypeNoAnon = resolveAnonymousFieldTypes(productType);
-        Map<Boolean, List<FieldType>> splitFieldList = productTypeNoAnon.getOwnFields().stream()
-                .collect(Collectors.partitioningBy((fieldType -> fieldType instanceof CompositionType)));
+        // todo: given type names must be consistent,
+        //  resolving anonymous types must be done by the author.
+        //  in this function, we won't support anonymous types.
+        Map<Boolean, List<FieldType>> splitFieldList = productType.getOwnFields().stream()
+                .collect(Collectors.partitioningBy((fieldType -> fieldType.getType() instanceof CompositionType)));
 
         // Get the list of non-resolvable fields
         List<FieldType> fieldsOfTypeNotComposition = splitFieldList.get(false);
         List<FieldType> fieldsOfTypeComposition = splitFieldList.get(true);
 
-        if(productType.getImplements().isEmpty() && fieldsOfTypeComposition.isEmpty()) {
-            return productTypeNoAnon;
+        if(fieldsOfTypeComposition.isEmpty()) {
+            return productType;
         }
 
-        ProductType baseProductType = ProductType.of(productTypeNoAnon.getImplements(), fieldsOfTypeNotComposition.stream());
-
-
-        // extending products
-//        Set<AnyType> extendingTypes = resolveExtendingReferences(productType);
-
-        // resolve inheritance
-//        Stream<ProductType> extendingProductTypes = extendingTypes.stream().map(
-//                LambdaExceptionUtil.function(extendingType -> productTypeToIDL((ProductType)extendingType)));
-
-//        ProductType baseFields = mergeInheritanceIn(extendingProductTypes, baseProductType);
-
-        // Get the list of resolvable fields
-        ProductType resolvedFields = mergeResolvableFields(fieldsOfTypeComposition.stream());
+        ProductType baseProductType = ProductType.of(productType.getImplements(), fieldsOfTypeNotComposition.stream());
+        ProductType resolvedFields = mergeFieldsCompositions(fieldsOfTypeComposition.stream());
 
         return mergeProductTypes(baseProductType, resolvedFields);
     }
 
-    private Set<AnyType> resolveExtendingReferences(ProductType productType) {
-        return productType.getImplements().stream()
-                .map(referencedType -> {
-                    NamedType namedType = schemaContext.getNamedType(referencedType.getReferenceName());
-                    return namedType.getType();
-                })
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
+    private ProductType mergeFieldsCompositions(Stream<FieldType> resolvableFieldsStream) {
 
-    private ProductType resolveAnonymousFieldTypes(ProductType productType){
-        // todo: resolve FieldAdditionalType first!!
-        Map<Boolean, List<FieldType>> partitions = productType.getOwnFields().stream()
-                .collect(Collectors.partitioningBy(field -> field instanceof FieldAdditionalTypes));
-        List<FieldType> additionalTypes = partitions.get(true);
-        Set<FieldType> fields = new LinkedHashSet<>(partitions.get(false));
-        if(!additionalTypes.isEmpty()){
-            additionalTypes.forEach(fieldType -> {
-                FieldAdditionalTypes fieldAdditionalTypes = (FieldAdditionalTypes)fieldType;
-                if(fieldAdditionalTypes.getType() instanceof ProductType productType1){
-                    fields.addAll(productType1.getOwnFields());
-                }
-            });
-        }
-
-        return ProductType.of(productType.getImplements(), fields.stream()
-                .peek(LambdaExceptionUtil.consumer(this::tryLabelAnonymousCompositionTypes)));
-    }
-
-    private ProductType mergeInheritanceIn(Stream<ProductType> resolvedProductTypes, ProductType extendedProductType) throws AdtException {
-        Set<FieldType> extendingFields = resolveAnonymousFieldTypes(extendedProductType).getOwnFields();
-
-        Set<FieldType> fieldTypeSet = resolvedProductTypes
-                .flatMap(productType -> productType.getOwnFields().stream())
-                .map(fieldType -> {
-                    FieldType fType = extendedProductType.getField(fieldType.getName());
-                    if(Objects.isNull(fType)){
-                        return fieldType;
-                    } else {
-                        extendingFields.remove(fType);
-                        return fType;
-                    }
-                })
-                .peek(LambdaExceptionUtil.consumer(this::tryLabelAnonymousCompositionTypes))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        fieldTypeSet.addAll(extendingFields);
-        return new ProductType(fieldTypeSet);
-    }
-
-    private ProductType mergeResolvableFields(Stream<FieldType> resolvableFieldsStream) throws AdtException {
         Set<FieldType> fields = resolvableFieldsStream
-                .map(LambdaExceptionUtil.function(this::fieldTypeToIDL))
-                .peek(LambdaExceptionUtil.consumer(this::tryLabelAnonymousCompositionTypes))
+                .peek(LambdaExceptionUtil.consumer(fieldType -> {
+                    fieldType.setType(compositionTypeToIDL((CompositionType)fieldType.getType()));
+                }))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         Map<String, Set<FieldType>> fieldMap = fields.stream()
                 .collect(Collectors.groupingBy(
                         fieldType -> Objects.isNull(fieldType.getName()) ? "" : fieldType.getName(),
-                        Collectors.toSet()));
+                        Collectors.toCollection(LinkedHashSet::new)));
 
-        Set<Map.Entry<String, Set<FieldType>>> entries = fieldMap.entrySet()
-                .stream()
-                .filter(entry-> entry.getValue().size()>1)
-                .collect(Collectors.toSet());
+        return fieldMap.entrySet().stream()
+                .map(LambdaExceptionUtil.function(entry -> {
+                    if(!entry.getValue().stream().allMatch(item -> item.getType() instanceof ProductType)){
+                        throw new AdtException("not supported");
+                    }
 
-        // todo: check if a field type is also resolvable and resolve
-
-        // happy case
-        if(entries.isEmpty())
-            return new ProductType(fields);
-
-        // todo: need resolve work
-        throw new AdtException("can't resolve");
-    }
-    private void tryLabelAnonymousCompositionTypes(FieldType fieldType) throws AdtException {
-        if (fieldType.getType() instanceof CompositionType) {
-            fieldType.setType(labelAnonymousCompositionTypes((CompositionType) fieldType.getType()));
-        }
-    }
-    private ReferenceNamedType labelAnonymousCompositionTypes(CompositionType anyType) throws AdtException {
-        throw new AdtException("anonymous type found: " + anyType.getClass().toString());
-//        String name = generateUniqueFQN(schemaContext.getName());
-//        schemaContext.registerNamedType(new NamedType(name, anyType));
-//        return new ReferenceNamedType(name);
+                    return entry.getValue().stream()
+                            .map(fieldType -> (ProductType)fieldType.getType())
+                            .reduce(this::mergeProductTypes).orElse(new ProductType());
+                }))
+                .reduce(this::mergeProductTypes).orElse(new ProductType());
     }
 
-    private static String generateUniqueFQN(String packageName) {
-        String uniqueName = generateUniqueName();
-        if (packageName != null && !packageName.isEmpty()) {
-            return packageName + "." + uniqueName;
-        }
-        return uniqueName;
-    }
-
-    private static String generateUniqueName() {
-        String uniqueID = UUID.randomUUID().toString().replace("-", "");
-        return "Anonymous_" + uniqueID;
-    }
 
     private ProductType mergeProductTypes(ProductType baseFields, ProductType resolvableFields){
         resolvableFields.getOwnFields().forEach(baseFields::addField);
         return baseFields;
-    }
-
-    public FieldType fieldTypeToIDL(FieldType fieldType) throws AdtException {
-        if(fieldType.getType() instanceof CompositionType){
-            fieldType.setType(compositionTypeToIDL((CompositionType)fieldType.getType()));
-        }
-
-        return fieldType;
     }
 
     @Override
@@ -340,14 +260,14 @@ public class SchemaCompositionToAdt implements AdtVisitor {
     @Override
     public void visit(AllOfType type) throws AdtException {
         if(lastSeenLabeledType instanceof NamedType) {
-            CompositionType compositionType = allOfTypeToIDL(type);
+            CompositionType compositionType = allOfTypeToProductType(type);
             lastSeenLabeledType.setType(compositionType);
         }
 
     }
 
     @Override
-    public void visit(AnyOfType type) throws AdtException {
+    public void visit(AnyOfType type) {
 
     }
 

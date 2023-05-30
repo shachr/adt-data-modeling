@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UnionType implements SumType {
-    private Collection<? extends AnyType> types;
+    private Collection<AnyType> types;
 
     // todo: ideally only ScalarType, ReferencedNamedType and NullValueType should be acceptable
-    public UnionType(Collection<? extends AnyType> types) {
+    public UnionType(Collection<AnyType> types) {
         this.types = types;
     }
 
@@ -34,6 +34,14 @@ public class UnionType implements SumType {
 
     public static UnionType of(Stream<? extends AnyType> types) {
         return new UnionType(types.collect(Collectors.toCollection(LinkedHashSet::new)));
+    }
+
+    public static UnionType of(AnyType... types) {
+        return of(Stream.of(types));
+    }
+
+    public void addType(AnyType type) {
+        this.types.add(type);
     }
 }
 

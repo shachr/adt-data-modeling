@@ -4,7 +4,6 @@ import adt.hiveddlFromAdt.mappers.*;
 import adt.hiveddlToAdt.HiveDDLToAdt;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.SchemaTypeStream;
-import data.modeling.adt.annotations.documentation.Identifier;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.FieldType;
@@ -70,8 +69,7 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
          */
 
         NamedType invoice = NamedType.builder("invoice", ProductType.of(
-                FieldType.builder("id", new data.modeling.adt.typedefs.StringType())
-                        .withAnnotations(new Identifier()).build(),
+                FieldType.builder("id", new data.modeling.adt.typedefs.StringType()).build(),
                 FieldType.builder("name", new data.modeling.adt.typedefs.StringType()).build(),
                 FieldType.builder("age", new data.modeling.adt.typedefs.Int64Type()).build()
         )).build();
