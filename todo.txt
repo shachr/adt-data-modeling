@@ -13,8 +13,8 @@ Domain Strategy
         1.1 Schema Parsing To ADT
             1.2.1. add support for json-schema subschema, such as schema composition, and conditional schema
             1.2.2. add anyOf
-            1.2.3. if/else/then = oneOf, should be a special fieldType?
-            1.2.4. dependentSchemes = more schema composition, should be a special fieldType?
+            1.2.3. if/else/then = oneOf, should be a special fieldDefinition?
+            1.2.4. dependentSchemes = more schema composition, should be a special fieldDefinition?
             1.2.5. dependentRequired: https://json-schema.org/understanding-json-schema/reference/conditionals.html
             1.2.6 visitor that can resolve given a schema context.
             1.2.7 name anonymous types! -> todo: name ideally based on location unless not possible

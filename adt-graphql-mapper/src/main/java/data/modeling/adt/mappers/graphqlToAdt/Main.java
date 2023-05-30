@@ -1,9 +1,6 @@
 package data.modeling.adt.mappers.graphqlToAdt;
 
 import data.modeling.adt.exceptions.AdtException;
-import data.modeling.adt.typedefs.NamedType;
-
-import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) throws AdtException {

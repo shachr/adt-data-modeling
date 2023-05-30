@@ -6,8 +6,8 @@ import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.SchemaTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.FieldType;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.FieldDefinition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.typedefs.ProductType;
 import org.apache.spark.sql.types.StructType;
 
@@ -18,14 +18,14 @@ import java.util.stream.Stream;
 
 public class HiveDDLFromAdt implements SchemaTypeStream<String> {
     private SchemaContext schemaContext;
-    private NamedType namedType;
+    private TypeDefinition typeDefinition;
 
     private FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
 
-    public HiveDDLFromAdt(SchemaContext schemaContext, NamedType namedType) {
+    public HiveDDLFromAdt(SchemaContext schemaContext, TypeDefinition typeDefinition) {
 
         this.schemaContext = schemaContext;
-        this.namedType = namedType;
+        this.typeDefinition = typeDefinition;
 
         fromAdtMapperRegistry.register(new ArrayTypeMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new BinaryTypeMapper());
@@ -68,10 +68,10 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
          * LOCATION '/delta/table/path'
          */
 
-        NamedType invoice = NamedType.builder("invoice", ProductType.of(
-                FieldType.builder("id", new data.modeling.adt.typedefs.StringType()).build(),
-                FieldType.builder("name", new data.modeling.adt.typedefs.StringType()).build(),
-                FieldType.builder("age", new data.modeling.adt.typedefs.Int64Type()).build()
+        TypeDefinition invoice = TypeDefinition.builder("invoice", ProductType.of(
+                FieldDefinition.builder("id", new data.modeling.adt.typedefs.StringType()).build(),
+                FieldDefinition.builder("name", new data.modeling.adt.typedefs.StringType()).build(),
+                FieldDefinition.builder("age", new data.modeling.adt.typedefs.Int64Type()).build()
         )).build();
 
         SchemaContext schemaContext = new SchemaContext();
@@ -88,7 +88,7 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
         System.out.println("STORED BY 'io.delta.hive.DeltaStorageHandler'");
         System.out.println("LOCATION '/delta/table/path'");
 
-        List<NamedType> namedTypeList = new HiveDDLToAdt("invoice", ddlString).stream().toList();
+        List<TypeDefinition> typeDefinitionList = new HiveDDLToAdt("invoice", ddlString).stream().toList();
         System.out.println("--");
     }
 
@@ -100,7 +100,7 @@ public class HiveDDLFromAdt implements SchemaTypeStream<String> {
     @Override
     public Stream<String> stream() throws AdtException {
 
-        StructType structType = fromAdtMapperRegistry.fromAdt(this.namedType);
+        StructType structType = fromAdtMapperRegistry.fromAdt(this.typeDefinition);
         return Arrays.stream(structType.toDDL().split(","));
 
 //        return Stream.concat(Arrays.stream(structType.toDDL().split(",")),

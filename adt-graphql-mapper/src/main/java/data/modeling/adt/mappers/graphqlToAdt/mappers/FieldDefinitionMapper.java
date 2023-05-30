@@ -3,16 +3,13 @@ package data.modeling.adt.mappers.graphqlToAdt.mappers;
 import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.AnyType;
-import data.modeling.adt.typedefs.FieldType;
+import data.modeling.adt.typedefs.FieldDefinition;
 import data.modeling.adt.typedefs.NullValueType;
-import graphql.language.FieldDefinition;
-import graphql.language.NonNullType;
 import graphql.language.Type;
 
 import java.util.Objects;
 
-public class FieldDefinitionMapper extends GraphQlSchemaMapper<FieldDefinition, FieldType> {
+public class FieldDefinitionMapper extends GraphQlSchemaMapper<graphql.language.FieldDefinition, FieldDefinition> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
 
@@ -21,20 +18,20 @@ public class FieldDefinitionMapper extends GraphQlSchemaMapper<FieldDefinition, 
         this.toAdtMapperRegistry = toAdtMapperRegistry;
     }
     @Override
-    public boolean canMap(FieldDefinition value) {
+    public boolean canMap(graphql.language.FieldDefinition value) {
         return true;
     }
 
     @Override
-    public FieldType toAdt(FieldDefinition value) throws AdtException {
+    public FieldDefinition toAdt(graphql.language.FieldDefinition value) throws AdtException {
         Type type = value.getType();
-        FieldType fieldType = FieldType.builder(value.getName(), toAdtMapperRegistry.toAdt(type)).build();
-        if(!(fieldType.getType() instanceof NullValueType)) {
-            fieldType.setRequired(true);
+        FieldDefinition fieldDefinition = FieldDefinition.builder(value.getName(), toAdtMapperRegistry.toAdt(type)).build();
+        if(!(fieldDefinition.getType() instanceof NullValueType)) {
+            fieldDefinition.setRequired(true);
         }
         if(!Objects.isNull(value.getDescription())){
-            fieldType.getAnnotations().add(new Description(value.getDescription().getContent()));
+            fieldDefinition.getAnnotations().add(new Description(value.getDescription().getContent()));
         }
-        return fieldType;
+        return fieldDefinition;
     }
 }

@@ -30,7 +30,7 @@ public class TypeNameMapper extends GraphQlSchemaMapper<TypeName, NullValueType>
             case "Boolean" -> new BoolType();
             case "Date" -> new DateType();
             case "DateTime" -> new DateTimeType();
-            default -> new ReferenceNamedType(value.getName());
+            default -> new ReferencedDefinition(value.getName());
         };
 
         return new NullValueType(anyType);

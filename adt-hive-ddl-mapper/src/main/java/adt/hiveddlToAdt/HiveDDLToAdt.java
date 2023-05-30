@@ -4,7 +4,7 @@ import adt.hiveddlToAdt.mappers.*;
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 import org.apache.spark.sql.types.StructType;
 
 import java.util.stream.Stream;
@@ -49,7 +49,7 @@ public class HiveDDLToAdt implements NamedTypeStream {
     }
 
     @Override
-    public Stream<NamedType> stream() throws AdtException {
-        return Stream.of((NamedType)toAdtMapperRegistry.toAdt(structType));
+    public Stream<TypeDefinition> stream() throws AdtException {
+        return Stream.of((TypeDefinition)toAdtMapperRegistry.toAdt(structType));
     }
 }

@@ -9,17 +9,17 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
-    private final String name;
+public class FieldDefinition implements Definition<AnyType>, Comparable<FieldDefinition> {
+    private String name;
     private AnyType type;
     private int index = 0;
     private Boolean isRequired=false;
     private final Set<Annotation<?>> annotations;
 
-    public FieldType(String name, AnyType type) {
+    public FieldDefinition(String name, AnyType type) {
         this(name, type, new HashSet<>());
     }
-    public FieldType(String name, AnyType type, Set<Annotation<?>> annotations) {
+    public FieldDefinition(String name, AnyType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
@@ -33,6 +33,11 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
         return name;
     }
 
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Set<Annotation<?>> getAnnotations() {
         return annotations;
     }
@@ -42,8 +47,8 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
         return type;
     }
 
-    public static FieldType of(String name, AnyType type){
-        return new FieldType(name, type, new HashSet<>());
+    public static FieldDefinition of(String name, AnyType type){
+        return new FieldDefinition(name, type, new HashSet<>());
     }
 
     @Override
@@ -55,11 +60,11 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FieldType fieldType = (FieldType) o;
-        return index == fieldType.index && name.equals(fieldType.name)
-                && type.equals(fieldType.type)
-                && annotations.equals(fieldType.annotations)
-                && isRequired.equals(fieldType.isRequired);
+        FieldDefinition fieldDefinition = (FieldDefinition) o;
+        return index == fieldDefinition.index && name.equals(fieldDefinition.name)
+                && type.equals(fieldDefinition.type)
+                && annotations.equals(fieldDefinition.annotations)
+                && isRequired.equals(fieldDefinition.isRequired);
     }
 
     public Integer getIndex() {
@@ -70,7 +75,7 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
         this.index = index;
     }
 
-    public FieldType withIndex(int index) {
+    public FieldDefinition withIndex(int index) {
         this.setIndex(index);
         return this;
     }
@@ -86,7 +91,7 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
     @Override
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.enterLabeledType(this);
-        LabeledType.super.accept(visitor);
+        Definition.super.accept(visitor);
         visitor.exitLabeledType(this);
     }
 
@@ -96,8 +101,8 @@ public class FieldType implements LabeledType<AnyType>, Comparable<FieldType> {
     }
 
     @Override
-    public int compareTo(FieldType otherFieldType) {
-        return Objects.isNull(otherFieldType)? 1 : otherFieldType.hashCode()-this.hashCode();
+    public int compareTo(FieldDefinition otherFieldDefinition) {
+        return Objects.isNull(otherFieldDefinition)? 1 : otherFieldDefinition.hashCode()-this.hashCode();
     }
 
     @Override

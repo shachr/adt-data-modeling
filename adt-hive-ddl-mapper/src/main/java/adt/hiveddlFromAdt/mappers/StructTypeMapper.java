@@ -3,18 +3,13 @@ package adt.hiveddlFromAdt.mappers;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.FieldType;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-public class StructTypeMapper extends DataTypeMapper<NamedType, StructType> {
+public class StructTypeMapper extends DataTypeMapper<TypeDefinition, StructType> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -26,12 +21,12 @@ public class StructTypeMapper extends DataTypeMapper<NamedType, StructType> {
     }
 
     @Override
-    public boolean canMap(NamedType value) {
+    public boolean canMap(TypeDefinition value) {
         return true;
     }
 
     @Override
-    public StructType fromAdt(NamedType value) throws AdtException {
+    public StructType fromAdt(TypeDefinition value) throws AdtException {
         if(!(value.getType() instanceof ProductType)){
             throw new AdtException("not implemented");
         }

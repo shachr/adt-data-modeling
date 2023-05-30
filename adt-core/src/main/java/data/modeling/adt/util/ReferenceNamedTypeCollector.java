@@ -1,14 +1,14 @@
 package data.modeling.adt.util;
 
-import data.modeling.adt.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.ReferencedDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ReferenceNamedTypeCollector<T> {
-    private Set<ReferenceNamedType> deferredReferences = new HashSet<>();
+    private Set<ReferencedDefinition> deferredReferences = new HashSet<>();
 
-    public void addReference(ReferenceNamedType reference) {
+    public void addReference(ReferencedDefinition reference) {
         deferredReferences.add(reference);
     }
 }

@@ -3,12 +3,12 @@ package adt.hiveddlFromAdt.mappers;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.AnyType;
-import data.modeling.adt.typedefs.FieldType;
+import data.modeling.adt.typedefs.FieldDefinition;
 import data.modeling.adt.typedefs.NullValueType;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 
-public class StructFieldMapper extends DataTypeMapper<FieldType, StructField> {
+public class StructFieldMapper extends DataTypeMapper<FieldDefinition, StructField> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
 
@@ -18,12 +18,12 @@ public class StructFieldMapper extends DataTypeMapper<FieldType, StructField> {
     }
 
     @Override
-    public boolean canMap(FieldType value) {
+    public boolean canMap(FieldDefinition value) {
         return true;
     }
 
     @Override
-    public StructField fromAdt(FieldType value) throws AdtException {
+    public StructField fromAdt(FieldDefinition value) throws AdtException {
         // todo: default value
         AnyType itemType = value.getType();
         boolean nullable = itemType instanceof NullValueType;

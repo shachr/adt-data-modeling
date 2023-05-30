@@ -7,8 +7,8 @@ import data.modeling.adt.typedefs.*;
 import java.util.Set;
 
 public interface AdtVisitor {
-    void enterLabeledType(LabeledType<?> type) throws AdtException;
-    void exitLabeledType(LabeledType<?> type) throws AdtException;
+    void enterLabeledType(Definition<?> type) throws AdtException;
+    void exitLabeledType(Definition<?> type) throws AdtException;
 
     void visit(ProductType type) throws AdtException;
 
@@ -18,7 +18,7 @@ public interface AdtVisitor {
 
     void visit(AnyOfType type) throws AdtException;
 
-    void visit(ReferenceNamedType type) throws AdtException;
+    void visit(ReferencedDefinition type) throws AdtException;
 
     void visit(Set<Annotation<?>> annotations) throws AdtException;
     void visit(Annotation<?> annotation) throws AdtException;

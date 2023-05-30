@@ -32,22 +32,22 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
         return schemaParsedMessage;
     }
 
-    private NamedType lastNamedType;
-    private FieldType lastFieldType;
+    private TypeDefinition lastTypeDefinition;
+    private FieldDefinition lastFieldDefinition;
     @Override
-    public void enterLabeledType(LabeledType type) {
-        if(type instanceof NamedType)
-            lastNamedType = (NamedType)type;
+    public void enterLabeledType(Definition type) {
+        if(type instanceof TypeDefinition)
+            lastTypeDefinition = (TypeDefinition)type;
         else
-            lastFieldType = (FieldType)type;
+            lastFieldDefinition = (FieldDefinition)type;
     }
 
     @Override
-    public void exitLabeledType(LabeledType type) {
-        if(type instanceof FieldType)
-            lastFieldType = null;
+    public void exitLabeledType(Definition type) {
+        if(type instanceof FieldDefinition)
+            lastFieldDefinition = null;
         else
-            lastNamedType = null;
+            lastTypeDefinition = null;
     }
 
     @Override
@@ -71,25 +71,26 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
     }
 
     @Override
-    public void visit(ReferenceNamedType type) {
+    public void visit(ReferencedDefinition type) {
 
     }
 
     @Override
     public void visit(Set<Annotation<?>> annotations) {
-        LabeledType<?> lastLabeledType = !Objects.isNull(lastFieldType) ? lastFieldType : lastNamedType;
+        Definition<?> lastDefinition = !Objects.isNull(lastFieldDefinition) ? lastFieldDefinition : lastTypeDefinition;
         annotations.forEach(annotation -> {
             switch (annotation.getName()) {
                 case "x-data-handling-classification" -> {
                     DataHandlingClassifications classification = DataHandlingClassifications.fromString((String) annotation.getValue());
                     DataHandlingClassification dataHandlingClassification = new DataHandlingClassification(classification);
-                    lastLabeledType.getAnnotations().add(dataHandlingClassification);
+                    lastDefinition.getAnnotations().add(dataHandlingClassification);
                 }
                 case "description" ->
-                        lastLabeledType.getAnnotations().add(new Description((String) annotation.getValue()));
-                case "default" -> lastLabeledType.getAnnotations().add(new DefaultValue(annotation.getValue()));
+                        lastDefinition.getAnnotations().add(new Description((String) annotation.getValue()));
+                case "default" -> lastDefinition.getAnnotations().add(new DefaultValue(annotation.getValue()));
                 case "x-idl-type-declaration" ->
-                        lastLabeledType.getAnnotations().add(TypeDeclaration.of((String) annotation.getValue()));
+                        //todo: should translate into InterfaceDefinition, can also implicitly support it
+                        lastDefinition.getAnnotations().add(TypeDeclaration.of((String) annotation.getValue()));
             }
         });
     }

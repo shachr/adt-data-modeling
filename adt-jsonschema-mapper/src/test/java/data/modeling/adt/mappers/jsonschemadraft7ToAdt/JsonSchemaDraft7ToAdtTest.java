@@ -1,12 +1,13 @@
 package data.modeling.adt.mappers.jsonschemadraft7ToAdt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.fixtures.*;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures.AllOfFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.fixtures.SanityFixtureData;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.ComplexType;
+import data.modeling.adt.typedefs.Definition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.compatibility.AnyTypeComparator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,7 @@ public class JsonSchemaDraft7ToAdtTest {
     public void testMethod() throws AdtException {
         JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt(fixtureData.getInputSchema());
         SchemaContext expectedSchemaContext = fixtureData.getExpectedSchemaContext();
-        NamedType expectedNamedType = expectedSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
+        Definition<ComplexType> expectedTypeDefinition = expectedSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
 
         // Convert JSON schema string to stream of ADT named types
         var namedTypes = mapper.stream();
@@ -51,8 +52,8 @@ public class JsonSchemaDraft7ToAdtTest {
 
         var namedType = actualSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
 
-        AnyTypeComparator.compare(expectedNamedType, namedType).forEach(System.out::println);
-        assertEquals(fixtureData.expectedDiffSize(), AnyTypeComparator.compare(expectedNamedType, namedType).size());
-        assertEquals(expectedNamedType, namedType);
+        AnyTypeComparator.compare(expectedTypeDefinition, namedType).forEach(System.out::println);
+        assertEquals(fixtureData.expectedDiffSize(), AnyTypeComparator.compare(expectedTypeDefinition, namedType).size());
+        assertEquals(expectedTypeDefinition, namedType);
     }
 }

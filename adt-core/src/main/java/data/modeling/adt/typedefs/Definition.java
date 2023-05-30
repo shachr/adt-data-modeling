@@ -11,8 +11,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public interface LabeledType<T extends AnyType> extends AdtType {
+public interface Definition<T extends AnyType> extends AdtType {
     String getName();
+
+    void setName(String name);
 
     T getType();
 
@@ -43,5 +45,17 @@ public interface LabeledType<T extends AnyType> extends AdtType {
         AdtVisitorUtil.visit(visitor, getType());
         visitor.visit(new HashSet<>(this.getAnnotations()));
         this.getAnnotations().forEach(LambdaExceptionUtil.consumer(visitor::visit));
+    }
+
+    default boolean isEnumDefinition(){
+        return this.getType() instanceof EnumType;
+    }
+
+    default boolean isProductTypeDefinition(){
+        return this.getType() instanceof ProductType;
+    }
+
+    default boolean isSumTypeDefinition(){
+        return this.getType() instanceof SumType;
     }
 }

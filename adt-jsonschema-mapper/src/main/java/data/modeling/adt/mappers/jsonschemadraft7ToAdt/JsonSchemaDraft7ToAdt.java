@@ -7,7 +7,9 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaJsonProcessingException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.ComplexType;
+import data.modeling.adt.typedefs.Definition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers.*;
 
 import java.util.Map;
@@ -52,7 +54,7 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
     }
 
     @Override
-    public Stream<NamedType> stream() throws AdtException {
+    public Stream<Definition<ComplexType>> stream() throws AdtException {
         new JsonSchemaMainMapper(toAdtMapperRegistry, schemaContext).toAdt(jsonSchemaMap);
         return schemaContext.stream();
     }

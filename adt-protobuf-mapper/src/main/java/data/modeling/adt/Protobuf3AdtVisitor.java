@@ -86,11 +86,11 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
                         .toList();
 
         ProductType productType = ProductType.of(typeList.stream()
-                .filter(type -> type instanceof FieldType)
-                .map(type->(FieldType)type)
-                .sorted(Comparator.comparingInt(FieldType::getIndex)));
+                .filter(type -> type instanceof FieldDefinition)
+                .map(type->(FieldDefinition)type)
+                .sorted(Comparator.comparingInt(FieldDefinition::getIndex)));
 
-        schemaContext.registerNamedType(new NamedType(name, productType));
+        schemaContext.registerNamedType(new TypeDefinition(name, productType));
         return Stream.empty();
     }
 
@@ -99,25 +99,25 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
         String label = field.fieldLabel().getText();
         String type = field.type_().getText();
         //todo: fieldOptions()
-        FieldType fieldType = FieldType.builder(fieldName, toAdt(label, type)).build();
-        fieldType.setIndex(Integer.parseInt(field.fieldNumber().getText()));
-        fieldType.setRequired(!label.equals("optional"));
-        return Stream.of(fieldType);
+        FieldDefinition fieldDefinition = FieldDefinition.builder(fieldName, toAdt(label, type)).build();
+        fieldDefinition.setIndex(Integer.parseInt(field.fieldNumber().getText()));
+        fieldDefinition.setRequired(!label.equals("optional"));
+        return Stream.of(fieldDefinition);
     }
 
-    private Stream<FieldType> readMapField(Protobuf3Parser.MapFieldContext mapField) throws AdtException {
-        FieldType fieldType = new FieldType(
+    private Stream<FieldDefinition> readMapField(Protobuf3Parser.MapFieldContext mapField) throws AdtException {
+        FieldDefinition fieldDefinition = new FieldDefinition(
                 mapField.mapName().getText(),
                 new MapType(
                         toAdt("", mapField.keyType().getText()),
                         toAdt("", mapField.type_().getText())));
 
-        fieldType.setIndex(Integer.parseInt(mapField.fieldNumber().getText()));
-        return Stream.of(fieldType);
+        fieldDefinition.setIndex(Integer.parseInt(mapField.fieldNumber().getText()));
+        return Stream.of(fieldDefinition);
     }
 
-    private FieldType readOneOf(Protobuf3Parser.OneofContext oneof) {
-        return FieldType.of(
+    private FieldDefinition readOneOf(Protobuf3Parser.OneofContext oneof) {
+        return FieldDefinition.of(
                 oneof.oneofName().getText(),
                 UnionType.of(oneof.oneofField().stream().map(LambdaExceptionUtil.function(this::readOneOfField)))
         );
@@ -127,9 +127,9 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
         String fieldName = field.fieldName().ident().IDENTIFIER().toString();
         String type = field.type_().getText();
         //todo: fieldOptions()
-        FieldType fieldType = FieldType.builder(fieldName, toAdt("", type)).build();
-        fieldType.setIndex(Integer.parseInt(field.fieldNumber().getText()));
-        return ProductType.of(fieldType);
+        FieldDefinition fieldDefinition = FieldDefinition.builder(fieldName, toAdt("", type)).build();
+        fieldDefinition.setIndex(Integer.parseInt(field.fieldNumber().getText()));
+        return ProductType.of(fieldDefinition);
     }
 
     private Stream<AnyType> readOptionStatement(Protobuf3Parser.OptionStatementContext optionStatement) {
@@ -141,7 +141,7 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
     }
 
     private void readEnumDefinition(Protobuf3Parser.EnumDefContext enumContext) {
-        schemaContext.registerNamedType(new NamedType(enumContext.enumName().getText(),
+        schemaContext.registerNamedType(new TypeDefinition(enumContext.enumName().getText(),
                 EnumType.of(new Int32Type(),
                         enumContext.enumBody().enumElement().stream()
                             .filter(enumElm -> !Objects.isNull(enumElm.enumField()))
@@ -167,7 +167,7 @@ class Protobuf3AdtVisitor extends Protobuf3BaseVisitor<SchemaContext> {
             case "float" -> new FloatType();
             case "double" -> new DoubleType();
             case "bytes" -> new BinaryType();
-            default -> new ReferenceNamedType(protoType);
+            default -> new ReferencedDefinition(protoType);
         };
         if(label.equals("repeated")){
             return new ListType(anyType);

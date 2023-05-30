@@ -2,7 +2,9 @@ package data.modeling.adt;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.ComplexType;
+import data.modeling.adt.typedefs.Definition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.util.*;
@@ -13,7 +15,7 @@ import java.util.stream.Stream;
  *
  */
 public class SchemaContext {
-    private final Map<String, NamedType> objectTypeMap;
+    private final Map<String, Definition<ComplexType>> objectTypeMap;
     private final Map<String, Set<Annotation>> annotations;
 
     private final Set<SchemaContextSetting> settings = new LinkedHashSet<>();
@@ -29,25 +31,25 @@ public class SchemaContext {
         this.annotations = new HashMap<>();
     }
 
-    public SchemaContext(Stream<NamedType> stream) {
+    public SchemaContext(Stream<Definition<ComplexType>> stream) {
         this.objectTypeMap = stream.collect(Collectors.toMap(
-                NamedType::getName,
+                Definition::getName,
                 namedType -> namedType
         ));
         this.annotations = new HashMap<>();
     }
 
-    public void registerNamedType(NamedType namedType)
+    public void registerNamedType(Definition<ComplexType> definition)
     {
-        objectTypeMap.put(namedType.getName(), namedType);
+        objectTypeMap.put(definition.getName(), definition);
     }
 
-    public void removeNamedType(NamedType namedType)
+    public void removeNamedType(Definition<ComplexType> definition)
     {
-        objectTypeMap.remove(namedType.getName());
+        objectTypeMap.remove(definition.getName());
     }
 
-    public NamedType getNamedType(String name) {
+    public Definition<ComplexType> getNamedType(String name) {
         return objectTypeMap.get(name);
     }
 
@@ -63,7 +65,7 @@ public class SchemaContext {
         return annotations.getOrDefault(name, Collections.emptySet());
     }
 
-    public static SchemaContext of(Stream<NamedType> namedTypeStream){
+    public static SchemaContext of(Stream<Definition<ComplexType>> namedTypeStream){
         return new SchemaContext(namedTypeStream);
     }
 
@@ -71,7 +73,7 @@ public class SchemaContext {
         return objectTypeMap.size();
     }
 
-    public Stream<NamedType> stream() {
+    public Stream<Definition<ComplexType>> stream() {
         return objectTypeMap.values().stream();
     }
 

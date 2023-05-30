@@ -31,8 +31,8 @@ public class AnyTypeComparator {
     public void compare() {
         comparatorContext.getCompatibilityCheck().compareAnyType(comparatorContext, obj1, obj2);
         if(obj1.getClass().equals(obj2.getClass())) {
-            if (obj1 instanceof NamedType) {
-                compareNamedType(comparatorContext, (NamedType) obj1, (NamedType) obj2);
+            if (obj1 instanceof TypeDefinition) {
+                compareNamedType(comparatorContext, (TypeDefinition) obj1, (TypeDefinition) obj2);
             } else if (obj1 instanceof ProductType) {
                 compareProductType(comparatorContext, (ProductType) obj1, (ProductType) obj2);
             }
@@ -42,8 +42,8 @@ public class AnyTypeComparator {
                 compareEnumType(comparatorContext, (EnumType) obj1, (EnumType) obj2);
             } else if (obj1 instanceof CollectionType) {
                 new AnyTypeComparator(comparatorContext, ((CollectionType) obj1).getItemType(), ((CollectionType) obj2).getItemType()).compare();
-            } else if (obj1 instanceof ReferenceNamedType) {
-                comparatorContext.getCompatibilityCheck().compareReferenceNamedType(comparatorContext, (ReferenceNamedType) obj1, (ReferenceNamedType) obj2);
+            } else if (obj1 instanceof ReferencedDefinition) {
+                comparatorContext.getCompatibilityCheck().compareReferenceNamedType(comparatorContext, (ReferencedDefinition) obj1, (ReferencedDefinition) obj2);
             }
         }
     }
@@ -61,45 +61,45 @@ public class AnyTypeComparator {
         compareFieldTypeCollection(comparatorContext, productType1.getOwnFields(), productType2.getOwnFields());
     }
 
-    private void compareFieldTypeCollection(ComparatorContext comparatorContext, Set<FieldType> coll1, Set<FieldType> coll2) {
-        Iterator<FieldType> iterator1 = coll1.iterator();
-        Iterator<FieldType> iterator2 = coll2.iterator();
+    private void compareFieldTypeCollection(ComparatorContext comparatorContext, Set<FieldDefinition> coll1, Set<FieldDefinition> coll2) {
+        Iterator<FieldDefinition> iterator1 = coll1.iterator();
+        Iterator<FieldDefinition> iterator2 = coll2.iterator();
         while(iterator1.hasNext()) {
-            FieldType fieldType1 = iterator1.next();
+            FieldDefinition fieldDefinition1 = iterator1.next();
             if (!iterator2.hasNext()) {
-                comparatorContext.getCompatibilityCheck().enterLabeledType(fieldType1);
-                comparatorContext.getCompatibilityCheck().compareFieldType(comparatorContext, fieldType1, null);
-                comparatorContext.getCompatibilityCheck().exitLabeledType(fieldType1);
+                comparatorContext.getCompatibilityCheck().enterLabeledType(fieldDefinition1);
+                comparatorContext.getCompatibilityCheck().compareFieldType(comparatorContext, fieldDefinition1, null);
+                comparatorContext.getCompatibilityCheck().exitLabeledType(fieldDefinition1);
             } else {
-                FieldType fieldType2 = iterator2.next();
-                comparatorContext.getCompatibilityCheck().enterLabeledType(fieldType2);
-                compareFieldTypes(comparatorContext, fieldType1, fieldType2);
-                comparatorContext.getCompatibilityCheck().exitLabeledType(fieldType2);
+                FieldDefinition fieldDefinition2 = iterator2.next();
+                comparatorContext.getCompatibilityCheck().enterLabeledType(fieldDefinition2);
+                compareFieldTypes(comparatorContext, fieldDefinition1, fieldDefinition2);
+                comparatorContext.getCompatibilityCheck().exitLabeledType(fieldDefinition2);
             }
         }
 
         while(iterator2.hasNext()){
-            FieldType fieldType2 = iterator2.next();
-            comparatorContext.getCompatibilityCheck().enterLabeledType(fieldType2);
-            comparatorContext.getCompatibilityCheck().compareFieldType(comparatorContext, null, fieldType2);
-            comparatorContext.getCompatibilityCheck().exitLabeledType(fieldType2);
+            FieldDefinition fieldDefinition2 = iterator2.next();
+            comparatorContext.getCompatibilityCheck().enterLabeledType(fieldDefinition2);
+            comparatorContext.getCompatibilityCheck().compareFieldType(comparatorContext, null, fieldDefinition2);
+            comparatorContext.getCompatibilityCheck().exitLabeledType(fieldDefinition2);
         }
     }
 
-    private void compareFieldTypes(ComparatorContext comparatorContext, FieldType fieldType1, FieldType fieldType2) {
+    private void compareFieldTypes(ComparatorContext comparatorContext, FieldDefinition fieldDefinition1, FieldDefinition fieldDefinition2) {
         // todo: compare additional types!!!
-        if(fieldType1 instanceof FieldAdditionalTypes || fieldType2 instanceof FieldAdditionalTypes) {
-            if (fieldType1 instanceof FieldAdditionalTypes && !(fieldType2 instanceof FieldAdditionalTypes)) {
+        if(fieldDefinition1 instanceof FieldAdditionalDefinition || fieldDefinition2 instanceof FieldAdditionalDefinition) {
+            if (fieldDefinition1 instanceof FieldAdditionalDefinition && !(fieldDefinition2 instanceof FieldAdditionalDefinition)) {
 
-            } else if (!(fieldType1 instanceof FieldAdditionalTypes)) {
+            } else if (!(fieldDefinition1 instanceof FieldAdditionalDefinition)) {
 
             }
         } else {
-            comparatorContext.getJsonPathTraversingContext().addSegment("/" + fieldType1.getName(), context -> {
+            comparatorContext.getJsonPathTraversingContext().addSegment("/" + fieldDefinition1.getName(), context -> {
                 ComparatorContext fieldComparatorContext = comparatorContext.overrideJsonPathTraversingContext(context);
-                comparatorContext.getCompatibilityCheck().compareFieldType(fieldComparatorContext, fieldType1, fieldType2);
-                this.compareAnnotations(comparatorContext, fieldType1, fieldType2);
-                new AnyTypeComparator(fieldComparatorContext, fieldType1.getType(), fieldType2.getType()).compare();
+                comparatorContext.getCompatibilityCheck().compareFieldType(fieldComparatorContext, fieldDefinition1, fieldDefinition2);
+                this.compareAnnotations(comparatorContext, fieldDefinition1, fieldDefinition2);
+                new AnyTypeComparator(fieldComparatorContext, fieldDefinition1.getType(), fieldDefinition2.getType()).compare();
             });
         }
     }
@@ -111,7 +111,7 @@ public class AnyTypeComparator {
         comparatorContext.getCompatibilityCheck().exitCompositionType(unionType2);
     }
 
-    private void compareNamedType(ComparatorContext comparatorContext, NamedType obj1, NamedType obj2) {
+    private void compareNamedType(ComparatorContext comparatorContext, TypeDefinition obj1, TypeDefinition obj2) {
         comparatorContext.getCompatibilityCheck().enterLabeledType(obj2);
         comparatorContext.getCompatibilityCheck().compareNamedType(comparatorContext, obj1, obj2);
         this.compareAnnotations(comparatorContext, obj1, obj2);
@@ -147,9 +147,9 @@ public class AnyTypeComparator {
     // todo: think more of the best way to do this
     //  might be best to ignore and let users override if the need to compare custom annotations
     //  "golden" annotations should be compared if needed.
-    public void compareAnnotations(ComparatorContext comparatorContext, LabeledType labeledType1, LabeledType labeledType2) {
-        Set<Annotation<?>> annotations1 = labeledType1.getAnnotations();
-        Set<Annotation<?>> annotations2 = labeledType2.getAnnotations();
+    public void compareAnnotations(ComparatorContext comparatorContext, Definition definition1, Definition definition2) {
+        Set<Annotation<?>> annotations1 = definition1.getAnnotations();
+        Set<Annotation<?>> annotations2 = definition2.getAnnotations();
 
         Iterator<? extends Annotation<?>> iterator1 = annotations1.iterator();
         Iterator<? extends Annotation<?>> iterator2 = annotations2.iterator();

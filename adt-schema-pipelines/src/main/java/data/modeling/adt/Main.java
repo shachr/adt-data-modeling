@@ -15,6 +15,7 @@ import data.modeling.adt.pipelines.schemaparsing.SchemaParsingPipeline;
 import data.modeling.adt.pipelines.schemaparsing.parsers.JsonSchemaTypeParser;
 import data.modeling.adt.pipelines.schemavalidation.SchemaValidationPipeline;
 import data.modeling.adt.pipelines.schemavalidation.validators.JsonSchemaValidator;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.util.FSUtil;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
@@ -99,7 +100,7 @@ public class Main {
 
         SchemaContext schemaContext = new SchemaContext();
         new Protobuf3ToAdt(schemaContext, readFromResources()).stream().collect(Collectors.toList());
-        Map<String, Object> jsonSchemaMap = new JsonSchemaDraft7FromAdt(schemaContext.getNamedType("Person"), schemaContext)
+        Map<String, Object> jsonSchemaMap = new JsonSchemaDraft7FromAdt((TypeDefinition) schemaContext.getNamedType("Person"), schemaContext)
                 .stream()
                 .findFirst().get();
         ObjectMapper objectMapper = new ObjectMapper();

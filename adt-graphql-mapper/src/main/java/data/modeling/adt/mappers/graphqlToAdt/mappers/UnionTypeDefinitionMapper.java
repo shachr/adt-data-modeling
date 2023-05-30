@@ -3,7 +3,7 @@ package data.modeling.adt.mappers.graphqlToAdt.mappers;
 import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.typedefs.UnionType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import graphql.language.*;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class UnionTypeDefinitionMapper extends GraphQlSchemaMapper<UnionTypeDefinition, NamedType> {
+public class UnionTypeDefinitionMapper extends GraphQlSchemaMapper<UnionTypeDefinition, TypeDefinition> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private TypeDefinitionRegistry typeDefinitionRegistry;
@@ -30,7 +30,7 @@ public class UnionTypeDefinitionMapper extends GraphQlSchemaMapper<UnionTypeDefi
     }
 
     @Override
-    public NamedType toAdt(UnionTypeDefinition value) throws AdtException {
+    public TypeDefinition toAdt(UnionTypeDefinition value) throws AdtException {
         List<UnionTypeExtensionDefinition> extensionDefinitionList = typeDefinitionRegistry.unionTypeExtensions().get(value.getName());
         if(Objects.isNull(extensionDefinitionList)){
             extensionDefinitionList = new ArrayList<>();
@@ -40,14 +40,14 @@ public class UnionTypeDefinitionMapper extends GraphQlSchemaMapper<UnionTypeDefi
                 .map(UnionTypeDefinition::getMemberTypes)
                 .flatMap(List::stream);
 
-        NamedType namedType = new NamedType(value.getName(), UnionType.of(
+        TypeDefinition typeDefinition = new TypeDefinition(value.getName(), UnionType.of(
                 Stream.concat(value.getMemberTypes().stream(), extensionFields)
                 .map(LambdaExceptionUtil.function(toAdtMapperRegistry::toAdt))));
 
         if(!Objects.isNull(value.getDescription()))
-            namedType.getAnnotations().add(new Description(value.getDescription().getContent()));
+            typeDefinition.getAnnotations().add(new Description(value.getDescription().getContent()));
 
-        return namedType;
+        return typeDefinition;
     }
 
 }

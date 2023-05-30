@@ -2,7 +2,7 @@ package data.modeling.adt.util;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.typedefs.AnyType;
-import data.modeling.adt.typedefs.FieldType;
+import data.modeling.adt.typedefs.FieldDefinition;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,9 +29,9 @@ public class FieldTypeBuilder {
         return this;
     }
 
-    public FieldType build() {
-        FieldType fieldType = new FieldType(name, type, annotations);
-        fieldType.setRequired(this.isRequired);
-        return fieldType;
+    public FieldDefinition build() {
+        FieldDefinition fieldDefinition = new FieldDefinition(name, type, annotations);
+        fieldDefinition.setRequired(this.isRequired);
+        return fieldDefinition;
     }
 }

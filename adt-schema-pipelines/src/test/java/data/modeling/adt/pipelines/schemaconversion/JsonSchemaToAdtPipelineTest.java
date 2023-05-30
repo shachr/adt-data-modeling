@@ -17,16 +17,16 @@ import static org.junit.Assert.*;
 public class JsonSchemaToAdtPipelineTest {
     final static String APPLICATION_SCHEMA_JSON = "application/schema+json";
 
-    private static final NamedType expectedNamedType = NamedType.builder("foo", ProductType.of(
-            FieldType.builder("id", new Int32Type()).withAnnotations(
+    private static final TypeDefinition EXPECTED_TYPE_DEFINITION = TypeDefinition.builder("foo", ProductType.of(
+            FieldDefinition.builder("id", new Int32Type()).withAnnotations(
                     new JsonSchemaAnnotation("description", "the identifier of foo"),
                     new Description("the identifier of foo")
             ).withIsRequired(true).build(),
-            FieldType.builder("name", new StringType()).withAnnotations(
+            FieldDefinition.builder("name", new StringType()).withAnnotations(
                     new JsonSchemaAnnotation("x-data-handling-classification", "PUBLIC"),
                     new DataHandlingClassification(DataHandlingClassifications.Public)
             ).withIsRequired(true).build(),
-            FieldType.builder("color", EnumType.of(new StringType(),
+            FieldDefinition.builder("color", EnumType.of(new StringType(),
                     new EnumType.EnumItemType("red", StringType.constantOf("red")),
                     new EnumType.EnumItemType("blue", StringType.constantOf("blue")),
                     new EnumType.EnumItemType("green", StringType.constantOf("green"))))
@@ -81,7 +81,7 @@ public class JsonSchemaToAdtPipelineTest {
         SchemaContext schemaContext = schemaParsingPipeline.apply(schemaParsingMessage).getSchemaContext();
         assertNotNull(schemaContext);
         assertTrue(schemaContext.containsNamedType("foo"));
-        NamedType namedType = schemaContext.getNamedType("foo");
-        assertEquals(expectedNamedType, namedType);
+        Definition<ComplexType> typeDefinition = schemaContext.getNamedType("foo");
+        assertEquals(EXPECTED_TYPE_DEFINITION, typeDefinition);
     }
 }

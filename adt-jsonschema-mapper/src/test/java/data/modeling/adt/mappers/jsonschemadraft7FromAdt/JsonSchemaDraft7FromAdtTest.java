@@ -5,7 +5,9 @@ import data.modeling.adt.mappers.MapAssert;
 import data.modeling.adt.mappers.fixtures.FromAdtFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures.AllOfFixtureData;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.fixtures.SanityFixtureData;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.ComplexType;
+import data.modeling.adt.typedefs.Definition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -14,8 +16,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static data.modeling.adt.util.StreamExtensions.toMap;
 
 
 @RunWith(Parameterized.class)
@@ -38,10 +38,10 @@ public class JsonSchemaDraft7FromAdtTest {
     @Test
     public void testMethod() throws Exception {
         SchemaContext schemaContext = fixtureData.getInputSchemaContext();
-        NamedType namedType = schemaContext.getNamedType(fixtureData.getInputNamedTypeName());
+        TypeDefinition typeDefinition = (TypeDefinition)schemaContext.getNamedType(fixtureData.getInputNamedTypeName());
 
         Map<String, Object> expectedMap = fixtureData.getExpectedSchema();
-        JsonSchemaDraft7FromAdt fromAdt = new JsonSchemaDraft7FromAdt(namedType, schemaContext);
+        JsonSchemaDraft7FromAdt fromAdt = new JsonSchemaDraft7FromAdt(typeDefinition, schemaContext);
         Map<String, Object> actualmap = fromAdt.stream().findFirst().get();
         MapAssert.assertMapsEqualIgnoreOrder(expectedMap, actualmap);
     }

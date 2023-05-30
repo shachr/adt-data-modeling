@@ -77,33 +77,33 @@ public class AllOfFixtureData implements ToAdtFixtureData<String> {
     public SchemaContext getExpectedSchemaContext() {
 
         SchemaContext expectedSchemaContext = new SchemaContext();
-        NamedType myDefinition = NamedType.builder(schemaNamespace + "_MyDefinition", ProductType.of(
-                FieldType.builder("id", new StringType()).build(),
-                FieldType.builder("name", new StringType()).build()
+        TypeDefinition myDefinition = TypeDefinition.builder(schemaNamespace + "_MyDefinition", ProductType.of(
+                FieldDefinition.builder("id", new StringType()).build(),
+                FieldDefinition.builder("name", new StringType()).build()
         )).build();
         expectedSchemaContext.registerNamedType(myDefinition);
 
-        NamedType expectedNamedType = NamedType.builder(schemaNamespace, AllOfType.of(
-                new ReferenceNamedType(schemaNamespace + "_MyDefinition"),
+        TypeDefinition expectedTypeDefinition = TypeDefinition.builder(schemaNamespace, AllOfType.of(
+                new ReferencedDefinition(schemaNamespace + "_MyDefinition"),
                 ProductType.of(
-                        FieldType.builder("prop1", new StringType()).build(),
-                        FieldType.builder("prop2", new DoubleType()).build()
+                        FieldDefinition.builder("prop1", new StringType()).build(),
+                        FieldDefinition.builder("prop2", new DoubleType()).build()
                 ),
                 ProductType.of(
-                        FieldType.builder("prop3", new BoolType()).build(),
-                        FieldType.builder("prop4", new ListType(new StringType())).build()
+                        FieldDefinition.builder("prop3", new BoolType()).build(),
+                        FieldDefinition.builder("prop4", new ListType(new StringType())).build()
                 )
 
         )).build();
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("$id", schemaNamespace));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("title", "My Schema"));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("description", "This is a sample schema that defines a data structure."));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("x-data-handling-classification", "PUBLIC"));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("x-data-compliances", 1));
-        expectedNamedType.getAnnotations().add(new JsonSchemaAnnotation("x-data-is-personal", true));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("$id", schemaNamespace));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("title", "My Schema"));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("description", "This is a sample schema that defines a data structure."));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("x-data-handling-classification", "PUBLIC"));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("x-data-compliances", 1));
+        expectedTypeDefinition.getAnnotations().add(new JsonSchemaAnnotation("x-data-is-personal", true));
 
-        expectedSchemaContext.registerNamedType(expectedNamedType);
+        expectedSchemaContext.registerNamedType(expectedTypeDefinition);
         return expectedSchemaContext;
     }
 

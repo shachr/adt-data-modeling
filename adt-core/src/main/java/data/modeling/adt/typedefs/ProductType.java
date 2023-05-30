@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public final class ProductType implements CompositionType, AdtType {
     private final FieldTypeCollection fieldTypeCollection = new FieldTypeCollection();
-    private LinkedHashSet<ReferenceNamedType> implements_;
+    private LinkedHashSet<ReferencedDefinition> implements_;
 
     private final Set<ProductTypeConstructor> constructors = new LinkedHashSet<>();
 
@@ -21,46 +21,46 @@ public final class ProductType implements CompositionType, AdtType {
         this.implements_ = new LinkedHashSet<>();
         this.isSealed = false;
     }
-    public ProductType(Set<FieldType> fields) {
+    public ProductType(Set<FieldDefinition> fields) {
         this.isSealed = false;
         this.fieldTypeCollection.addAll(fields);
         this.implements_ = new LinkedHashSet<>();
     }
-    public ProductType(Set<FieldType> fields, boolean isSealed) {
+    public ProductType(Set<FieldDefinition> fields, boolean isSealed) {
         this.isSealed = isSealed;
         this.fieldTypeCollection.addAll(fields);
         this.implements_ = new LinkedHashSet<>();
     }
-    public ProductType(Set<FieldType> fields, LinkedHashSet<ReferenceNamedType> implements_, boolean isSealed) {
+    public ProductType(Set<FieldDefinition> fields, LinkedHashSet<ReferencedDefinition> implements_, boolean isSealed) {
         this.isSealed = isSealed;
         this.fieldTypeCollection.addAll(fields);
         this.implements_ = implements_;
     }
 
-    public Set<FieldType> getOwnFields() {
+    public Set<FieldDefinition> getOwnFields() {
         return fieldTypeCollection.getFields();
     }
 
-    public boolean addField(FieldType fieldType){
-        if(!fieldTypeCollection.containsName(fieldType.getName()))
-            return fieldTypeCollection.add(fieldType);
+    public boolean addField(FieldDefinition fieldDefinition){
+        if(!fieldTypeCollection.containsName(fieldDefinition.getName()))
+            return fieldTypeCollection.add(fieldDefinition);
         return false;
     }
 
-    public FieldType getField(String name) {
+    public FieldDefinition getField(String name) {
         return fieldTypeCollection.get(name);
     }
 
-    public void setImplements(LinkedHashSet<ReferenceNamedType> value){
+    public void setImplements(LinkedHashSet<ReferencedDefinition> value){
         implements_ = value;
     }
 
-    public LinkedHashSet<ReferenceNamedType> getImplements(){
+    public LinkedHashSet<ReferencedDefinition> getImplements(){
         return implements_;
     }
 
-    public Set<FieldType> resolveAllFields(SchemaContext schemaContext) {
-        List<Set<FieldType>> inheritanceChain = new ArrayList<>();
+    public Set<FieldDefinition> resolveAllFields(SchemaContext schemaContext) {
+        List<Set<FieldDefinition>> inheritanceChain = new ArrayList<>();
         implements_.stream().forEach(referenceNamedType -> {
             // resolve ReferenceNamedType to Product Type
             AnyType anyType = schemaContext.getNamedType(referenceNamedType.getReferenceName()).getType();
@@ -69,10 +69,10 @@ public final class ProductType implements CompositionType, AdtType {
         });
         inheritanceChain.add(fieldTypeCollection.cloneFields());
 
-        Map<String, FieldType> fieldTypesByName = new LinkedHashMap<>();
-        for (Set<FieldType> fieldTypes : inheritanceChain) {
-            for (FieldType fieldType : fieldTypes) {
-                fieldTypesByName.put(fieldType.getName(), fieldType);
+        Map<String, FieldDefinition> fieldTypesByName = new LinkedHashMap<>();
+        for (Set<FieldDefinition> fieldDefinitions : inheritanceChain) {
+            for (FieldDefinition fieldDefinition : fieldDefinitions) {
+                fieldTypesByName.put(fieldDefinition.getName(), fieldDefinition);
             }
         }
 
@@ -81,22 +81,22 @@ public final class ProductType implements CompositionType, AdtType {
         return effectiveFieldTypeCollection.getFields();
     }
 
-    public static ProductType of(FieldType... fields){
+    public static ProductType of(FieldDefinition... fields){
         return of(new LinkedHashSet<>(), Arrays.stream(fields), false);
     }
 
-    public static ProductType of(Stream<FieldType> fields){
+    public static ProductType of(Stream<FieldDefinition> fields){
         return of(new LinkedHashSet<>(), fields, false);
     }
 
-    public static ProductType of(boolean isSealed, FieldType... fields){
+    public static ProductType of(boolean isSealed, FieldDefinition... fields){
         return of(new LinkedHashSet<>(), Arrays.stream(fields), isSealed);
     }
 
-    public static ProductType of(LinkedHashSet<ReferenceNamedType> extendedProducts, Stream<FieldType> fields){
+    public static ProductType of(LinkedHashSet<ReferencedDefinition> extendedProducts, Stream<FieldDefinition> fields){
         return of(extendedProducts, fields, false);
     }
-    public static ProductType of(LinkedHashSet<ReferenceNamedType> extendedProducts, Stream<FieldType> fields, boolean isSealed){
+    public static ProductType of(LinkedHashSet<ReferencedDefinition> extendedProducts, Stream<FieldDefinition> fields, boolean isSealed){
         return new ProductType(fields.collect(Collectors.toCollection(LinkedHashSet::new)), extendedProducts, isSealed);
     }
 
@@ -133,7 +133,7 @@ public final class ProductType implements CompositionType, AdtType {
         return constructors;
     }
 
-    public Set<Set<FieldType>> getResolvedConstructors() {
+    public Set<Set<FieldDefinition>> getResolvedConstructors() {
         return constructors.stream()
                 .map(ctor ->
                         ctor.fieldNames

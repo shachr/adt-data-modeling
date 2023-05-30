@@ -3,7 +3,9 @@ package data.modeling.adt;
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.ComplexType;
+import data.modeling.adt.typedefs.Definition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.antlr4.Protobuf3Lexer;
 import data.modeling.antlr4.Protobuf3Parser;
 import org.antlr.v4.runtime.CharStream;
@@ -43,7 +45,7 @@ public class Protobuf3ToAdt implements NamedTypeStream {
     }
 
     @Override
-    public Stream<NamedType> stream() throws AdtException {
+    public Stream<Definition<ComplexType>> stream() throws AdtException {
 
         // Create a CharStream from your Proto file
         CharStream input = CharStreams.fromString(protoContent);

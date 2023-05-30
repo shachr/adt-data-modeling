@@ -6,7 +6,7 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ProductType;
-import data.modeling.adt.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.ReferencedDefinition;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import data.modeling.adt.util.MapsUtil;
 
@@ -41,7 +41,7 @@ public class JsonSchemaAllOfMapperLegacy extends JsonSchemaMapper<Map<String, Ob
             return (ProductType) mapper.toAdt(allOf.get(0));
         } else {
             List<Map> jsonSchemaAllOfObjects = extractJsonSchemaProperties(allOf);
-            LinkedHashSet<ReferenceNamedType> extendedProductTypes = extractAllReferenceNamedTypes(allOf);
+            LinkedHashSet<ReferencedDefinition> extendedProductTypes = extractAllReferenceNamedTypes(allOf);
 
             if(!jsonSchemaAllOfObjects.isEmpty()) {
                 Map mergedJsonSchemaObjects = MapsUtil.deepMergeMaps(jsonSchemaAllOfObjects);
@@ -60,17 +60,17 @@ public class JsonSchemaAllOfMapperLegacy extends JsonSchemaMapper<Map<String, Ob
         return jsonSchemaAllOfObjects;
     }
 
-    private LinkedHashSet<ReferenceNamedType> extractAllReferenceNamedTypes(List<Object> allOf) {
+    private LinkedHashSet<ReferencedDefinition> extractAllReferenceNamedTypes(List<Object> allOf) {
         Set<Object> jsonSchemaAllOfRefs = allOf.stream()
                 .filter(map->!isObjectWithProperties((Map)map))
                 .collect(Collectors.toSet());
 
-        LinkedHashSet<ReferenceNamedType> extendedProductTypes = jsonSchemaAllOfRefs.stream()
+        LinkedHashSet<ReferencedDefinition> extendedProductTypes = jsonSchemaAllOfRefs.stream()
                 .map(LambdaExceptionUtil.function(jsonSchemaElem -> {
                     AnyType anyType = toAdtMapperRegistry.toAdt(jsonSchemaElem);
-                    if(anyType instanceof ReferenceNamedType){
+                    if(anyType instanceof ReferencedDefinition){
                         // #definitions
-                        return (ReferenceNamedType)anyType;
+                        return (ReferencedDefinition)anyType;
                     } else {
                         // not supported
                         throw new AdtException("not supported");

@@ -2,8 +2,8 @@ package data.modeling.adt.mappers.graphqlToAdt.mappers;
 
 import data.modeling.adt.annotations.documentation.Description;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.FieldType;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.FieldDefinition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import graphql.language.*;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class InputObjectTypeDefinitionMapper extends GraphQlSchemaMapper<InputObjectTypeDefinition, NamedType> {
+public class InputObjectTypeDefinitionMapper extends GraphQlSchemaMapper<InputObjectTypeDefinition, TypeDefinition> {
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private TypeDefinitionRegistry typeDefinitionRegistry;
 
@@ -29,7 +29,7 @@ public class InputObjectTypeDefinitionMapper extends GraphQlSchemaMapper<InputOb
     }
 
     @Override
-    public NamedType toAdt(InputObjectTypeDefinition value) {
+    public TypeDefinition toAdt(InputObjectTypeDefinition value) {
         typeDefinitionRegistry.inputObjectTypeExtensions().get(value.getName());
         // support object type extensions
         List<InputObjectTypeExtensionDefinition> extensionDefinitionList = typeDefinitionRegistry.inputObjectTypeExtensions().get(value.getName());
@@ -41,15 +41,15 @@ public class InputObjectTypeDefinitionMapper extends GraphQlSchemaMapper<InputOb
                 .map(InputObjectTypeExtensionDefinition::getInputValueDefinitions)
                 .flatMap(List::stream);
 
-        NamedType namedType = NamedType.builder(value.getName(), ProductType.of(
+        TypeDefinition typeDefinition = TypeDefinition.builder(value.getName(), ProductType.of(
                 Stream.concat(value.getInputValueDefinitions().stream(), extensionObjectTypes)
-                        .map(LambdaExceptionUtil.function(field -> (FieldType)toAdtMapperRegistry.toAdt(field)))))
+                        .map(LambdaExceptionUtil.function(field -> (FieldDefinition)toAdtMapperRegistry.toAdt(field)))))
                 .build();
 
         if(!Objects.isNull(value.getDescription())){
-            namedType.getAnnotations().add(new Description(value.getDescription().getContent()));
+            typeDefinition.getAnnotations().add(new Description(value.getDescription().getContent()));
         }
 
-        return namedType;
+        return typeDefinition;
     }
 }

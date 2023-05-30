@@ -2,11 +2,7 @@ package data.modeling.adt.mappers.graphqlToAdt.mappers;
 
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.EnumType;
-import data.modeling.adt.typedefs.NamedType;
 import data.modeling.adt.typedefs.NullValueType;
-import data.modeling.adt.typedefs.StringType;
-import graphql.language.EnumTypeDefinition;
 import graphql.language.ListType;
 
 public class ListTypeMapper extends GraphQlSchemaMapper<ListType, NullValueType> {

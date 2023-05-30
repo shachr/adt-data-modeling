@@ -8,11 +8,11 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class ReferenceNamedType implements AnyType {
+public class ReferencedDefinition implements AnyType {
     private String refName;
     private final Set<Annotation<?>> annotations = new LinkedHashSet<>();
 
-    public ReferenceNamedType(String refName) {
+    public ReferencedDefinition(String refName) {
         this.refName = refName;
     }
 
@@ -27,7 +27,7 @@ public class ReferenceNamedType implements AnyType {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReferenceNamedType that = (ReferenceNamedType) o;
+        ReferencedDefinition that = (ReferencedDefinition) o;
         return refName.equals(that.refName);
     }
 

@@ -2,7 +2,7 @@ package data.modeling.adt.util;
     import data.modeling.adt.compatibility.AnyTypeComparator;
     import data.modeling.adt.compatibility.Difference;
     import data.modeling.adt.compatibility.DifferenceTypes;
-    import data.modeling.adt.typedefs.FieldType;
+    import data.modeling.adt.typedefs.FieldDefinition;
     import data.modeling.adt.typedefs.Int32Type;
     import data.modeling.adt.typedefs.ProductType;
     import data.modeling.adt.typedefs.StringType;
@@ -12,14 +12,14 @@ package data.modeling.adt.util;
 
     import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FieldTypeComparatorTest {
+public class FieldDefinitionComparatorTest {
 
     @Test
     public void testCompareFieldTypes() {
-        FieldType fieldType1 = new FieldType("field1", new StringType());
-        FieldType fieldType2 = new FieldType("field2", new Int32Type());
+        FieldDefinition fieldDefinition1 = new FieldDefinition("field1", new StringType());
+        FieldDefinition fieldDefinition2 = new FieldDefinition("field2", new Int32Type());
 
-        List<Difference> diffs = AnyTypeComparator.compare(ProductType.of(fieldType1), ProductType.of(fieldType2));
+        List<Difference> diffs = AnyTypeComparator.compare(ProductType.of(fieldDefinition1), ProductType.of(fieldDefinition2));
         assertEquals(2, diffs.size());
 
         Difference diff1 = diffs.get(0);

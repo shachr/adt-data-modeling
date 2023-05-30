@@ -13,8 +13,8 @@ public class SchemaContextUtil {
         this.schemaContext = schemaContext;
     }
     public void rename(String pattern, String replacement){
-        List<NamedType> namedTypeList = this.schemaContext.stream().toList();
-        namedTypeList.forEach(namedType -> {
+        List<Definition<ComplexType>> typeDefinitionList = this.schemaContext.stream().toList();
+        typeDefinitionList.forEach(namedType -> {
             if(namedType.getName().matches(pattern)){
                 schemaContext.removeNamedType(namedType);
                 String oldName = namedType.getName();
@@ -23,24 +23,24 @@ public class SchemaContextUtil {
                 schemaContext.registerNamedType(namedType);
 
                 // find all references
-                renameReferencedNamedType(oldName, newName, namedTypeList);
+                renameReferencedNamedType(oldName, newName, typeDefinitionList);
             }
         });
     }
 
-    private void renameReferencedNamedType(String oldName, String newName, List<NamedType> namedTypeList) {
-        namedTypeList.forEach(namedType -> {
+    private void renameReferencedNamedType(String oldName, String newName, List<Definition<ComplexType>> typeDefinitionList) {
+        typeDefinitionList.forEach(namedType -> {
             if(namedType.getType() instanceof ProductType productType){
                 productType.getOwnFields().stream()
-                        .filter(fieldType -> fieldType.getType() instanceof ReferenceNamedType)
-                        .map(FieldType::getType)
-                        .map(anyType -> (ReferenceNamedType)anyType)
+                        .filter(fieldType -> fieldType.getType() instanceof ReferencedDefinition)
+                        .map(FieldDefinition::getType)
+                        .map(anyType -> (ReferencedDefinition)anyType)
                         .filter(referenceNamedType -> referenceNamedType.getReferenceName().equals(oldName))
                         .forEach(referenceNamedType -> referenceNamedType.setReferenceName(newName));
             } else if(namedType.getType() instanceof UnionType unionType){
                 unionType.getTypes().stream()
-                        .filter(anyType -> anyType instanceof ReferenceNamedType)
-                        .map(anyType -> (ReferenceNamedType)anyType)
+                        .filter(anyType -> anyType instanceof ReferencedDefinition)
+                        .map(anyType -> (ReferencedDefinition)anyType)
                         .filter(referenceNamedType -> referenceNamedType.getReferenceName().equals(oldName))
                         .forEach(referenceNamedType -> referenceNamedType.setReferenceName(newName));
             }

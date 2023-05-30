@@ -1,7 +1,7 @@
 <#assign packageName = packageName()>
 <#assign imports = imports()>
 <#assign className = className()>
-<#assign namedType = namedType()>
+<#assign typeDefinition = typeDefinition()>
 <#-- Output the package statement -->
 <#if packageName?has_content>
 package ${packageName};
@@ -15,13 +15,13 @@ import ${import};
 <#-- Output the class declaration -->
 public enum ${className} {
 
-<#list namedType.type.items as item>
+<#list typeDefinition.type.items as item>
     ${escapeName(item.name())}("${toJavaType(item.value())}")<#if item?has_next>,<#else>;</#if>
 </#list>
 
-    private final ${toJavaType(namedType.type.baseType)} value;
+    private final ${toJavaType(typeDefinition.type.baseType)} value;
 
-    ${className}(${toJavaType(namedType.type.baseType)} value) {
+    ${className}(${toJavaType(typeDefinition.type.baseType)} value) {
         this.value = value;
     }
 

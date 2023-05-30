@@ -5,15 +5,14 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaMissingId;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
-import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ComplexType;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
 import java.util.Map;
 import java.util.Objects;
 
-public class JsonSchemaMainMapper extends JsonSchemaMapper<Map<String, Object>, NamedType> {
+public class JsonSchemaMainMapper extends JsonSchemaMapper<Map<String, Object>, TypeDefinition> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -30,7 +29,7 @@ public class JsonSchemaMainMapper extends JsonSchemaMapper<Map<String, Object>, 
     }
 
     @Override
-    public NamedType toAdt(Map<String, Object> value) throws AdtException {
+    public TypeDefinition toAdt(Map<String, Object> value) throws AdtException {
         String id = (String)value.get("$id");
 
         if(Objects.isNull(id)){
@@ -45,13 +44,13 @@ public class JsonSchemaMainMapper extends JsonSchemaMapper<Map<String, Object>, 
         return registerNamedType(id, value);
     }
 
-    private NamedType registerNamedType(String name, Map<String, Object> map) throws AdtException {
+    private TypeDefinition registerNamedType(String name, Map<String, Object> map) throws AdtException {
         ComplexType anyType = (ComplexType)toAdtMapperRegistry.toAdt(map);
-        NamedType namedType = new NamedType(name, anyType);
+        TypeDefinition typeDefinition = new TypeDefinition(name, anyType);
         map.keySet().forEach(key -> {
-            namedType.getAnnotations().add(new JsonSchemaAnnotation(key, map.get(key)));
+            typeDefinition.getAnnotations().add(new JsonSchemaAnnotation(key, map.get(key)));
         });
-        schemaContext.registerNamedType(namedType);
-        return namedType;
+        schemaContext.registerNamedType(typeDefinition);
+        return typeDefinition;
     }
 }

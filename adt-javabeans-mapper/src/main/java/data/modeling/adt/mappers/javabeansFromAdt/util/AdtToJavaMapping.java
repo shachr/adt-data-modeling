@@ -30,8 +30,8 @@ public class AdtToJavaMapping {
       return this.map((NullValueType) anyType);
     } else if(anyType instanceof MapType) {
       return this.map((MapType) anyType);
-    } else if(anyType instanceof ReferenceNamedType){
-        return JavaFileUtil.toFullyQualifiedName(((ReferenceNamedType) anyType).getReferenceName()).getValue();
+    } else if(anyType instanceof ReferencedDefinition){
+        return JavaFileUtil.toFullyQualifiedName(((ReferencedDefinition) anyType).getReferenceName()).getValue();
     } else if(anyType instanceof ConstantPrimitiveType){
       return ((ConstantPrimitiveType)anyType).getConstant().toString();
     } else {

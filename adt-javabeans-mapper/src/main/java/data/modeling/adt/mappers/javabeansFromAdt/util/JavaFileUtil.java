@@ -2,9 +2,7 @@ package data.modeling.adt.mappers.javabeansFromAdt.util;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
-import data.modeling.adt.typedefs.NamedType;
-import data.modeling.adt.typedefs.ProductType;
-import data.modeling.adt.typedefs.ReferenceNamedType;
+import data.modeling.adt.typedefs.*;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -31,16 +29,16 @@ public class JavaFileUtil {
         this.schemaContext = schemaContext;
         this.classLoader = classLoader;
     }
-    public JavaFile toClassFile(NamedType namedType) throws IOException, TemplateException {
-        return processType(namedType, "/class.ftlh");
+    public JavaFile toClassFile(TypeDefinition typeDefinition) throws IOException, TemplateException {
+        return processType(typeDefinition, "/class.ftlh");
     }
-    public JavaFile toInterfaceFile(NamedType namedType) throws IOException, TemplateException {
-        return processType(namedType, "/interface.ftlh");
+    public JavaFile toInterfaceFile(InterfaceDefinition typeDefinition) throws IOException, TemplateException {
+        return processType(typeDefinition, "/interface.ftlh");
     }
-    public JavaFile toEnumFile(NamedType namedType) throws IOException, TemplateException {
-        return processType(namedType, "/enum.ftlh");
+    public JavaFile toEnumFile(Definition<ComplexType> typeDefinition) throws IOException, TemplateException {
+        return processType(typeDefinition, "/enum.ftlh");
     }
-    private JavaFile processType(NamedType namedType, String templateLocation)
+    private JavaFile processType(Definition<ComplexType> typeDefinition, String templateLocation)
             throws IOException, TemplateException {
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
@@ -55,11 +53,11 @@ public class JavaFileUtil {
         Writer out = new OutputStreamWriter(outputStream);
 
         final Template temp = cfg.getTemplate(templateLocation);
-        AbstractMap.SimpleEntry<String, String> simpleEntry = toFullyQualifiedName(namedType.getName());
-        Set<String> inherits = getInherits(namedType);
-        Set<String> imports = getImports(schemaContext, namedType);
+        AbstractMap.SimpleEntry<String, String> simpleEntry = toFullyQualifiedName(typeDefinition.getName());
+        Set<String> inherits = getInherits(typeDefinition);
+        Set<String> imports = getImports(schemaContext, typeDefinition);
 
-        JavaFileTemplate javaFile = new JavaFileTemplate(simpleEntry.getKey(), imports, simpleEntry.getValue(), inherits, namedType);
+        JavaFileTemplate javaFile = new JavaFileTemplate(simpleEntry.getKey(), imports, simpleEntry.getValue(), inherits, typeDefinition);
         temp.process(javaFile, out);
 
         byte[] bufferContent = outputStream.toByteArray();
@@ -68,10 +66,10 @@ public class JavaFileUtil {
         return new JavaFile(fileName, bufferString);
     }
 
-    private Set<String> getInherits(NamedType namedType) {
-        if(namedType.getType() instanceof ProductType productType){
+    private Set<String> getInherits(Definition<ComplexType> typeDefinition) {
+        if(typeDefinition.getType() instanceof ProductType productType){
             return productType.getImplements().stream()
-                    .map(ReferenceNamedType::getReferenceName)
+                    .map(ReferencedDefinition::getReferenceName)
                     .map(JavaFileUtil::toFullyQualifiedName)
                     .map(AbstractMap.SimpleEntry::getValue)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -119,20 +117,20 @@ public class JavaFileUtil {
         // Capitalize the first letter to form a valid class name
         return normalized.substring(0, 1).toUpperCase() + normalized.substring(1);
     }
-    private static Set<String> getImports(SchemaContext schemaContext, NamedType namedType) {
-        if(namedType.getType() instanceof ProductType){
-            ProductType productType = (ProductType) namedType.getType();
+    private static Set<String> getImports(SchemaContext schemaContext, Definition<ComplexType> typeDefinition) {
+        if(typeDefinition.getType() instanceof ProductType){
+            ProductType productType = (ProductType) typeDefinition.getType();
             return Stream.concat(
                 // inherits
                 productType.getImplements().stream()
-                .map(ReferenceNamedType::getReferenceName)
+                .map(ReferencedDefinition::getReferenceName)
                 .map(JavaFileUtil::toFullyQualifiedName)
                 .map(entry->entry.getKey() + "." + entry.getValue()),
 
                 // references
                 productType.resolveAllFields(schemaContext).stream()
-                .filter(fieldType -> fieldType.getType() instanceof ReferenceNamedType)
-                .map(fieldType -> ((ReferenceNamedType)fieldType.getType()).getReferenceName())
+                .filter(fieldType -> fieldType.getType() instanceof ReferencedDefinition)
+                .map(fieldType -> ((ReferencedDefinition)fieldType.getType()).getReferenceName())
                 .map(LambdaExceptionUtil.function(JavaFileUtil::toFullyQualifiedName))
                 .map(entry-> entry.getKey() + "." + entry.getValue())
 

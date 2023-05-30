@@ -1,10 +1,9 @@
 package data.modeling.adt.typedefs;
 
-import data.modeling.adt.SchemaContext;
-import data.modeling.adt.exceptions.AdtException;
-
-public class FieldAdditionalTypes extends FieldType {
-    public FieldAdditionalTypes(AnyType type) {
+// todo: should this be part of json-schema specifically? such that once its created,
+//  a schema pipe can denormalize such that other mappers can understand.
+public class FieldAdditionalDefinition extends FieldDefinition {
+    public FieldAdditionalDefinition(AnyType type) {
         super(null, type);
     }
 
@@ -17,7 +16,7 @@ public class FieldAdditionalTypes extends FieldType {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FieldAdditionalTypes fieldType = (FieldAdditionalTypes) o;
+        FieldAdditionalDefinition fieldType = (FieldAdditionalDefinition) o;
         return this.getType().equals(fieldType.getType())
                 && this.getAnnotations().equals(fieldType.getAnnotations())
                 && this.isRequired().equals(fieldType.isRequired());

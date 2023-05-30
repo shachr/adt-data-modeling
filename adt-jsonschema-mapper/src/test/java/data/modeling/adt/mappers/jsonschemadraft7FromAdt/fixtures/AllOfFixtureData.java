@@ -26,37 +26,37 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
     @Override
     public SchemaContext getInputSchemaContext() {
         SchemaContext schemaContext = new SchemaContext();
-        NamedType emptyObject = new NamedType("EmptyObject", new ProductType());
-        NamedType namedType = NamedType.builder(schemaNamespace, AllOfType.of(
-                new ReferenceNamedType("#/definitions/" + emptyObject.getName()),
+        TypeDefinition emptyObject = new TypeDefinition("EmptyObject", new ProductType());
+        TypeDefinition typeDefinition = TypeDefinition.builder(schemaNamespace, AllOfType.of(
+                new ReferencedDefinition("#/definitions/" + emptyObject.getName()),
                 ProductType.of(
-                    FieldType.builder("productId", new Int32Type())
+                    FieldDefinition.builder("productId", new Int32Type())
                             .withAnnotations(new JsonSchemaAnnotation("description", "The unique identifier for a product"))
                             .withIsRequired(true)
                             .build(),
-                    FieldType.builder("productName", new StringType())
+                    FieldDefinition.builder("productName", new StringType())
                             .withAnnotations(new JsonSchemaAnnotation("description", "Name of the product"))
                             .withIsRequired(true)
                             .build(),
-                    FieldType.builder("price", new DoubleType())
+                    FieldDefinition.builder("price", new DoubleType())
                             .withAnnotations(new JsonSchemaAnnotation("description", "The price of the product"),
                                     new JsonSchemaAnnotation("exclusiveMinimum", 0))
                             .withIsRequired(true)
                             .build(),
-                    FieldType.builder("tags", new NullValueType(new SetType(new StringType())))
+                    FieldDefinition.builder("tags", new NullValueType(new SetType(new StringType())))
                             .withAnnotations(
                                     new JsonSchemaAnnotation("minItems", 1),
                                     new JsonSchemaAnnotation("description", "Tags for the product")
                             )
                             .build(),
-                    FieldType.builder("dimensions", ProductType.of(
-                                    FieldType.builder("length", new DoubleType()).withIsRequired(true).build(),
-                                    FieldType.builder("width", new DoubleType()).withIsRequired(true).build(),
-                                    FieldType.builder("height", new DoubleType()).withIsRequired(true).build()
+                    FieldDefinition.builder("dimensions", ProductType.of(
+                                    FieldDefinition.builder("length", new DoubleType()).withIsRequired(true).build(),
+                                    FieldDefinition.builder("width", new DoubleType()).withIsRequired(true).build(),
+                                    FieldDefinition.builder("height", new DoubleType()).withIsRequired(true).build()
                             ))
                             .withAnnotations(new JsonSchemaAnnotation("description", "Product dimensions"))
                             .build(),
-                    FieldType.builder("color", EnumType.of(
+                    FieldDefinition.builder("color", EnumType.of(
                                     new StringType(),
                                     new EnumType.EnumItemType("red", StringType.constantOf("red")),
                                     new EnumType.EnumItemType("green", StringType.constantOf("green")),
@@ -64,19 +64,19 @@ public class AllOfFixtureData implements FromAdtFixtureData<Map<String, Object>>
                             ))
                             .withAnnotations(new JsonSchemaAnnotation("description", "Product color"))
                             .build(),
-                    FieldType.builder("isAvailable", new BoolType())
+                    FieldDefinition.builder("isAvailable", new BoolType())
                             .withAnnotations(new JsonSchemaAnnotation("description", "Product availability"))
                             .build()
                 )
         )).build();
 
-        namedType.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));
-        namedType.getAnnotations().add(new JsonSchemaAnnotation("$id", schemaNamespace));
-        namedType.getAnnotations().add(new JsonSchemaAnnotation("title", "Product"));
-        namedType.getAnnotations().add(new JsonSchemaAnnotation("description", "A product from Acme's catalog"));
+        typeDefinition.getAnnotations().add(new JsonSchemaAnnotation("$schema", "http://json-schema.org/draft-07/schema#"));
+        typeDefinition.getAnnotations().add(new JsonSchemaAnnotation("$id", schemaNamespace));
+        typeDefinition.getAnnotations().add(new JsonSchemaAnnotation("title", "Product"));
+        typeDefinition.getAnnotations().add(new JsonSchemaAnnotation("description", "A product from Acme's catalog"));
 
         schemaContext.registerNamedType(emptyObject);
-        schemaContext.registerNamedType(namedType);
+        schemaContext.registerNamedType(typeDefinition);
         return schemaContext;
     }
 

@@ -3,8 +3,6 @@ package data.modeling.adt.mappers.jsonschemadraft7ToAdt.mappers;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.AnyOfType;
 import data.modeling.adt.typedefs.AnyType;
-import data.modeling.adt.typedefs.FieldType;
-import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaAnyOfNotSupported;
 import data.modeling.adt.util.LambdaExceptionUtil;
 

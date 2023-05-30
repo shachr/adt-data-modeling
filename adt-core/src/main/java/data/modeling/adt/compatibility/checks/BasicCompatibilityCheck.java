@@ -10,17 +10,17 @@ import data.modeling.adt.typedefs.*;
 import java.util.Objects;
 
 public class BasicCompatibilityCheck implements CompatibilityCheck {
-    LabeledType<?> lastSeenLabeledType;
+    Definition<?> lastSeenDefinition;
     CompositionType lastCompositionType;
 
     @Override
-    public void enterLabeledType(LabeledType<?> labeledType) {
-        lastSeenLabeledType = labeledType;
+    public void enterLabeledType(Definition<?> definition) {
+        lastSeenDefinition = definition;
     }
 
     @Override
-    public void exitLabeledType(LabeledType<?> labeledType) {
-        lastSeenLabeledType = null;
+    public void exitLabeledType(Definition<?> definition) {
+        lastSeenDefinition = null;
     }
 
     @Override
@@ -43,8 +43,8 @@ public class BasicCompatibilityCheck implements CompatibilityCheck {
                     null));
         }
         else if(Objects.isNull(anyType1) && !Objects.isNull(anyType2)){
-            if(!Objects.isNull(lastSeenLabeledType)
-                    && lastSeenLabeledType.testAnnotation(DefaultValue.class, anno-> !Objects.isNull(anno.getValue()))){
+            if(!Objects.isNull(lastSeenDefinition)
+                    && lastSeenDefinition.testAnnotation(DefaultValue.class, anno-> !Objects.isNull(anno.getValue()))){
                 comparatorContext.getDiffs().add(new Difference(
                         DifferenceTypes.TypeAddedWithDefault,
                         comparatorContext.getJsonPathTraversingContext().getJsonPointer(),
@@ -68,7 +68,7 @@ public class BasicCompatibilityCheck implements CompatibilityCheck {
     }
 
     @Override
-    public void compareNamedType(ComparatorContext comparatorContext, NamedType obj1, NamedType obj2) {
+    public void compareNamedType(ComparatorContext comparatorContext, TypeDefinition obj1, TypeDefinition obj2) {
         if(!obj1.getName().equals(obj2.getName())) {
             comparatorContext.getDiffs().add(new Difference(DifferenceTypes.LabelChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer(), obj1.getName(), obj2.getName()));
         }
@@ -82,39 +82,39 @@ public class BasicCompatibilityCheck implements CompatibilityCheck {
     }
 
     @Override
-    public void compareReferenceNamedType(ComparatorContext comparatorContext, ReferenceNamedType obj1, ReferenceNamedType obj2) {
+    public void compareReferenceNamedType(ComparatorContext comparatorContext, ReferencedDefinition obj1, ReferencedDefinition obj2) {
         if(!obj1.getReferenceName().equals(obj2.getReferenceName())){
             comparatorContext.getDiffs().add(new Difference(DifferenceTypes.ReferenceChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer(), obj1.getReferenceName(), obj2.getReferenceName()));;
         }
     }
 
     @Override
-    public void compareFieldType(ComparatorContext comparatorContext, FieldType fieldType1, FieldType fieldType2) {
-        if(!Objects.isNull(fieldType1) && Objects.isNull(fieldType2)){
+    public void compareFieldType(ComparatorContext comparatorContext, FieldDefinition fieldDefinition1, FieldDefinition fieldDefinition2) {
+        if(!Objects.isNull(fieldDefinition1) && Objects.isNull(fieldDefinition2)){
             comparatorContext.getDiffs().add(new Difference(
-                    fieldType1.isRequired() ? DifferenceTypes.FieldRemoved : DifferenceTypes.FieldRemovedOptional,
-                    comparatorContext.getJsonPathTraversingContext().getJsonPointer() + fieldType1.getName(),
-                    fieldType1,
+                    fieldDefinition1.isRequired() ? DifferenceTypes.FieldRemoved : DifferenceTypes.FieldRemovedOptional,
+                    comparatorContext.getJsonPathTraversingContext().getJsonPointer() + fieldDefinition1.getName(),
+                    fieldDefinition1,
                     null));
         }
-        else if(Objects.isNull(fieldType1) && !Objects.isNull(fieldType2)){
+        else if(Objects.isNull(fieldDefinition1) && !Objects.isNull(fieldDefinition2)){
             comparatorContext.getDiffs().add(new Difference(
-                    fieldType2.isRequired() ? DifferenceTypes.FieldAdded : DifferenceTypes.FieldAddedOptional,
+                    fieldDefinition2.isRequired() ? DifferenceTypes.FieldAdded : DifferenceTypes.FieldAddedOptional,
                     comparatorContext.getJsonPathTraversingContext().getJsonPointer(),
                     null,
-                    fieldType2));
+                    fieldDefinition2));
         }
         else {
-            if (!fieldType1.getName().equals(fieldType2.getName())) {
-                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldLabelChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer("name"), fieldType1.getName(), fieldType2.getName()));
+            if (!fieldDefinition1.getName().equals(fieldDefinition2.getName())) {
+                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldLabelChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer("name"), fieldDefinition1.getName(), fieldDefinition2.getName()));
             }
-            if (!fieldType1.getIndex().equals(fieldType2.getIndex())) {
-                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldOrderChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer("index"), fieldType1.getIndex(), fieldType2.getIndex()));
+            if (!fieldDefinition1.getIndex().equals(fieldDefinition2.getIndex())) {
+                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldOrderChanged, comparatorContext.getJsonPathTraversingContext().getJsonPointer("index"), fieldDefinition1.getIndex(), fieldDefinition2.getIndex()));
             }
-            if (fieldType1.isRequired() && !fieldType2.isRequired()) {
-                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldChangedToOptional, comparatorContext.getJsonPathTraversingContext().getJsonPointer("isRequired"), fieldType1.isRequired(), fieldType2.isRequired()));
-            } else if (!fieldType1.isRequired() && fieldType2.isRequired()) {
-                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldChangedToMandatory, comparatorContext.getJsonPathTraversingContext().getJsonPointer("isRequired"), fieldType1.isRequired(), fieldType2.isRequired()));
+            if (fieldDefinition1.isRequired() && !fieldDefinition2.isRequired()) {
+                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldChangedToOptional, comparatorContext.getJsonPathTraversingContext().getJsonPointer("isRequired"), fieldDefinition1.isRequired(), fieldDefinition2.isRequired()));
+            } else if (!fieldDefinition1.isRequired() && fieldDefinition2.isRequired()) {
+                comparatorContext.getDiffs().add(new Difference(DifferenceTypes.FieldChangedToMandatory, comparatorContext.getJsonPathTraversingContext().getJsonPointer("isRequired"), fieldDefinition1.isRequired(), fieldDefinition2.isRequired()));
             }
         }
     }

@@ -24,24 +24,24 @@ public class SanityComparatorTest {
 
     @Test
     public void testCompare() {
-        NamedType namedType1 = new NamedType("person", new ProductType(new HashSet<>()));
-        NamedType namedType2 = new NamedType("person", new ProductType(new HashSet<>()));
+        TypeDefinition typeDefinition1 = new TypeDefinition("person", new ProductType(new HashSet<>()));
+        TypeDefinition typeDefinition2 = new TypeDefinition("person", new ProductType(new HashSet<>()));
 
         // Same objects
-        assertEquals(0, AnyTypeComparator.compare(namedType1, namedType1).size());
+        assertEquals(0, AnyTypeComparator.compare(typeDefinition1, typeDefinition1).size());
 
         // Different objects with same values
-        assertEquals(0, AnyTypeComparator.compare(namedType1, namedType2).size());
+        assertEquals(0, AnyTypeComparator.compare(typeDefinition1, typeDefinition2).size());
 
         // Different named types
-        FieldType foo = new FieldType("foo", new StringType());
-        FieldType bar = new FieldType("bar", new Int32Type());
-        namedType2 = new NamedType("person", ProductType.of(
+        FieldDefinition foo = new FieldDefinition("foo", new StringType());
+        FieldDefinition bar = new FieldDefinition("bar", new Int32Type());
+        typeDefinition2 = new TypeDefinition("person", ProductType.of(
                 foo,
                 bar
         ));
 
-        List<Difference> diffs = AnyTypeComparator.compare(namedType1, namedType2);
+        List<Difference> diffs = AnyTypeComparator.compare(typeDefinition1, typeDefinition2);
         assertEquals(2, diffs.size());
 
         Difference diff1 = diffs.get(0);
@@ -63,8 +63,8 @@ public class SanityComparatorTest {
 
     @Test
     void testCompareNamedTypeDifferentName() {
-        NamedType nt1 = new NamedType("foo", new ListType(new Int32Type()));
-        NamedType nt2 = new NamedType("bar", new ListType(new Int32Type()));
+        TypeDefinition nt1 = new TypeDefinition("foo", new ListType(new Int32Type()));
+        TypeDefinition nt2 = new TypeDefinition("bar", new ListType(new Int32Type()));
         List<Difference> diffs = AnyTypeComparator.compare(nt1, nt2);
         Assertions.assertEquals(1, diffs.size());
         Difference diff = diffs.get(0);

@@ -1,7 +1,7 @@
 <#assign packageName = packageName()>
 <#assign imports = imports()>
 <#assign className = className()>
-<#assign namedType = namedType()>
+<#assign typeDefinition = typeDefinition()>
 <#-- Output the package statement -->
 <#if packageName?has_content>
 package ${packageName};
@@ -15,26 +15,26 @@ import ${import};
 <#-- Output the class declaration -->
 public class ${className}<#if inherits()?has_content> implements <#list inherits() as inheritedType>${inheritedType}<#if inheritedType?has_next>,</#if></#list></#if> {
 <#-- Output the class properties
-<#list namedType.annotations as annotation>
+<#list typeDefinition.annotations as annotation>
     <@generateAnnotation annotation/>
 </#list>
 -->
-<#list namedType.type.getOwnFields() as field>
+<#list typeDefinition.type.getOwnFields() as field>
     private ${toJavaType(field.type)} ${escapeName(field.name)};
 </#list>
 
 <#-- Output the class constructor-->
-<#if namedType.type.getResolvedConstructors()?size = 0 >
+<#if typeDefinition.type.getResolvedConstructors()?size = 0 >
     public ${className}() {}
 
-    public ${className}(<#list namedType.type.getOwnFields() as field>${toJavaType(field.type)} ${escapeName(field.name)}<#if field?has_next>,</#if></#list>) {
-        <#list namedType.type.getOwnFields() as field>
+    public ${className}(<#list typeDefinition.type.getOwnFields() as field>${toJavaType(field.type)} ${escapeName(field.name)}<#if field?has_next>,</#if></#list>) {
+        <#list typeDefinition.type.getOwnFields() as field>
         this.${escapeName(field.name)} = ${escapeName(field.name)}
         </#list>
     }
 </#if>
 
-<#list namedType.type.getResolvedConstructors() as fields>
+<#list typeDefinition.type.getResolvedConstructors() as fields>
     public ${className}(<#list fields as field>${toJavaType(field.type)} ${escapeName(field.name)}</#list>) {
     <#list fields as field>
         this.${escapeName(field.name)} = ${escapeName(field.name)}
@@ -42,8 +42,8 @@ public class ${className}<#if inherits()?has_content> implements <#list inherits
     }
 </#list>
 <#-- Output the getter methods -->
-<#list namedType.type.getOwnFields() as field>
-<#if namedType.type.class.simpleName == "BoolType">
+<#list typeDefinition.type.getOwnFields() as field>
+<#if typeDefinition.type.class.simpleName == "BoolType">
     public ${toJavaType(field.type)} is${field.name?cap_first}() {
         return this.${field.name};
     }

@@ -1,10 +1,8 @@
 package data.modeling.adt.util;
 
 import data.modeling.adt.abstraction.annotations.Annotation;
-import data.modeling.adt.typedefs.AnyType;
 import data.modeling.adt.typedefs.ComplexType;
-import data.modeling.adt.typedefs.CompositionType;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -27,7 +25,7 @@ public class NamedTypeBuilder {
         return this;
     }
 
-    public NamedType build() {
-        return new NamedType(name, type, annotations);
+    public TypeDefinition build() {
+        return new TypeDefinition(name, type, annotations);
     }
 }

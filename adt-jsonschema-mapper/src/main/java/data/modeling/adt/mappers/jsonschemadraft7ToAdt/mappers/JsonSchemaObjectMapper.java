@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>, ProductType> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
-    private LinkedHashSet<ReferenceNamedType> extendedProducts;
+    private LinkedHashSet<ReferencedDefinition> extendedProducts;
     private SchemaContext schemaContext;
 
     public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, SchemaContext schemaContext) {
@@ -26,7 +26,7 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>
         this.toAdtMapperRegistry = toAdtMapperRegistry;
     }
 
-    public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, LinkedHashSet<ReferenceNamedType> extendedProducts) {
+    public JsonSchemaObjectMapper(ToAdtMapperRegistry toAdtMapperRegistry, LinkedHashSet<ReferencedDefinition> extendedProducts) {
 
         this.toAdtMapperRegistry = toAdtMapperRegistry;
         this.extendedProducts = extendedProducts;
@@ -44,7 +44,7 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>
         Object additionalProperties = value.remove("additionalProperties");
         final boolean isSealed = !Objects.isNull(additionalProperties) && additionalProperties.equals(false);
 
-        Stream<FieldType> fieldTypeStream = Stream.empty();
+        Stream<FieldDefinition> fieldTypeStream = Stream.empty();
         Map<String, Object> properties = (Map<String, Object>)value.remove("properties");
         if(!Objects.isNull(properties)) {
             fieldTypeStream = properties.entrySet().stream().map(LambdaExceptionUtil.function(
@@ -52,17 +52,17 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>
                     {
                         Map<String, Object> fieldMap = (Map<String, Object>) entry.getValue();
                         AnyType fieldAdtType = toAdtMapperRegistry.toAdt(fieldMap);
-                        FieldType fieldType = FieldType.of(entry.getKey(), fieldAdtType);
+                        FieldDefinition fieldDefinition = FieldDefinition.of(entry.getKey(), fieldAdtType);
                         fieldMap.keySet().forEach(key ->
-                                fieldType.getAnnotations().add(new JsonSchemaAnnotation(key, fieldMap.get(key))));
-                        return fieldType;
+                                fieldDefinition.getAnnotations().add(new JsonSchemaAnnotation(key, fieldMap.get(key))));
+                        return fieldDefinition;
                     }
             ));
         }
 
         if(!Objects.isNull(additionalProperties) && !isSealed){
-            FieldAdditionalTypes fieldType = new FieldAdditionalTypes(ProductType.of(new FieldType("additionalProperties", new MapType(new StringType(), toAdtMapperRegistry.toAdt(additionalProperties)))));
-            List<FieldType> fields = fieldTypeStream.collect(Collectors.toList());
+            FieldAdditionalDefinition fieldType = new FieldAdditionalDefinition(ProductType.of(new FieldDefinition("additionalProperties", new MapType(new StringType(), toAdtMapperRegistry.toAdt(additionalProperties)))));
+            List<FieldDefinition> fields = fieldTypeStream.collect(Collectors.toList());
             fields.add(fieldType);
             fieldTypeStream = fields.stream();
         }
@@ -71,9 +71,9 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<Map<String, Object>
         List<String> required = (List<String>)value.remove("required");
         if(null != required){
             required.forEach(fieldName -> {
-                FieldType fieldType = productType.getField(fieldName);
-                if(null != fieldType) {
-                    fieldType.setRequired(true);
+                FieldDefinition fieldDefinition = productType.getField(fieldName);
+                if(null != fieldDefinition) {
+                    fieldDefinition.setRequired(true);
                 }
             });
         }

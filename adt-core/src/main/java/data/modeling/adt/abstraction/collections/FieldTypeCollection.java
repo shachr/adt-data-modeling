@@ -1,21 +1,21 @@
 package data.modeling.adt.abstraction.collections;
 
-import data.modeling.adt.typedefs.FieldType;
+import data.modeling.adt.typedefs.FieldDefinition;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FieldTypeCollection  {
-    private final LinkedHashSet<FieldType> fieldTypes = new LinkedHashSet<>();
-    private final Map<String, FieldType> fieldsMap = new HashMap<>();
+    private final LinkedHashSet<FieldDefinition> fieldDefinitions = new LinkedHashSet<>();
+    private final Map<String, FieldDefinition> fieldsMap = new HashMap<>();
 
-    public boolean add(FieldType fieldType) {
-        fieldType.setIndex(fieldTypes.size());
-        fieldsMap.put(fieldType.getName(), fieldType);
-        return fieldTypes.add(fieldType);
+    public boolean add(FieldDefinition fieldDefinition) {
+        fieldDefinition.setIndex(fieldDefinitions.size());
+        fieldsMap.put(fieldDefinition.getName(), fieldDefinition);
+        return fieldDefinitions.add(fieldDefinition);
     }
 
-    public FieldType get(String name){
+    public FieldDefinition get(String name){
         return fieldsMap.get(name);
     }
 
@@ -23,19 +23,19 @@ public class FieldTypeCollection  {
         return fieldsMap.containsKey(name);
     }
 
-    public void addAll(Collection<FieldType> collection) {
+    public void addAll(Collection<FieldDefinition> collection) {
         collection.forEach(this::add);
     }
 
-    public Set<FieldType> getFields(){
-        return fieldTypes;
+    public Set<FieldDefinition> getFields(){
+        return fieldDefinitions;
     }
 
-    public Set<FieldType> cloneFields(){
-        return fieldTypes.stream().map(fieldType-> {
-            FieldType cloneFieldType = new FieldType(fieldType.getName(), fieldType.getType());
-            cloneFieldType.getAnnotations().addAll(fieldType.getAnnotations());
-            return cloneFieldType;
+    public Set<FieldDefinition> cloneFields(){
+        return fieldDefinitions.stream().map(fieldType-> {
+            FieldDefinition cloneFieldDefinition = new FieldDefinition(fieldType.getName(), fieldType.getType());
+            cloneFieldDefinition.getAnnotations().addAll(fieldType.getAnnotations());
+            return cloneFieldDefinition;
         }).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -44,11 +44,11 @@ public class FieldTypeCollection  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FieldTypeCollection that = (FieldTypeCollection) o;
-        return fieldTypes.equals(that.fieldTypes);
+        return fieldDefinitions.equals(that.fieldDefinitions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fieldTypes);
+        return Objects.hash(fieldDefinitions);
     }
 }

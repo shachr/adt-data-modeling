@@ -5,7 +5,7 @@ import data.modeling.adt.abstraction.monads.SchemaTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.mappers.*;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -14,12 +14,12 @@ import static data.modeling.adt.util.StreamExtensions.toMap;
 
 public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map<String, Object>> {
 
-    private final NamedType namedType;
+    private final TypeDefinition typeDefinition;
     protected SchemaContext schemaContext;
     private final FromAdtMapperRegistry fromAdtMapperRegistry = new FromAdtMapperRegistry();
 
-    public JsonSchemaDraft7FromAdt(NamedType namedType, SchemaContext schemaContext) {
-        this.namedType = namedType;
+    public JsonSchemaDraft7FromAdt(TypeDefinition typeDefinition, SchemaContext schemaContext) {
+        this.typeDefinition = typeDefinition;
         this.schemaContext = schemaContext;
         fromAdtMapperRegistry.register(new JsonSchemaNullMapper(fromAdtMapperRegistry));
         fromAdtMapperRegistry.register(new JsonSchemaEnumMapper(fromAdtMapperRegistry));
@@ -42,6 +42,6 @@ public class JsonSchemaDraft7FromAdt implements SchemaTypeStream<Map<String, Obj
 
     @Override
     public Stream<Map<String, Object>> stream() throws AdtException {
-        return Stream.of(toMap(new JsonSchemaMainMapper(fromAdtMapperRegistry, schemaContext).fromAdt(namedType)));
+        return Stream.of(toMap(new JsonSchemaMainMapper(fromAdtMapperRegistry, schemaContext).fromAdt(typeDefinition)));
     }
 }

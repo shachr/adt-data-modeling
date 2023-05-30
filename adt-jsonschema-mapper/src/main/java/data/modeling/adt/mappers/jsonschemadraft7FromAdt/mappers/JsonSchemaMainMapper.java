@@ -5,14 +5,14 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.NamedType;
+import data.modeling.adt.typedefs.TypeDefinition;
 
 import static data.modeling.adt.util.StreamExtensions.toMap;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class JsonSchemaMainMapper extends JsonSchemaMapper<NamedType> {
+public class JsonSchemaMainMapper extends JsonSchemaMapper<TypeDefinition> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
     private SchemaContext schemaContext;
@@ -24,12 +24,12 @@ public class JsonSchemaMainMapper extends JsonSchemaMapper<NamedType> {
     }
 
     @Override
-    public boolean canMap(NamedType value) {
+    public boolean canMap(TypeDefinition value) {
         return false;
     }
 
     @Override
-    public Stream<Map.Entry<String, Object>> fromAdt(NamedType type) throws AdtException {
+    public Stream<Map.Entry<String, Object>> fromAdt(TypeDefinition type) throws AdtException {
         MapBuilder jsonSchemaMap = MapBuilder.create();
         type.getAnnotations().stream()
                 .filter(annotation -> annotation instanceof JsonSchemaAnnotation)

@@ -39,7 +39,7 @@ public class SchemaCompositionToAdt implements AdtVisitor {
      */
 
     private final SchemaContext schemaContext;
-    private LabeledType lastSeenLabeledType;
+    private Definition lastSeenDefinition;
 
     public SchemaCompositionToAdt(SchemaContext schemaContext){
 
@@ -52,20 +52,20 @@ public class SchemaCompositionToAdt implements AdtVisitor {
     }
 
     @Override
-    public void enterLabeledType(LabeledType<?> type) {
-        lastSeenLabeledType = type;
+    public void enterLabeledType(Definition<?> type) {
+        lastSeenDefinition = type;
     }
 
     @Override
-    public void exitLabeledType(LabeledType<?> type) {
-        lastSeenLabeledType = null;
+    public void exitLabeledType(Definition<?> type) {
+        lastSeenDefinition = null;
     }
 
     @Override
     public void visit(ProductType type) throws AdtException {
-        if(lastSeenLabeledType instanceof NamedType) {
+        if(lastSeenDefinition instanceof TypeDefinition) {
             ProductType productType = productTypeFieldsToAdt(type);
-            lastSeenLabeledType.setType(productType);
+            lastSeenDefinition.setType(productType);
         }
     }
     private CompositionType compositionTypeToIDL(CompositionType compositionType) throws AdtException {
@@ -89,7 +89,7 @@ public class SchemaCompositionToAdt implements AdtVisitor {
             Map<Boolean, List<AnyType>> partitions =  anyOfType.getTypes().stream().collect(Collectors.partitioningBy(item -> item instanceof ProductType));
             Stream<ProductType> productTypes = partitions.get(true).stream().map(item -> (ProductType)item);
             Stream<ProductType> productTypes2 = partitions.get(false).stream()
-                    .map(item -> (ReferenceNamedType)item)
+                    .map(item -> (ReferencedDefinition)item)
                     .map(ref -> (ProductType)schemaContext.getNamedType(ref.getReferenceName()).getType());
             Stream<ProductType> mergedStream = StreamUtil.concatStreams(productTypes, productTypes2);
             return mergedStream.reduce(this::mergeProductTypes).get();
@@ -106,9 +106,9 @@ public class SchemaCompositionToAdt implements AdtVisitor {
 
         for (int i = 0; i < lastIndex; i++) {
             AnyType item = types.get(i);
-            if(item instanceof ReferenceNamedType referenceNamedType){
-                NamedType namedType = schemaContext.getNamedType(referenceNamedType.getReferenceName());
-                if(!(namedType.getType() instanceof ProductType)){
+            if(item instanceof ReferencedDefinition referencedDefinition){
+                Definition<ComplexType> definition = schemaContext.getNamedType(referencedDefinition.getReferenceName());
+                if(!(definition.isProductTypeDefinition())){
                     isValid = false;
                     break;
                 }
@@ -141,8 +141,8 @@ public class SchemaCompositionToAdt implements AdtVisitor {
                     .map(item -> (AnyType) item)
                     .collect(Collectors.partitioningBy(item -> item instanceof ProductType));
 
-            LinkedHashSet<ReferenceNamedType> referenceNamedTypes = partitionMap.get(false).stream()
-                    .map(item -> (ReferenceNamedType) item)
+            LinkedHashSet<ReferencedDefinition> referencedDefinitions = partitionMap.get(false).stream()
+                    .map(item -> (ReferencedDefinition) item)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
             List<ProductType> productTypes = partitionMap.get(true).stream()
@@ -153,7 +153,7 @@ public class SchemaCompositionToAdt implements AdtVisitor {
                     .reduce(this::mergeProductTypes)
                     .orElse(new ProductType());
 
-            mergedProductType.setImplements(referenceNamedTypes);
+            mergedProductType.setImplements(referencedDefinitions);
             return mergedProductType;
         } else {
             throw new AdtException("not supported");
@@ -171,11 +171,11 @@ public class SchemaCompositionToAdt implements AdtVisitor {
 
         for (int i = 0; i < lastIndex; i++) {
             AnyType item = types.get(i);
-            if(!(item instanceof ReferenceNamedType || item instanceof ProductType)) {
+            if(!(item instanceof ReferencedDefinition || item instanceof ProductType)) {
                 isValid = false;
                 break;
             }
-            if(item instanceof ReferenceNamedType) {
+            if(item instanceof ReferencedDefinition) {
                 if(isProductTypeFound) {
                     isValid = false;
                     break;
@@ -200,12 +200,12 @@ public class SchemaCompositionToAdt implements AdtVisitor {
         // todo: given type names must be consistent,
         //  resolving anonymous types must be done by the author.
         //  in this function, we won't support anonymous types.
-        Map<Boolean, List<FieldType>> splitFieldList = productType.getOwnFields().stream()
+        Map<Boolean, List<FieldDefinition>> splitFieldList = productType.getOwnFields().stream()
                 .collect(Collectors.partitioningBy((fieldType -> fieldType.getType() instanceof CompositionType)));
 
         // Get the list of non-resolvable fields
-        List<FieldType> fieldsOfTypeNotComposition = splitFieldList.get(false);
-        List<FieldType> fieldsOfTypeComposition = splitFieldList.get(true);
+        List<FieldDefinition> fieldsOfTypeNotComposition = splitFieldList.get(false);
+        List<FieldDefinition> fieldsOfTypeComposition = splitFieldList.get(true);
 
         if(fieldsOfTypeComposition.isEmpty()) {
             return productType;
@@ -217,15 +217,15 @@ public class SchemaCompositionToAdt implements AdtVisitor {
         return mergeProductTypes(baseProductType, resolvedFields);
     }
 
-    private ProductType mergeFieldsCompositions(Stream<FieldType> resolvableFieldsStream) {
+    private ProductType mergeFieldsCompositions(Stream<FieldDefinition> resolvableFieldsStream) {
 
-        Set<FieldType> fields = resolvableFieldsStream
+        Set<FieldDefinition> fields = resolvableFieldsStream
                 .peek(LambdaExceptionUtil.consumer(fieldType -> {
                     fieldType.setType(compositionTypeToIDL((CompositionType)fieldType.getType()));
                 }))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        Map<String, Set<FieldType>> fieldMap = fields.stream()
+        Map<String, Set<FieldDefinition>> fieldMap = fields.stream()
                 .collect(Collectors.groupingBy(
                         fieldType -> Objects.isNull(fieldType.getName()) ? "" : fieldType.getName(),
                         Collectors.toCollection(LinkedHashSet::new)));
@@ -251,17 +251,17 @@ public class SchemaCompositionToAdt implements AdtVisitor {
 
     @Override
     public void visit(SumType type) throws AdtException {
-        if(lastSeenLabeledType instanceof NamedType) {
+        if(lastSeenDefinition instanceof TypeDefinition) {
             CompositionType compositionType = sumTypeToIDL(type);
-            lastSeenLabeledType.setType(compositionType);
+            lastSeenDefinition.setType(compositionType);
         }
     }
 
     @Override
     public void visit(AllOfType type) throws AdtException {
-        if(lastSeenLabeledType instanceof NamedType) {
+        if(lastSeenDefinition instanceof TypeDefinition) {
             CompositionType compositionType = allOfTypeToProductType(type);
-            lastSeenLabeledType.setType(compositionType);
+            lastSeenDefinition.setType(compositionType);
         }
 
     }
@@ -272,7 +272,7 @@ public class SchemaCompositionToAdt implements AdtVisitor {
     }
 
     @Override
-    public void visit(ReferenceNamedType type) {
+    public void visit(ReferencedDefinition type) {
 
     }
 

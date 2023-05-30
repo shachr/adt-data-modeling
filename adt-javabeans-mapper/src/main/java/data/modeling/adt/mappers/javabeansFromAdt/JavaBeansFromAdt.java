@@ -2,16 +2,15 @@ package data.modeling.adt.mappers.javabeansFromAdt;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.SchemaTypeStream;
-import data.modeling.adt.annotations.sdl.TypeDeclaration;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaFileUtil;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.EnumType;
-import data.modeling.adt.typedefs.ProductType;
+import data.modeling.adt.typedefs.InterfaceDefinition;
+import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class JavaBeansFromAdt implements SchemaTypeStream<JavaFile> {
@@ -38,20 +37,13 @@ public class JavaBeansFromAdt implements SchemaTypeStream<JavaFile> {
             if(namedType.getType() instanceof EnumType) {
                 return javaFileUtil.toEnumFile(namedType);
             }
-            else if(namedType.getType() instanceof ProductType) {
-                Optional<TypeDeclaration> typeDeclarationOpt = namedType.findAnnotation(TypeDeclaration.class);
-                if(typeDeclarationOpt.isPresent()){
-                    TypeDeclaration typeDeclaration = typeDeclarationOpt.get();
-                    switch (typeDeclaration.getValue()) {
-                        case Class -> {
-                            return javaFileUtil.toClassFile(namedType);
-                        }
-                        case Interface -> {
-                            return javaFileUtil.toInterfaceFile(namedType);
-                        }
-                    }
-                }
-                return javaFileUtil.toClassFile(namedType);
+            else if(namedType.isProductTypeDefinition()) {
+                if(namedType instanceof TypeDefinition)
+                    return javaFileUtil.toClassFile((TypeDefinition) namedType);
+                else if(namedType instanceof InterfaceDefinition)
+                    return javaFileUtil.toInterfaceFile((InterfaceDefinition)namedType);
+                else
+                    throw new AdtException("not supported");
             } else {
                 throw new AdtException("not supported");
             }

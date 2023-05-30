@@ -3,6 +3,7 @@ package data.modeling.adt.mappers.graphqlToAdt.mappers;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.*;
+import data.modeling.adt.typedefs.TypeDefinition;
 import graphql.language.*;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class EnumTypeDefinitionMapper extends GraphQlSchemaMapper<EnumTypeDefinition, NamedType> {
+public class EnumTypeDefinitionMapper extends GraphQlSchemaMapper<EnumTypeDefinition, TypeDefinition> {
 
     private ToAdtMapperRegistry toAdtMapperRegistry;
     private TypeDefinitionRegistry typeDefinitionRegistry;
@@ -27,7 +28,7 @@ public class EnumTypeDefinitionMapper extends GraphQlSchemaMapper<EnumTypeDefini
     }
 
     @Override
-    public NamedType toAdt(EnumTypeDefinition value) throws AdtException {
+    public TypeDefinition toAdt(EnumTypeDefinition value) throws AdtException {
         typeDefinitionRegistry.enumTypeExtensions().get(value.getName());
         // support object type extensions
         List<EnumTypeExtensionDefinition> extensionDefinitionList = typeDefinitionRegistry.enumTypeExtensions().get(value.getName());
@@ -49,7 +50,7 @@ public class EnumTypeDefinitionMapper extends GraphQlSchemaMapper<EnumTypeDefini
         );
 
 
-        return NamedType.builder(name, enumType).build();
+        return TypeDefinition.builder(name, enumType).build();
     }
 
 }

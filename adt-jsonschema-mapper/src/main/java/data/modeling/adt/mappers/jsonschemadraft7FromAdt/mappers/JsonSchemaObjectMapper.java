@@ -4,7 +4,7 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.annotations.JsonSchemaAnnotation;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
-import data.modeling.adt.typedefs.FieldAdditionalTypes;
+import data.modeling.adt.typedefs.FieldAdditionalDefinition;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 import static data.modeling.adt.util.StreamExtensions.toMap;
@@ -38,7 +38,7 @@ public class JsonSchemaObjectMapper extends JsonSchemaMapper<ProductType> {
                 if (fieldType.isRequired()) {
                     required.add(fieldType.getName());
                 }
-                if(fieldType instanceof FieldAdditionalTypes){
+                if(fieldType instanceof FieldAdditionalDefinition){
                     mapBuilder.put("additionalProperties", toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType())));
                 } else {
                     Map<String, Object> fieldMap = toMap(fromAdtMapperRegistry.fromAdt(fieldType.getType()));

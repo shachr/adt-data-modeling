@@ -27,7 +27,7 @@ public class FieldAnnotationValidator {
             boolean isOfSumType = lastType instanceof SumType;
             boolean defaultFound = !isOfSumType;
 
-            String jsonPointer = "/" + String.join("/", traversingContext.getNamedTypeStack().stream().map(LabeledType::getName).collect(Collectors.toList()));
+            String jsonPointer = "/" + String.join("/", traversingContext.getNamedTypeStack().stream().map(Definition::getName).collect(Collectors.toList()));
             for (Annotation<?> annotation : annotations) {
                 if (annotation instanceof DataHandlingClassification) {
                     xDataHandlingFound = true;

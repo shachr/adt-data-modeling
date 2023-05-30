@@ -120,8 +120,8 @@ public class SumTypeComparatorTest {
                 new EnumType.EnumItemType("2", Int32Type.constantOf(2)))
                 .collect(Collectors.toSet()));
 
-        ProductType productType1 = ProductType.of(FieldType.builder("foo", enumType1).withAnnotations(new DefaultValue(1)).build());
-        ProductType productType2 = ProductType.of(FieldType.builder("foo", enumType2).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType1 = ProductType.of(FieldDefinition.builder("foo", enumType1).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType2 = ProductType.of(FieldDefinition.builder("foo", enumType2).withAnnotations(new DefaultValue(1)).build());
 
         // Compare the enum types
         List<Difference> differences = AnyTypeComparator.compare(productType1, productType2);
@@ -142,8 +142,8 @@ public class SumTypeComparatorTest {
         UnionType unionType1 = new UnionType(Stream.of(new Int32Type()).collect(Collectors.toCollection(LinkedHashSet::new)));
         UnionType unionType2 = new UnionType(Stream.of(new Int32Type(), new StringType()).collect(Collectors.toCollection(LinkedHashSet::new)));
 
-        ProductType productType1 = ProductType.of(FieldType.builder("foo", unionType1).withAnnotations(new DefaultValue(1)).build());
-        ProductType productType2 = ProductType.of(FieldType.builder("foo", unionType2).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType1 = ProductType.of(FieldDefinition.builder("foo", unionType1).withAnnotations(new DefaultValue(1)).build());
+        ProductType productType2 = ProductType.of(FieldDefinition.builder("foo", unionType2).withAnnotations(new DefaultValue(1)).build());
 
         // Compare the enum types
         List<Difference> differences = AnyTypeComparator.compare(productType1, productType2);

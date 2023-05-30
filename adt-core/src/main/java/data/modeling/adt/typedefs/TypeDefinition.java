@@ -9,16 +9,16 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class NamedType implements LabeledType<ComplexType> {
+public class TypeDefinition implements Definition<ComplexType> {
     private String name;
     private ComplexType type;
     private final Set<Annotation<?>> annotations;
 
-    public NamedType(String name, ComplexType type) {
+    public TypeDefinition(String name, ComplexType type) {
         this(name, type, new LinkedHashSet<>());
     }
 
-    public NamedType(String name, ComplexType type, Set<Annotation<?>> annotations) {
+    public TypeDefinition(String name, ComplexType type, Set<Annotation<?>> annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
@@ -50,8 +50,8 @@ public class NamedType implements LabeledType<ComplexType> {
         type = anyType;
     }
 
-    public static NamedType of(String name, ComplexType type){
-        return new NamedType(name, type, new HashSet<>());
+    public static TypeDefinition of(String name, ComplexType type){
+        return new TypeDefinition(name, type, new HashSet<>());
     }
 
     @Override
@@ -63,14 +63,14 @@ public class NamedType implements LabeledType<ComplexType> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedType namedType = (NamedType) o;
-        return name.equals(namedType.name) && type.equals(namedType.type) && annotations.equals(namedType.annotations);
+        TypeDefinition typeDefinition = (TypeDefinition) o;
+        return name.equals(typeDefinition.name) && type.equals(typeDefinition.type) && annotations.equals(typeDefinition.annotations);
     }
 
     @Override
     public void accept(AdtVisitor visitor) throws AdtException {
         visitor.enterLabeledType(this);
-        LabeledType.super.accept(visitor);
+        Definition.super.accept(visitor);
         visitor.exitLabeledType(this);
     }
 }

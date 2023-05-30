@@ -29,19 +29,19 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
         return new SchemaValidationMessage(schemaContext, schemaContext.stream().flatMap(LambdaExceptionUtil.function(this::validate)));
     }
 
-    private Stream<SchemaValidationMessage.ValidationError> validate(NamedType namedType) throws AdtException {
-        namedType.accept(this);
+    private Stream<SchemaValidationMessage.ValidationError> validate(Definition<ComplexType> typeDefinition) throws AdtException {
+        typeDefinition.accept(this);
         return traversingContext.getValidationErrors().stream();
     }
 
     @Override
-    public void enterLabeledType(LabeledType type) {
+    public void enterLabeledType(Definition type) {
         // build inheritance graph & dependency graph
         traversingContext.getNamedTypeStack().push(type);
     }
 
     @Override
-    public void exitLabeledType(LabeledType type) {
+    public void exitLabeledType(Definition type) {
         traversingContext.getNamedTypeStack().pop();
     }
 
@@ -66,14 +66,14 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     }
 
     @Override
-    public void visit(ReferenceNamedType type) {
+    public void visit(ReferencedDefinition type) {
         //build dependency graph
     }
 
     @Override
     public void visit(Set<Annotation<?>> annotations) {
         //validate data-classification and description exists
-        if(traversingContext.getNamedTypeStack().lastElement() instanceof FieldType){
+        if(traversingContext.getNamedTypeStack().lastElement() instanceof FieldDefinition){
             new FieldAnnotationValidator(traversingContext).validateAnnotations(annotations);
         }
     }
