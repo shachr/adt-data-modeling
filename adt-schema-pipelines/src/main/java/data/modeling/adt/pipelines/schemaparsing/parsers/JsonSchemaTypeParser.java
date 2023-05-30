@@ -1,17 +1,16 @@
 package data.modeling.adt.pipelines.schemaparsing.parsers;
 
+import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.annotations.Annotation;
 import data.modeling.adt.abstraction.visitors.AdtVisitor;
 import data.modeling.adt.annotations.datagovernance.DataHandlingClassification;
-import data.modeling.adt.annotations.sdl.TypeDeclaration;
-import data.modeling.adt.annotations.syntactic.DefaultValue;
 import data.modeling.adt.annotations.documentation.Description;
+import data.modeling.adt.annotations.syntactic.DefaultValue;
 import data.modeling.adt.enums.DataHandlingClassifications;
-import data.modeling.adt.messages.SchemaParsingMessage;
-import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.JsonSchemaDraft7ToAdt;
 import data.modeling.adt.messages.SchemaParsedMessage;
+import data.modeling.adt.messages.SchemaParsingMessage;
 import data.modeling.adt.typedefs.*;
 import data.modeling.processing.abstraction.Task;
 
@@ -88,9 +87,6 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
                 case "description" ->
                         lastDefinition.getAnnotations().add(new Description((String) annotation.getValue()));
                 case "default" -> lastDefinition.getAnnotations().add(new DefaultValue(annotation.getValue()));
-                case "x-idl-type-declaration" ->
-                        //todo: should translate into InterfaceDefinition, can also implicitly support it
-                        lastDefinition.getAnnotations().add(TypeDeclaration.of((String) annotation.getValue()));
             }
         });
     }

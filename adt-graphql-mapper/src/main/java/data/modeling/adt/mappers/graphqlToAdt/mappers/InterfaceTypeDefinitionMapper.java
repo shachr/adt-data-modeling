@@ -1,14 +1,12 @@
 package data.modeling.adt.mappers.graphqlToAdt.mappers;
 
 import data.modeling.adt.annotations.documentation.Description;
-import data.modeling.adt.annotations.sdl.TypeDeclaration;
-import data.modeling.adt.enums.TypeDeclarations;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.InterfaceDefinition;
-import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
-import graphql.language.*;
+import graphql.language.InterfaceTypeDefinition;
+import graphql.language.InterfaceTypeExtensionDefinition;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
 import java.util.*;
