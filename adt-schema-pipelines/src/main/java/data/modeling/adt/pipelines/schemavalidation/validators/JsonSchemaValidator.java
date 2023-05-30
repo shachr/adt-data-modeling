@@ -35,14 +35,14 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     }
 
     @Override
-    public void enterLabeledType(Definition type) {
+    public void enterLabeledType(Definition<?> type) {
         // build inheritance graph & dependency graph
-        traversingContext.getNamedTypeStack().push(type);
+        traversingContext.getDefinitionStack().push(type);
     }
 
     @Override
-    public void exitLabeledType(Definition type) {
-        traversingContext.getNamedTypeStack().pop();
+    public void exitLabeledType(Definition<?> type) {
+        traversingContext.getDefinitionStack().pop();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     @Override
     public void visit(Set<Annotation<?>> annotations) {
         //validate data-classification and description exists
-        if(traversingContext.getNamedTypeStack().lastElement() instanceof FieldDefinition){
+        if(traversingContext.getDefinitionStack().lastElement() instanceof FieldDefinition){
             new FieldAnnotationValidator(traversingContext).validateAnnotations(annotations);
         }
     }

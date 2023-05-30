@@ -9,22 +9,22 @@ import java.util.Set;
 import java.util.Stack;
 
 public class TraversingContext {
-        private Set<SchemaValidationMessage.ValidationError> validationErrors = new LinkedHashSet<>();
-        private Stack<Definition> definitionStack = new Stack<>();
+    private Set<SchemaValidationMessage.ValidationError> validationErrors = new LinkedHashSet<>();
+    private Stack<Definition<?>> definitionStack = new Stack<>();
     private SchemaContext schemaContext;
 
-    public Stack<Definition> getNamedTypeStack() {
+    public Stack<Definition<?>> getDefinitionStack() {
             return definitionStack;
-        }
+    }
 
-        public Set<SchemaValidationMessage.ValidationError> getValidationErrors() {
-            return validationErrors;
-        }
+    public Set<SchemaValidationMessage.ValidationError> getValidationErrors() {
+        return validationErrors;
+    }
 
-        public TraversingContext(SchemaContext schemaContext){
+    public TraversingContext(SchemaContext schemaContext){
 
-            this.schemaContext = schemaContext;
-        }
+        this.schemaContext = schemaContext;
+    }
 
     public SchemaContext getSchemaContext() {
         return schemaContext;
