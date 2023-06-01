@@ -1,4 +1,4 @@
-package data.modeling.adt.pipelines.schemaconvertion.converters;
+package data.modeling.adt.mappers.jsonschemadraft7ToAdt.visitors;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.annotations.Annotation;
@@ -195,13 +195,9 @@ public class SchemaCompositionToAdt implements AdtVisitor {
         return sumType;
     }
     private ProductType productTypeFieldsToAdt(ProductType productType) throws AdtException {
-        // todo: json-schema to codegen tool: https://www.jsonschema2pojo.org/ style
-
-        // todo: given type names must be consistent,
-        //  resolving anonymous types must be done by the author.
-        //  in this function, we won't support anonymous types.
+        //todo: handle sum types as well.
         Map<Boolean, List<FieldDefinition>> splitFieldList = productType.getOwnFields().stream()
-                .collect(Collectors.partitioningBy((fieldType -> fieldType.getType() instanceof CompositionType)));
+                .collect(Collectors.partitioningBy((fieldType -> fieldType.getType() instanceof CompositionType && !(fieldType.getType() instanceof SumType))));
 
         // Get the list of non-resolvable fields
         List<FieldDefinition> fieldsOfTypeNotComposition = splitFieldList.get(false);
@@ -308,6 +304,11 @@ public class SchemaCompositionToAdt implements AdtVisitor {
 
     @Override
     public void visit(AnyType type) {
+
+    }
+
+    @Override
+    public void visit(TypeModifier type) throws AdtException {
 
     }
 }

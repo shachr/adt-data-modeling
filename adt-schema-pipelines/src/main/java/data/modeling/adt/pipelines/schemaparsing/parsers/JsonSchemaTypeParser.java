@@ -25,7 +25,7 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
 
     @Override
     public SchemaParsedMessage execute(SchemaParsingMessage message) throws AdtException {
-        JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt((String)message.getMessage());
+        JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt((String)message.getMessage(), true);
         SchemaParsedMessage schemaParsedMessage = new SchemaParsedMessage(new SchemaContext(mapper.stream()));
         schemaParsedMessage.getSchemaContext().accept(this);
         return schemaParsedMessage;
@@ -118,6 +118,11 @@ public class JsonSchemaTypeParser implements Task<SchemaParsingMessage, SchemaPa
 
     @Override
     public void visit(AnyType type) {
+
+    }
+
+    @Override
+    public void visit(TypeModifier type) throws AdtException {
 
     }
 }

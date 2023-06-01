@@ -3,6 +3,7 @@ package data.modeling.adt.pipelines.schemaconvertion.converters;
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.mappers.javabeansFromAdt.JavaBeansFromAdt;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
+import data.modeling.adt.mappers.jsonschemadraft7ToAdt.visitors.SchemaCompositionToAdt;
 import data.modeling.adt.messages.SchemaConvertedMessage;
 import data.modeling.adt.messages.SchemaConvertionMessage;
 import data.modeling.processing.abstraction.Task;

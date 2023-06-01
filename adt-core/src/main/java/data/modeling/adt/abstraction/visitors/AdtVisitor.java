@@ -27,4 +27,6 @@ public interface AdtVisitor {
     void visit(CollectionType type) throws AdtException;
     void visit(TimestampType type) throws AdtException;
     void visit(AnyType type) throws AdtException;
+
+    void visit(TypeModifier type) throws AdtException;
 }

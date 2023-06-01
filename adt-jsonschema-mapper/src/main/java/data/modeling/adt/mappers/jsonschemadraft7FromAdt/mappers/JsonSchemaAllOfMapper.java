@@ -4,6 +4,7 @@ import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.util.MapBuilder;
 import data.modeling.adt.mappers.registries.FromAdtMapperRegistry;
 import data.modeling.adt.typedefs.AllOfType;
+import data.modeling.adt.typedefs.CompositionType;
 import data.modeling.adt.typedefs.ProductType;
 import data.modeling.adt.util.LambdaExceptionUtil;
 
@@ -13,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class JsonSchemaAllOfMapper extends JsonSchemaMapper<AllOfType> {
+public class JsonSchemaAllOfMapper extends JsonSchemaMapper<CompositionType> {
 
     private FromAdtMapperRegistry fromAdtMapperRegistry;
 
@@ -23,20 +24,27 @@ public class JsonSchemaAllOfMapper extends JsonSchemaMapper<AllOfType> {
     }
 
     @Override
-    public boolean canMap(AllOfType value) {
-        return true;
+    public boolean canMap(CompositionType value) {
+        return value instanceof AllOfType || (value instanceof ProductType productType && !productType.getImplements().isEmpty());
     }
 
     @Override
-    public Stream<Map.Entry<String, Object>> fromAdt(AllOfType type) throws AdtException {
+    public Stream<Map.Entry<String, Object>> fromAdt(CompositionType type) throws AdtException {
         MapBuilder mapBuilder = MapBuilder.create();
         List<Map<String, Object>> allOf = new LinkedList<>();
         mapBuilder.put("type", "object");
         mapBuilder.put("allOf", allOf);
 
-        allOf.addAll(type.getTypes()
+        AllOfType allOfType;
+        if(type instanceof ProductType){
+            allOfType = AllOfType.of(((ProductType) type));
+        } else {
+            allOfType = (AllOfType) type;
+        }
+
+        allOf.addAll(allOfType.getTypes()
                 .stream()
-                .map(LambdaExceptionUtil.function(itemType-> toMap(fromAdtMapperRegistry.fromAdt(itemType))))
+                .map(LambdaExceptionUtil.function(itemType -> toMap(fromAdtMapperRegistry.fromAdt(itemType))))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
 
         return mapBuilder.build().entrySet().stream();

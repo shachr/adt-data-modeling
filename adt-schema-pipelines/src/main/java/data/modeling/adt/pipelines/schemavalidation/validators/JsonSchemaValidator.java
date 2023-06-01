@@ -105,4 +105,9 @@ public class JsonSchemaValidator implements Task<SchemaParsedMessage, SchemaVali
     public void visit(AnyType type) {
 
     }
+
+    @Override
+    public void visit(TypeModifier type) throws AdtException {
+
+    }
 }

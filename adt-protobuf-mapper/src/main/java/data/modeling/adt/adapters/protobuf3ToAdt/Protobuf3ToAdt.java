@@ -1,11 +1,11 @@
-package data.modeling.adt;
+package data.modeling.adt.adapters.protobuf3ToAdt;
 
+import data.modeling.adt.SchemaContext;
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.ComplexType;
 import data.modeling.adt.typedefs.Definition;
-import data.modeling.adt.typedefs.TypeDefinition;
 import data.modeling.antlr4.Protobuf3Lexer;
 import data.modeling.antlr4.Protobuf3Parser;
 import org.antlr.v4.runtime.CharStream;

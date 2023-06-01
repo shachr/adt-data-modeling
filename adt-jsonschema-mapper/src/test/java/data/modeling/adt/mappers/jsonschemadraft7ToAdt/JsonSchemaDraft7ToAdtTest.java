@@ -39,7 +39,7 @@ public class JsonSchemaDraft7ToAdtTest {
 
     @Test
     public void testMethod() throws AdtException {
-        JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt(fixtureData.getInputSchema());
+        JsonSchemaDraft7ToAdt mapper = new JsonSchemaDraft7ToAdt(fixtureData.getInputSchema(), false);
         SchemaContext expectedSchemaContext = fixtureData.getExpectedSchemaContext();
         Definition<ComplexType> expectedTypeDefinition = expectedSchemaContext.getNamedType(fixtureData.getExpectedNamedTypeName());
 

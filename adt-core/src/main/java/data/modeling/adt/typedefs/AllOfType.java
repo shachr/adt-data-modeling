@@ -25,6 +25,10 @@ public class AllOfType implements CompositionType {
         return new AllOfType(Arrays.stream(types));
     }
 
+    public static AllOfType of(ProductType productType) {
+        return new AllOfType(Stream.concat(productType.getImplements().stream(), Stream.of(productType.clone())));
+    }
+
     public Collection<? extends AnyType> getTypes() {
         return types;
     }

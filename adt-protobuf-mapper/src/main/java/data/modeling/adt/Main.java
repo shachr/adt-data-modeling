@@ -1,10 +1,9 @@
 package data.modeling.adt;
 
+import data.modeling.adt.adapters.protobuf3ToAdt.Protobuf3ToAdt;
 import data.modeling.adt.util.ResourcesUtil;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 public class Main {
     public static void main(String[] args) throws Exception {

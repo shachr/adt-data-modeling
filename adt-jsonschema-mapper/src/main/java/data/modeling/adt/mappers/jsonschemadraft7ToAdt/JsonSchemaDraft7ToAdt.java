@@ -6,6 +6,7 @@ import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.abstraction.monads.NamedTypeStream;
 import data.modeling.adt.mappers.jsonschemadraft7ToAdt.exceptions.JsonSchemaJsonProcessingException;
+import data.modeling.adt.mappers.jsonschemadraft7ToAdt.visitors.SchemaCompositionToAdt;
 import data.modeling.adt.mappers.registries.ToAdtMapperRegistry;
 import data.modeling.adt.typedefs.ComplexType;
 import data.modeling.adt.typedefs.Definition;
@@ -19,10 +20,13 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
 
     protected Map<String, Object> jsonSchemaMap;
     protected SchemaContext schemaContext;
-    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
 
-    public JsonSchemaDraft7ToAdt(String jsonSchemaString) throws JsonSchemaJsonProcessingException {
+    private ToAdtMapperRegistry toAdtMapperRegistry = new ToAdtMapperRegistry();
+    private boolean useAdtTypeOnly;
+
+    public JsonSchemaDraft7ToAdt(String jsonSchemaString, boolean useAdtTypeOnly) throws JsonSchemaJsonProcessingException {
         this(jsonSchemaString, new SchemaContext());
+        this.useAdtTypeOnly = useAdtTypeOnly;
     }
     public JsonSchemaDraft7ToAdt(String jsonSchemaString, SchemaContext schemaContext) throws JsonSchemaJsonProcessingException {
         this.schemaContext = schemaContext;
@@ -56,6 +60,9 @@ public class JsonSchemaDraft7ToAdt implements NamedTypeStream {
     @Override
     public Stream<Definition<ComplexType>> stream() throws AdtException {
         new JsonSchemaMainMapper(toAdtMapperRegistry, schemaContext).toAdt(jsonSchemaMap);
+        if(useAdtTypeOnly) {
+            new SchemaCompositionToAdt(schemaContext).apply();
+        }
         return schemaContext.stream();
     }
 }

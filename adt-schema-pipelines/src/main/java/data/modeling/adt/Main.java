@@ -1,13 +1,13 @@
 package data.modeling.adt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data.modeling.adt.adapters.protobuf3ToAdt.Protobuf3ToAdt;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.mappers.javabeansFromAdt.artifacts.JavaFile;
 import data.modeling.adt.mappers.javabeansFromAdt.util.JavaJarUtil;
 import data.modeling.adt.mappers.jsonschemadraft7FromAdt.JsonSchemaDraft7FromAdt;
 import data.modeling.adt.messages.*;
 import data.modeling.adt.pipelines.schemaconvertion.SchemaConversionPipeline;
-import data.modeling.adt.pipelines.schemaconvertion.converters.SchemaCompositionToAdt;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JavaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaConverter;
 import data.modeling.adt.pipelines.schemaconvertion.converters.JsonSchemaFile;
@@ -125,7 +125,7 @@ public class Main {
 
         // convert to map of java file/java content
         schemaContext.setName("com.shachar");
-        schemaContext = new SchemaCompositionToAdt(schemaContext).apply();
+//        schemaContext = new SchemaCompositionToAdt(schemaContext).apply();
         schemaConvertedMessage = schemaConversionPipeline.apply(
                 new SchemaConvertionMessage(BINARY_JAVA, "com.shachar.foo", schemaContext));
 

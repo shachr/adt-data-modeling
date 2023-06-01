@@ -89,6 +89,10 @@ public final class ProductType implements CompositionType, AdtType {
         return of(new LinkedHashSet<>(), fields, false);
     }
 
+    public static ProductType of(boolean isSealed, Stream<FieldDefinition> fieldStream){
+        return of(new LinkedHashSet<>(), fieldStream, isSealed);
+    }
+
     public static ProductType of(boolean isSealed, FieldDefinition... fields){
         return of(new LinkedHashSet<>(), Arrays.stream(fields), isSealed);
     }
@@ -154,6 +158,10 @@ public final class ProductType implements CompositionType, AdtType {
         public Set<String> getFieldNames() {
             return fieldNames;
         }
+    }
+
+    public ProductType clone(){
+        return ProductType.of(this.isSealed, this.fieldTypeCollection.getFields().stream());
     }
 }
 

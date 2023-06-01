@@ -1,5 +1,6 @@
-package data.modeling.adt;
+package data.modeling.adt.adapters.protobuf3ToAdt;
 
+import data.modeling.adt.SchemaContext;
 import data.modeling.adt.exceptions.AdtException;
 import data.modeling.adt.typedefs.*;
 import data.modeling.adt.util.LambdaExceptionUtil;

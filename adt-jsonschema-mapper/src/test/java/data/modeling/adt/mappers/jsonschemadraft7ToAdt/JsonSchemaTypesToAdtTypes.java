@@ -1,9 +1,9 @@
-package data.modeling.adt.pipelines.schemaconversion;
+package data.modeling.adt.mappers.jsonschemadraft7ToAdt;
 
 import data.modeling.adt.SchemaContext;
 import data.modeling.adt.compatibility.AnyTypeComparator;
 import data.modeling.adt.compatibility.Difference;
-import data.modeling.adt.pipelines.schemaconvertion.converters.SchemaCompositionToAdt;
+import data.modeling.adt.mappers.jsonschemadraft7ToAdt.visitors.SchemaCompositionToAdt;
 import data.modeling.adt.typedefs.*;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
-public class JsonSchemaToPojoPipelineTest {
+public class JsonSchemaTypesToAdtTypes {
     TypeDefinition expectedTypeDefinition = TypeDefinition.builder("foo", ProductType.of(
             Stream.of(new ReferencedDefinition("base")).collect(Collectors.toCollection(LinkedHashSet::new)),
             Stream.of(
