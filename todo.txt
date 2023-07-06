@@ -109,3 +109,40 @@ Fabric Strategy ( self-service infrastructure and easy-to-use tools )
             3.1 <T extends DomainEntity> Event<T> unmarshalEvent()
             3.2 <T extends DomainEntity> Message<T> unmarshalMessage()
 
+
+
+Ontology:
+------------------------------------------------
+type Id - iri, globally unique URIs
+type - class
+named type - class
+field type - objectProperty or datatypeProperty
+type composition - rdfs:domain
+relationship - objectProperty
+value object - objectProperty
+scalar type - datatypeProperty
+alias - rdfs:label
+description - rdfs:description
+inheritance - rdfs:subClassOf
+
+Graph:
+------------------------------------------------
+type Id - globally unique URIs
+type - node
+named type - node
+field type - node
+type composition - edge
+relationship w/o properties - edge
+relationship w/ properties - edge w/ properties
+value object - node properties
+scalar type - node properties
+alias - node properties
+description - node properties
+inheritance - edge
+
+Semantic Vector:
+------------------------------------------------
+dataAsset[id, ] -> vector[schemaContext.domain, schemaContext.subdomain, schemaContext.name, namedType.name, namedType.alias, namedType.attribute]
+
+
+

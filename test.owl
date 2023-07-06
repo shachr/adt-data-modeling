@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://intuit.com/ontology#"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+  <!-- IRI Definitions -->
+  <owl:Ontology rdf:about="http://intuit.com/datamap">
+    <dc:title>The Data Map Ontology</dc:title>
+    <dc:description>Ontology for a semantic data map catalog</dc:description>
+  </owl:Ontology>
+
+  <!-- Upper Ontology -->
+  <!-- Semantic -->
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/semantic/Domain" >
+    <owl:hasKey rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#upper/semantic/Domain/hasDomain">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#upper/semantic/Domain"/>
+        <rdfs:range rdf:resource="http://intuit.com/datamap#upper/semantic/Domain"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/semantic/BoundedContext" >
+    <owl:hasKey rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#upper/semantic/BoundedContext/hasDomain">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#upper/semantic/BoundedContext"/>
+        <rdfs:range rdf:resource="http://intuit.com/datamap#upper/semantic/Domain"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/semantic/Entity" >
+    <owl:hasKey rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#upper/semantic/Entity/hasBoundedContext">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#upper/semantic/Entity"/>
+        <rdfs:range rdf:resource="http://intuit.com/datamap#upper/semantic/BoundedContext"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <!-- Physical -->
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/physical/DataAsset">
+    <owl:hasKey  rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#upper/physical/DataAsset/id">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#upper/physical/DataAsset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+      </owl:DatatypeProperty>
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#upper/physical/DataAsset/hasSemanticDefinition">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#upper/physical/DataAsset"/>
+        <rdfs:range rdf:resource="http://intuit.com/datamap#upper/semantic/Entity"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/physical/KafkaTopic">
+    <rdfs:subClassOf rdf:resource="http://intuit.com/datamap#upper/physical/DataAsset"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#upper/physical/HiveTable">
+    <rdfs:subClassOf rdf:resource="http://intuit.com/datamap#upper/physical/DataAsset"/>
+  </owl:Class>
+
+  <!-- Lower Ontology -->
+  <!-- Semantic -->
+  <owl:Class rdf:about="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice">
+    <rdfs:subClassOf rdf:resource="http://intuit.com/datamap#upper/semantic/Entity"/>
+    <owl:hasKey rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice/id">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/hasInvoice">
+    <rdfs:domain rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Payment"/>
+    <rdfs:range rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice"/>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Payment">
+    <rdfs:subClassOf rdf:resource="http://intuit.com/datamap#upper/semantic/Entity"/>
+    <owl:hasKey rdf:parseType="Collection">
+      <owl:DatatypeProperty rdf:about="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Payment/invoiceId">
+        <rdfs:domain rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Payment"/>
+        <rdfs:range rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice/id"/>
+        <owl:equivalentProperty rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/hasInvoice"/>
+      </owl:DatatypeProperty>
+    </owl:hasKey>
+  </owl:Class>
+
+  <rdf:Description rdf:about="urn:intuit.com:datamap:commerce">
+    <rdfs:subClassOf rdf:resource="http://intuit.com/datamap#upper/semantic/Domain"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="urn:intuit.com:datamap:commerce:invoicingAndSales">
+    <rdf:type rdf:resource="http://intuit.com/datamap#upper/semantic/Domain"/>
+    <hasDomain rdf:resource="urn:intuit.com:datamap:commerce"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="urn:intuit.com:datamap:commerce:invoicingAndSales:invoicingWorkflows">
+    <rdf:type rdf:resource="http://intuit.com/datamap#upper/semantic/BoundedContext"/>
+    <hasDomain rdf:resource="urn:intuit.com:datamap:commerce:invoicingAndSales"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="urn:intuit-aws:eventbus-1:prd:invoicingworkflows.invoice.v1">
+    <rdf:type rdf:resource="http://intuit.com/datamap#upper/physical/KafkaTopic"/>
+    <id rdf:resource="urn:intuit-aws:eventbus-1:prd:invoicingworkflows.invoice.v1"/>
+    <hasBoundedContext rdf:resource="urn:intuit.com:datamap:commerce:invoicingAndSales:invoicingWorkflows" />
+    <hasSemanticDefinition rdf:resource="http://intuit.com/datamap#commerce/invoicingAndSales/invoicingWorkflows/Invoice"/>
+  </rdf:Description>
+
+</rdf:RDF>
